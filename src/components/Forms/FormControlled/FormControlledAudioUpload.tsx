@@ -62,7 +62,10 @@ const FormControlledAudioUpload = (props: InputProps) => {
       setUploading(true);
 
       const audioName = getValues("name");
-      const audioNameSlug = slugify(`${episodeId}-${audioName}-audio-file`);
+      const fileExtension = files[0].name.split(".").pop();
+      const audioNameSlug = slugify(
+        `${episodeId}-${audioName}-audio-file.${fileExtension}`,
+      );
       setValue("blobName", audioNameSlug);
 
       const getFile: File = files[0];
@@ -70,6 +73,7 @@ const FormControlledAudioUpload = (props: InputProps) => {
         type: getFile.type,
         lastModified: getFile.lastModified,
       });
+
       const reader = new FileReader();
       // When the file has been succesfully read
       reader.onload = function (event) {

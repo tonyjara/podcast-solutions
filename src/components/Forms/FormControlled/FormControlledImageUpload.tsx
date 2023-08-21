@@ -134,7 +134,8 @@ const FormControlledImageUpload = <T extends FieldValues>(
 
             const compressed = await compressPodcastImage(blob as any);
 
-            console.log(imageName);
+            const fileExtension = blob.name.split(".").pop();
+            const fileName = `${imageName}.${fileExtension}`;
 
             const req = await axios("/api/get-connection-string");
             const { connectionString } = req.data;
@@ -143,7 +144,7 @@ const FormControlledImageUpload = <T extends FieldValues>(
                 {
                     file: compressed,
                     containerName: userId,
-                    fileName: imageName,
+                    fileName,
                     connectionString,
                 }
             );
