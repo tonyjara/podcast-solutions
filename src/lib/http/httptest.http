@@ -1,0 +1,28 @@
+# Get Hello
+POST http://localhost:3000/api/receive-stripe-payments
+
+###
+POST http://localhost:8000/api/process-url
+x-api-key: my-secret-key
+content-type: application/json
+
+{
+    "url": "https://images.unsplash.com/photo-1528459199957-0ff28496a7f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=743&q=80"
+}
+
+### Examples
+GET https://pokeapi.co/api/v2/pokemon/pikachu
+
+POST https://jsonplaceholder.typicode.com/posts
+content-type: application/json
+
+{
+  "alpha": "developer",
+  "key": "{{KEY}}",
+  "number": "{{$randomInt}}"
+}
+
+
+GET https://httpbin.org/headers
+x-test: alpha
+
