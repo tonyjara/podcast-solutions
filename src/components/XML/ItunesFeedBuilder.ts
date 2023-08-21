@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { Podcast as MakePodcast } from "podcast";
 
-type PodcastTypeForFeed = Prisma.PodcastGetPayload<{
+export type PodcastTypeForFeed = Prisma.PodcastGetPayload<{
   include: {
     episodes: { include: { audioFiles: { where: { isSelected: true } } } };
   };
@@ -20,7 +20,7 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
     description: podcast.description,
     language: podcast.language,
     feedUrl: `${webUrl}/rss/${podcast.slug}`,
-    /* siteUrl: `${webUrl}/podcasts/${podcast.slug}`, */
+    siteUrl: `${webUrl}/podcasts/${podcast.slug}`,
     imageUrl: podcast.imageUrl,
     author: podcast.author,
     pubDate: podcast.publishedAt,

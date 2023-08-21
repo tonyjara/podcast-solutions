@@ -1,4 +1,5 @@
 import {
+    Text,
     FormControl,
     FormHelperText,
     FormErrorMessage,
@@ -52,6 +53,7 @@ interface InputProps<T extends FieldValues> {
     userId: string;
     setImageIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
     imageName: string; //This is used to replace an existing image with a new one.
+    minW?: number;
 }
 
 const FormControlledImageUpload = <T extends FieldValues>(
@@ -68,11 +70,13 @@ const FormControlledImageUpload = <T extends FieldValues>(
         userId,
         imageName,
         setImageIsLoading,
+        minW,
     } = props;
     const [uploading, setUploading] = useState(false);
     const pictureUrl = useWatch({ control, name: name }) as string;
     const [fileUrl, setFileUrl] = useState<string | undefined>();
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+    const [tooSmall, setTooSmall] = useState(false);
 
     const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -88,16 +92,21 @@ const FormControlledImageUpload = <T extends FieldValues>(
 
     const onCropComplete = useCallback(
         (croppedArea: Area, croppedAreaPixels: Area) => {
+
+            if (minW && croppedAreaPixels.width < minW) {
+                setTooSmall(true);
+                return;
+            }
+            if (tooSmall) setTooSmall(false);
+
             setCroppedAreaPixels(croppedAreaPixels);
         },
-        [],
+        [minW, tooSmall],
     );
     const processCroppedImage = useCallback(async () => {
         try {
             if (!fileUrl) return;
             const croppedImage = await getCroppedImg(fileUrl, croppedAreaPixels);
-
-
 
             handleImageUpload(croppedImage as Blob);
         } catch (e) {
@@ -191,12 +200,25 @@ const FormControlledImageUpload = <T extends FieldValues>(
                 <ModalOverlay />
                 <ModalContent minH={{ base: "100vh", md: "100vh" }}>
                     <Box
+                        padding="20px"
+                        backgroundColor={"orange.500"}
+                        position={"absolute"}
+                        top={"0px"}
+                        width={"100%"}
+                        alignItems={"center"}
+                        display={tooSmall ? "flex" : "none"}
+                    /* gap={"20px"} */
+                    >
+                        <Text fontWeight={"bold"}>The image is too small, it needs to be at least {minW} pixels square </Text>
+                    </Box>
+                    <Box
                         position={"absolute"}
                         top={"0"}
                         left={"0"}
                         right={"0"}
                         bottom={"0"}
                         marginBottom="100px"
+                        marginTop={tooSmall ? "65px" : "0"}
                     >
                         <Cropper
                             image={fileUrl}
@@ -234,7 +256,7 @@ const FormControlledImageUpload = <T extends FieldValues>(
                             </SliderTrack>
                             <SliderThumb />
                         </Slider>{" "}
-                        <Button onClick={processCroppedImage}>Save</Button>
+                        <Button isDisabled={tooSmall} onClick={processCroppedImage}>Save</Button>
                     </Box>
                 </ModalContent>
             </Modal>

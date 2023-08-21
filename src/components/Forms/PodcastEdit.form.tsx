@@ -106,6 +106,7 @@ const PodcastEditForm = ({
             setValue={setValue}
             helperText="The image must be at least 1400 x 1400 pixels and at most 3000 x 3000 pixels, in JPEG or PNG format, and in the RGB color space with a minimum size of 500KB and a maximum size of 10MB."
             userId={user.id}
+            minW={1400}
           />
         )}
         <FormControlledText
