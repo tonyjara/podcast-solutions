@@ -63,9 +63,9 @@ const FormControlledAudioUpload = (props: InputProps) => {
 
       const audioName = getValues("name");
       const fileExtension = files[0].name.split(".").pop();
-      const audioNameSlug = slugify(
-        `${episodeId}-${audioName}-audio-file.${fileExtension}`,
-      );
+      const audioNameSlug = `${slugify(
+        `${episodeId}-${audioName}-audio-file`,
+      )}.${fileExtension}`;
       setValue("blobName", audioNameSlug);
 
       const getFile: File = files[0];

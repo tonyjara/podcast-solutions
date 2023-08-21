@@ -10,7 +10,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   query,
 }) => {
   const q = query as { slug: string };
-  console.log(query);
 
   const podcast = await prisma.podcast.findUnique({
     where: { slug: q.slug, active: true },

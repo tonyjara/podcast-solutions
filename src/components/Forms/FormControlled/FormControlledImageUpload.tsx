@@ -97,6 +97,8 @@ const FormControlledImageUpload = <T extends FieldValues>(
             if (!fileUrl) return;
             const croppedImage = await getCroppedImg(fileUrl, croppedAreaPixels);
 
+
+
             handleImageUpload(croppedImage as Blob);
         } catch (e) {
             console.error(e);
@@ -108,7 +110,9 @@ const FormControlledImageUpload = <T extends FieldValues>(
         /* handleImageUpload(acceptedFiles); */
         if (!files[0]) return;
         const getFile: File = files[0];
-        const file = new File([getFile], imageName, {
+        const fileExtension = getFile.name.split(".").pop();
+        const fileName = `${imageName}.${fileExtension}`;
+        const file = new File([getFile], fileName, {
             type: getFile.type,
             lastModified: getFile.lastModified,
         });
@@ -134,20 +138,17 @@ const FormControlledImageUpload = <T extends FieldValues>(
 
             const compressed = await compressPodcastImage(blob as any);
 
-            const fileExtension = blob.name.split(".").pop();
-            const fileName = `${imageName}.${fileExtension}`;
-
             const req = await axios("/api/get-connection-string");
             const { connectionString } = req.data;
 
-            const url = await uploadFileToBlob(
-                {
-                    file: compressed,
-                    containerName: userId,
-                    fileName,
-                    connectionString,
-                }
-            );
+            const fileName = `${imageName}.${compressed.type.split("/")[1]}`;
+
+            const url = await uploadFileToBlob({
+                file: compressed,
+                containerName: userId,
+                fileName,
+                connectionString,
+            });
 
             setValue(name, url);
             setUploading(false);
