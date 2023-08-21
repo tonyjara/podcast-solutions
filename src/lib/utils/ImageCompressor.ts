@@ -5,6 +5,7 @@ export const compressPodcastImage = async (file: File) => {
     maxSizeMB: 0.4,
     maxWidthOrHeight: 3000,
     useWebWorker: true,
+    alwaysKeepResolution: true,
   });
 
   return compressedImage;
