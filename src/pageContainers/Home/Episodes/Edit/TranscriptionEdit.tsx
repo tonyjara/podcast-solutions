@@ -9,6 +9,7 @@ import { trpcClient } from "@/utils/api";
 import { Episode } from "@prisma/client";
 import React from "react";
 import { Control } from "react-hook-form";
+import { SiOpenai } from "react-icons/si";
 
 const TranscriptionEdit = ({
   control,
@@ -34,8 +35,9 @@ const TranscriptionEdit = ({
       title="Transcription"
       titleComponents={
         <AreYouSureButton
+          rightIcon={<SiOpenai fontSize={"sm"} />}
           isDisabled={!episode || !episode.selectedAudioFileId}
-          buttonText="Generate transcription"
+          buttonText="Generate"
           confirmAction={() => {
             if (!episode || !episode.selectedAudioFileId) {
               return myToast.error("No audio file selected");
@@ -45,7 +47,7 @@ const TranscriptionEdit = ({
               audioFileId: episode.selectedAudioFileId,
             });
           }}
-          title="Generate transcription"
+          title="Generate Transcription"
           modalContent="Are you sure you want to generate a transcription? This will overwrite any existing transcription, unsaved changes will be lost."
         />
       }

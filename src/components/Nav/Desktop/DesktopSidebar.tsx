@@ -25,9 +25,7 @@ interface SidebarProps {
 }
 
 const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
-  const { data } = useSession();
-  const isAdmin = data?.user.role === "admin";
-
+  const user = useSession().data?.user;
   const { colorMode } = useColorMode();
   const logo =
     colorMode === "light"
@@ -104,57 +102,58 @@ const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
         </Flex>
       </Flex>
 
-      {SidebarLinks(isAdmin).map((link) => (
-        <div key={link.name}>
-          {link.children?.length && (
-            <Accordion allowToggle>
-              <AccordionItem>
-                {/* the column fixes annoying margin leftrover when minimized */}
-                <Flex
-                  flexDir={minimized ? "column" : "row"}
-                  justifyContent="space-between"
-                >
-                  <DesktopNavItem
-                    minimized={minimized}
-                    icon={link.icon}
-                    dest={link.dest}
-                    name={link.name}
-                    target={link.target}
-                  />
-
-                  <AccordionButton
-                    display={minimized ? "none" : "flex"}
-                    justifyContent={minimized ? "center" : "right"}
+      {user &&
+        SidebarLinks(user).map((link) => (
+          <div key={link.name}>
+            {link.children?.length && (
+              <Accordion allowToggle>
+                <AccordionItem>
+                  {/* the column fixes annoying margin leftrover when minimized */}
+                  <Flex
+                    flexDir={minimized ? "column" : "row"}
+                    justifyContent="space-between"
                   >
-                    {!minimized && <AccordionIcon />}
-                  </AccordionButton>
-                </Flex>
-                {link.children.map((x) => (
-                  <AccordionPanel key={x.name}>
-                    <NavItemChild
-                      icon={x.icon}
-                      name={x.name}
-                      dest={x.dest}
+                    <DesktopNavItem
                       minimized={minimized}
+                      icon={link.icon}
+                      dest={link.dest}
+                      name={link.name}
                       target={link.target}
                     />
-                  </AccordionPanel>
-                ))}
-              </AccordionItem>
-            </Accordion>
-          )}
-          {!link.children?.length && (
-            <DesktopNavItem
-              name={link.name}
-              minimized={minimized}
-              icon={link.icon}
-              dest={link.dest}
-              target={link.target}
-            />
-          )}
-          <Divider />
-        </div>
-      ))}
+
+                    <AccordionButton
+                      display={minimized ? "none" : "flex"}
+                      justifyContent={minimized ? "center" : "right"}
+                    >
+                      {!minimized && <AccordionIcon />}
+                    </AccordionButton>
+                  </Flex>
+                  {link.children.map((x) => (
+                    <AccordionPanel key={x.name}>
+                      <NavItemChild
+                        icon={x.icon}
+                        name={x.name}
+                        dest={x.dest}
+                        minimized={minimized}
+                        target={link.target}
+                      />
+                    </AccordionPanel>
+                  ))}
+                </AccordionItem>
+              </Accordion>
+            )}
+            {!link.children?.length && (
+              <DesktopNavItem
+                name={link.name}
+                minimized={minimized}
+                icon={link.icon}
+                dest={link.dest}
+                target={link.target}
+              />
+            )}
+            <Divider />
+          </div>
+        ))}
     </Box>
   );
 };

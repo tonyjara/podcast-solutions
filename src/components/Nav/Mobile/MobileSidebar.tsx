@@ -15,8 +15,8 @@ interface SidebarProps {
 }
 
 const MobileSidebar = ({ onClose, isOpen }: SidebarProps) => {
-  const { data } = useSession();
-  const isAdmin = data?.user.role === "admin";
+  const user = useSession().data?.user;
+  /* const isAdmin = data?.user.role === "admin"; */
 
   const { colorMode } = useColorMode();
   const logo =
@@ -66,50 +66,51 @@ const MobileSidebar = ({ onClose, isOpen }: SidebarProps) => {
             <CloseButton onClick={onClose} />
           </Flex>
 
-          {SidebarLinks(isAdmin).map((link) => (
-            <div key={link.name}>
-              {link.children?.length && (
-                <Accordion allowToggle>
-                  <AccordionItem as={"div"}>
-                    {/* the column fixes annoying margin leftrover when minimized */}
-                    <Flex>
-                      <NavItem
-                        onClose={onClose}
-                        icon={link.icon}
-                        dest={link.dest}
-                        target={link.target}
-                      >
-                        {link.name}
-                      </NavItem>
-                      <AccordionButton justifyContent={"left"}>
-                        {<AccordionIcon />}
-                      </AccordionButton>
-                    </Flex>
-                    {link.children.map((x) => (
-                      <AccordionPanel key={x.name}>
-                        <NavItemChild
-                          icon={x.icon}
-                          name={x.name}
-                          dest={x.dest}
+          {user &&
+            SidebarLinks(user).map((link) => (
+              <div key={link.name}>
+                {link.children?.length && (
+                  <Accordion allowToggle>
+                    <AccordionItem as={"div"}>
+                      {/* the column fixes annoying margin leftrover when minimized */}
+                      <Flex>
+                        <NavItem
+                          onClose={onClose}
+                          icon={link.icon}
+                          dest={link.dest}
                           target={link.target}
-                        />
-                      </AccordionPanel>
-                    ))}
-                  </AccordionItem>
-                </Accordion>
-              )}
-              {!link.children?.length && (
-                <NavItem
-                  target={link.target}
-                  onClose={onClose}
-                  icon={link.icon}
-                  dest={link.dest}
-                >
-                  {link.name}
-                </NavItem>
-              )}
-            </div>
-          ))}
+                        >
+                          {link.name}
+                        </NavItem>
+                        <AccordionButton justifyContent={"left"}>
+                          {<AccordionIcon />}
+                        </AccordionButton>
+                      </Flex>
+                      {link.children.map((x) => (
+                        <AccordionPanel key={x.name}>
+                          <NavItemChild
+                            icon={x.icon}
+                            name={x.name}
+                            dest={x.dest}
+                            target={link.target}
+                          />
+                        </AccordionPanel>
+                      ))}
+                    </AccordionItem>
+                  </Accordion>
+                )}
+                {!link.children?.length && (
+                  <NavItem
+                    target={link.target}
+                    onClose={onClose}
+                    icon={link.icon}
+                    dest={link.dest}
+                  >
+                    {link.name}
+                  </NavItem>
+                )}
+              </div>
+            ))}
         </Box>
       </DrawerContent>
     </Drawer>

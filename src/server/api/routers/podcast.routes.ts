@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
-import slugify from "@sindresorhus/slugify";
+import slugify from "slugify";
 import { validatePodcastEdit } from "@/components/Validations/PodcastEdit.validate";
 
 export const podcastRouter = createTRPCRouter({
@@ -14,12 +14,12 @@ export const podcastRouter = createTRPCRouter({
       const podcast = await prisma.podcast.create({
         data: {
           name: input.name,
-          slug: slugify(input.name),
+          slug: slugify(input.name, { lower: true }),
           description: "",
           imageUrl: "",
           email: user.email,
           author: `${user.firstName} ${user.lastName}`,
-          category: "",
+          categories: [],
           explicit: false,
           language: "en",
           user: {
@@ -57,7 +57,7 @@ export const podcastRouter = createTRPCRouter({
           email: input.email,
           imageUrl: input.imageUrl,
           author: input.author,
-          category: input.category,
+          categories: input.categories,
           description: input.description,
           explicit: input.explicit,
           language: input.language,
@@ -73,7 +73,6 @@ export const podcastRouter = createTRPCRouter({
     if (!preferences) return null;
     return await prisma.podcast.findUnique({
       where: { id: preferences.selectedPodcastId },
-      include: { episodes: true },
     });
   }),
 });

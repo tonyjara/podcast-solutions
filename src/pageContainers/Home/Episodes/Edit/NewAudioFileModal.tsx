@@ -6,7 +6,7 @@ import {
 } from "@/components/Toasts & Alerts/MyToast";
 import {
   defaultAudioFile,
-  vailidateAudioFile,
+  validateAudioFile,
 } from "@/components/Validations/Validate.AudioFile";
 import { trpcClient } from "@/utils/api";
 import {
@@ -53,7 +53,7 @@ const NewAudioFileModal = ({
       episodeId: episode.id,
       podcastId: episode.podcastId,
     }),
-    resolver: zodResolver(vailidateAudioFile),
+    resolver: zodResolver(validateAudioFile),
   });
   const handleClose = () => {
     reset();

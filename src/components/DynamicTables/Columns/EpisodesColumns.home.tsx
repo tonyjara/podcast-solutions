@@ -5,36 +5,28 @@ import { Episode } from "@prisma/client";
 
 const columnHelper = createColumnHelper<Episode>();
 
-export const homeEpisodesColumns = ({
-  pageIndex,
-  pageSize,
-}: {
-  pageSize: number;
-  pageIndex: number;
-}) => [
-  columnHelper.display({
-    cell: (x) => x.row.index + 1 + pageIndex * pageSize,
-    header: "N.",
+export const homeEpisodesColumns = () => [
+  columnHelper.accessor("episodeNumber", {
+    cell: (x) => `# ${x.getValue()}` ?? "-",
+    header: "№",
+    sortingFn: "datetime",
   }),
-  columnHelper.accessor("createdAt", {
-    cell: (x) => <DateCell date={x.getValue()} />,
-    header: "Fecha de Creación",
+  columnHelper.accessor("releaseDate", {
+    cell: (x) =>
+      x.getValue() ? <DateCell date={x.getValue() ?? new Date()} /> : "-",
+    header: "Release Date",
     sortingFn: "datetime",
   }),
   columnHelper.accessor("title", {
     cell: (x) => <TextCell text={x.getValue()} />,
-    header: "Episode Title",
+    header: "Title",
+    sortingFn: "text",
+  }),
+
+  columnHelper.accessor("status", {
+    cell: (x) => <TextCell text={x.getValue()} />,
+    header: "Status",
     sortingFn: "text",
   }),
   //TODO add small audio player
-  /* columnHelper.display({ */
-  /*   cell: (x) => ( */
-  /*     <TextCell */
-  /*       text={ */
-  /*         x.row.original.fantasyName?.length ? x.row.original.fantasyName : "-" */
-  /*       } */
-  /*     /> */
-  /*   ), */
-  /*   header: "N. de Fantasía", */
-  /* }), */
 ];

@@ -2,6 +2,8 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { validateEpisodeEdit } from "@/components/Validations/EpisodeEdit.validate";
+import { EpisodeStatus } from "@prisma/client";
+import { handleSortEpisodes } from "./routeUtils/Sorting.routeUtils";
 
 export const episodesRouter = createTRPCRouter({
   createEpisodeWithTitle: protectedProcedure
@@ -49,6 +51,17 @@ export const episodesRouter = createTRPCRouter({
       });
     }),
 
+  updateEpisodeStatus: protectedProcedure
+    .input(z.object({ id: z.string(), status: z.nativeEnum(EpisodeStatus) }))
+    .mutation(async ({ input }) => {
+      return await prisma.episode.update({
+        where: { id: input.id },
+        data: {
+          status: input.status,
+        },
+      });
+    }),
+
   getEpisodeWithAudioFiles: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
@@ -56,5 +69,60 @@ export const episodesRouter = createTRPCRouter({
         where: { id: input.id },
         include: { audioFiles: true },
       });
+    }),
+  countEpisodesFromSelectedPodcast: protectedProcedure
+    .input(
+      z.object({
+        whereFilterList: z.any().array().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const preferences = await prisma.preferences.findUnique({
+        where: { userId: userId },
+      });
+      if (!preferences) return null;
+
+      return await prisma.episode.count({
+        where: {
+          podcastId: preferences.selectedPodcastId,
+          AND: [...(input?.whereFilterList ?? [])],
+        },
+      });
+    }),
+
+  getMySelectedPodcastEpisodes: protectedProcedure
+    .input(
+      z.object({
+        pageIndex: z.number().nullish(),
+        pageSize: z.number().min(1).max(100).nullish(),
+        whereFilterList: z.any().array().optional(),
+        sorting: z
+          .object({ id: z.string(), desc: z.boolean() })
+          .array()
+          .nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const preferences = await prisma.preferences.findUnique({
+        where: { userId: userId },
+      });
+      if (!preferences) return null;
+
+      const pageSize = input.pageSize ?? 10;
+      const pageIndex = input.pageIndex ?? 0;
+
+      const episodes = await prisma.episode.findMany({
+        take: pageSize,
+        skip: pageIndex * pageSize,
+        orderBy: handleSortEpisodes({ input }),
+        where: {
+          podcastId: preferences.selectedPodcastId,
+          AND: [...(input?.whereFilterList ?? [])],
+        },
+      });
+
+      return episodes;
     }),
 });

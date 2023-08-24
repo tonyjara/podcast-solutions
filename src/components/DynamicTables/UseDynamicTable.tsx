@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export const useDynamicTable = () => {
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(30);
   const [sorting, setSorting] = useState<SortingState>([]);
   return {
     pageIndex,

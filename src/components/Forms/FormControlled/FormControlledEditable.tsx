@@ -76,7 +76,7 @@ const FormControlledEditableText = <T extends FieldValues>(
         name={name}
         render={({ field }) => (
           <Editable
-            textAlign="center"
+            whiteSpace="nowrap"
             onChange={field.onChange}
             value={field.value}
             fontSize={fontSize ?? "2xl"}

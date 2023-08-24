@@ -98,7 +98,7 @@ model Podcast {
   author      String
   slug        String      @unique
   description String
-  category    String
+  categories    String[]
   language    String
   imageUrl    String
   explicit    Boolean
@@ -145,22 +145,23 @@ model EpisodeChat {
 }
 
 model AudioFile {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  name       String
-  blobName   String
-  url        String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
-  episode    Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
-  episodeId  String
-  podcast    Podcast  @relation(fields: [podcastId], references: [id], onDelete: Cascade)
-  isSelected Boolean  @default(false)
-  length     Int //file size in bytes
-  duration   Int //in seconds
-  type       String   @default("audio/mpeg") //mp3
-  podcastId  String
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  name         String
+  blobName     String
+  url          String
+  isHostedByPS Boolean  @default(true)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  episode      Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  episodeId    String
+  podcast      Podcast  @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+  isSelected   Boolean  @default(false)
+  length       Int //file size in bytes
+  duration     Int //in seconds
+  type         String   @default("audio/mpeg") //mp3
+  podcastId    String
 
   @@unique([blobName, userId])
 }

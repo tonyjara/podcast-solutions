@@ -13,8 +13,11 @@ const validateName = z.object({
     .min(3, "Name must be at least 3 character")
     .max(100, "Name must be less than 100 characters"),
 });
+interface props {
+  goBack: () => void;
+}
 
-const PodcastNameForm = () => {
+const PodcastNameForm = (props: props) => {
   const trpcContext = trpcClient.useContext();
   const {
     handleSubmit,
@@ -51,15 +54,26 @@ const PodcastNameForm = () => {
           label="Podcast Name"
           autoFocus={true}
         />
-        <Button
-          type="submit"
-          isLoading={isSubmitting}
-          colorScheme="green"
-          size="lg"
-          alignSelf={"flex-end"}
-        >
-          Next
-        </Button>
+
+        <Flex justifyContent={"space-between"}>
+          <Button
+            onClick={props.goBack}
+            isLoading={isSubmitting}
+            size="lg"
+            alignSelf={"flex-end"}
+          >
+            Prev
+          </Button>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            colorScheme="green"
+            size="lg"
+            alignSelf={"flex-end"}
+          >
+            Next
+          </Button>
+        </Flex>
       </Flex>
     </form>
   );

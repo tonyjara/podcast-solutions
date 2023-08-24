@@ -67,16 +67,16 @@ const TablePagination = <T extends object>({
 
       <Flex alignItems="center">
         <Text whiteSpace={"nowrap"} mr={8}>
-          Pag.{" "}
+          Page{" "}
           <Text fontWeight="bold" as="span">
             {pageIndex + 1}
           </Text>{" "}
-          de{" "}
+          of{" "}
           <Text fontWeight="bold" as="span">
             {lastPage}
           </Text>
         </Text>
-        <Text whiteSpace={"nowrap"}>Ir a pag.:</Text>{" "}
+        <Text whiteSpace={"nowrap"}>Go to page:</Text>{" "}
         <NumberInput
           ml={2}
           mr={8}
@@ -105,7 +105,7 @@ const TablePagination = <T extends object>({
         >
           {[10, 20, 30, 40, 50, 100].map((pageSize) => (
             <option key={pageSize} value={pageSize}>
-              Mostrar {pageSize}
+              Show {pageSize}
             </option>
           ))}
         </Select>

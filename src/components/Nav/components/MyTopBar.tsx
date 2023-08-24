@@ -29,7 +29,7 @@ const MyTopBar = ({ onOpen, authenticated }: MobileProps) => {
       position={"fixed"}
       width="100%"
       zIndex={1}
-      px={{ base: 4, md: 4 }}
+      /* px={{ base: 4, md: 4 }} */
       height="65px"
       alignItems="center"
       bg={useColorModeValue("white", "gray.900")}
@@ -46,7 +46,7 @@ const MyTopBar = ({ onOpen, authenticated }: MobileProps) => {
         {!authenticated && (
           <Image
             onClick={() => router.push("/")}
-            ml={authenticated ? "80px" : undefined}
+            ml={authenticated ? "80px" : "10px"}
             display={{ base: authenticated ? "none" : "flex", md: "flex" }}
             src={logo}
             alt="logo"

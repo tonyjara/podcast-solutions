@@ -5,6 +5,8 @@ import { TbSeeding } from "react-icons/tb";
 import { FaCcStripe } from "react-icons/fa";
 import { VscPreview } from "react-icons/vsc";
 import { BsRss } from "react-icons/bs";
+import { Session } from "inspector";
+import { SessionUser } from "@/server/auth";
 
 export interface LinkItemProps {
   name: string;
@@ -43,24 +45,17 @@ const AdminLinks: (isAdmin: boolean) => Array<LinkItemProps> = (isAdmin) => {
     : [];
 };
 
-export const SidebarLinks: (isAdmin: boolean) => Array<LinkItemProps> = (
-  isAdmin,
+export const SidebarLinks: (user: SessionUser) => Array<LinkItemProps> = (
+  user: SessionUser,
 ) => {
   return [
-    ...AdminLinks(isAdmin),
+    ...AdminLinks(user.role === "admin"),
     { name: "Home", icon: FiHome, dest: "/home" },
     {
       name: "Preview",
       icon: VscPreview,
       dest: "/home/preview",
     },
-    {
-      name: "Rss Preview",
-      icon: BsRss,
-      dest: "/home/preview/rss",
-      target: "_blank",
-    },
-
     { name: "Settings", icon: FiSettings, dest: "/home/settings" },
   ];
 };

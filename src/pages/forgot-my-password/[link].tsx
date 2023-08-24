@@ -27,7 +27,7 @@ interface PasswordRecoveryForm {
   email: string;
 }
 
-export const vailidatePasswordRecovery = z
+export const validatePasswordRecovery = z
   .object({
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z
@@ -53,7 +53,7 @@ export default function NewUser(props: {
     control,
     formState: { errors, isSubmitting },
   } = useForm<PasswordRecoveryForm>({
-    resolver: zodResolver(vailidatePasswordRecovery),
+    resolver: zodResolver(validatePasswordRecovery),
     defaultValues: {
       linkId: props.data?.linkId,
       email: props.data.email,

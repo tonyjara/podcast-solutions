@@ -12,7 +12,7 @@ import {
 } from "@/server/mailersend/mailersend";
 import { z } from "zod";
 import { verifyToken } from "@/lib/utils/asyncJWT";
-import { vailidatePasswordRecovery } from "@/pages/forgot-my-password/[link]";
+import { validatePasswordRecovery } from "@/pages/forgot-my-password/[link]";
 import { validateRecaptcha } from "@/server/serverUtils";
 
 export const magicLinksRouter = createTRPCRouter({
@@ -71,11 +71,17 @@ export const magicLinksRouter = createTRPCRouter({
           email: input.email,
         },
       });
-      await sendVerificationEmail({
-        email: input.email,
-        name: `${input.firstName} ${input.lastName}`,
-        link,
-      });
+      const isDevEnv = process.env.NODE_ENV === "development";
+      if (!isDevEnv) {
+        await sendVerificationEmail({
+          email: input.email,
+          name: `${input.firstName} ${input.lastName}`,
+          link,
+        });
+      }
+      if (isDevEnv) {
+        console.log("Verification Link: ", link);
+      }
 
       return { status: "successs", sentAt: verificationLink.createdAt };
     }),
@@ -144,7 +150,7 @@ export const magicLinksRouter = createTRPCRouter({
     }),
 
   assignPasswordFromRecovery: publicProcedure
-    .input(vailidatePasswordRecovery)
+    .input(validatePasswordRecovery)
     .mutation(async ({ input }) => {
       const secret = process.env.JWT_SECRET;
 

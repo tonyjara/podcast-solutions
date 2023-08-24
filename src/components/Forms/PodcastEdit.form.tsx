@@ -62,14 +62,20 @@ const PodcastEditForm = ({
     });
   };
 
+  const podcastActive = useWatch({ control, name: "active" });
+
   return (
     <form
       style={{ height: "100%" }}
       onSubmit={handleSubmit(submitFunc)}
       noValidate
     >
-      <Flex flexDir={"column"} gap={5}>
-        <Heading fontSize={"4xl"}>Tell us more about your podcast</Heading>
+      <Flex flexDir={"column"} gap={5} py={"10px"}>
+        {!podcast.active ? (
+          <Heading fontSize={"4xl"}>Tell us more about your podcast</Heading>
+        ) : (
+          <Heading fontSize={"4xl"}>Edit your podcast details</Heading>
+        )}
         {!podcast.active && (
           <Text color={"orange.300"}>
             If you do not wish to publish your podcast through our platform and
@@ -81,7 +87,8 @@ const PodcastEditForm = ({
           control={control}
           errors={errors}
           name="active"
-          label="Flip the switch to publish your podcast"
+          label={podcastActive ? "Published" : "Inactive"}
+          helperText="Flip the switch to publish/unpublish your podcast."
         />
 
         <FormControlledDatePicker
@@ -128,14 +135,14 @@ const PodcastEditForm = ({
           name="author"
           label="Author"
         />
-        <FormControlledSelect
-          control={control}
-          errors={errors}
-          name="category"
-          label="Category"
-          options={podcastCategoriesOptions}
-          placeholder="Select a category"
-        />
+        {/* <FormControlledSelect */}
+        {/*   control={control} */}
+        {/*   errors={errors} */}
+        {/*   name="category" */}
+        {/*   label="Category" */}
+        {/*   options={podcastCategoriesOptions} */}
+        {/*   placeholder="Select a category" */}
+        {/* /> */}
 
         <FormControlledSelect
           control={control}
@@ -166,7 +173,7 @@ const PodcastEditForm = ({
             onClick={handleSkipAndUpdatePreferences}
             size={"lg"}
           >
-            Skip for now
+            Cancel
           </Button>
           <Button
             type="submit"

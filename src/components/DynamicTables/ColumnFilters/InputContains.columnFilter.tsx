@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ColumnFilterProps } from "../ColumnFilter";
 import { Prisma } from "@prisma/client";
-import { Input } from "@chakra-ui/react";
+import { Button, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
 import useDebounce from "@/lib/hooks/useDebounce";
 
 const InputContainsColumnFilter = ({
@@ -36,7 +36,7 @@ const InputContainsColumnFilter = ({
   useEffect(() => {
     if (!setWhereFilterList) return;
     setWhereFilterList((prev) =>
-      prev.filter((x) => (keyName ? !x[keyName] : true))
+      prev.filter((x) => (keyName ? !x[keyName] : true)),
     );
     if (!debouncedSearchValue.length) return;
 
@@ -47,10 +47,25 @@ const InputContainsColumnFilter = ({
   const handleChange = (e: any) => {
     setSearchValue(e.target.value);
   };
+  const handleClear = () => {
+    setSearchValue("");
+  };
 
   return (
     <div style={{ minWidth: "130px" }} onClick={(e) => e.stopPropagation()}>
-      <Input value={searchValue} size={"sm"} onChange={handleChange} />
+      <InputGroup size="md">
+        <Input
+          value={searchValue}
+          size={"sm"}
+          onChange={handleChange}
+          pr="4.5rem"
+        />
+        <InputRightElement hidden={!searchValue.length} width="4.5rem">
+          <Button h="1.75rem" size="sm" onClick={handleClear}>
+            Clear
+          </Button>
+        </InputRightElement>
+      </InputGroup>
     </div>
   );
 };

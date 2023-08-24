@@ -34,9 +34,9 @@ const NavbarProfileSection = () => {
       />
 
       {/* <NotificationIcon /> */}
-      <Flex pl={"10px"} alignItems={"center"}>
-        <Menu>
-          {data && (
+      {data && (
+        <Flex pl={"10px"} alignItems={"center"}>
+          <Menu>
             <MenuButton
               py={2}
               transition="all 0.3s"
@@ -44,23 +44,23 @@ const NavbarProfileSection = () => {
             >
               <Avatar size={"sm"} src={data?.user.image ?? undefined} />
             </MenuButton>
-          )}
-          <Portal>
-            <MenuList>
-              <MenuItem>
-                {data?.user.firstName} {data?.user.lastName}{" "}
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem onClick={() => router.push("/home/settings")}>
-                My Account
-              </MenuItem>
+            <Portal>
+              <MenuList>
+                <MenuItem>
+                  {data?.user.firstName} {data?.user.lastName}{" "}
+                </MenuItem>
+                <MenuDivider />
+                <MenuItem onClick={() => router.push("/home/settings")}>
+                  My Account
+                </MenuItem>
 
-              <MenuDivider />
-              <MenuItem onClick={() => signOut()}>Logout</MenuItem>
-            </MenuList>
-          </Portal>
-        </Menu>
-      </Flex>
+                <MenuDivider />
+                <MenuItem onClick={() => signOut()}>Logout</MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </Flex>
+      )}
     </Flex>
   );
 };

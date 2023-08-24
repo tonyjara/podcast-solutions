@@ -19,7 +19,7 @@ export const validatePodcastEdit: z.ZodType<Podcast> = z.lazy(() =>
       .string()
       .min(1, { message: "Description is required" })
       .max(3900),
-    category: z.string().min(1, { message: "Category is required" }),
+    categories: z.string().array().min(1, { message: "Category is required" }),
     language: z.string().min(1, { message: "Language is required" }),
     imageUrl: z
       .string()
@@ -38,7 +38,7 @@ export const defaultPodcastValues: Podcast = {
   author: "",
   slug: "",
   description: "",
-  category: "",
+  categories: [],
   language: "",
   imageUrl: "",
   explicit: false,
