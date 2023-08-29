@@ -1,18 +1,11 @@
-import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
-
 // import {
 //   defaultAccountProfileData,
 //   validateAccountProfile,
 // } from '@/lib/validations/profileSettings.validate';
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { signOut } from "next-auth/react";
-import { useSession } from "next-auth/react";
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { knownErrors } from "@/lib/dictionaries/knownErrors";
+import React from "react";
 
 const ProfileSettingsPage = () => {
-  const user = useSession().data?.user;
   // const context = trpcClient.useContext();
   // const {
   //   handleSubmit,

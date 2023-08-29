@@ -4,7 +4,6 @@ import {
   useColorModeValue,
   IconButton,
   useColorMode,
-  Button,
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -26,10 +25,11 @@ const MyTopBar = ({ onOpen, authenticated }: MobileProps) => {
 
   return (
     <Flex
+      id="top"
       position={"fixed"}
       width="100%"
       zIndex={1}
-      /* px={{ base: 4, md: 4 }} */
+      px={{ base: 4, md: 4 }}
       height="65px"
       alignItems="center"
       bg={useColorModeValue("white", "gray.900")}
@@ -68,9 +68,11 @@ const MyTopBar = ({ onOpen, authenticated }: MobileProps) => {
       </div>
       <Flex alignItems={"center"}>
         {!authenticated && (
-          <ChakraLink href={"/signin"} as={Link}>
-            Sign In
-          </ChakraLink>
+          <>
+            <ChakraLink href={"/signin"} as={Link}>
+              Sign In
+            </ChakraLink>
+          </>
         )}
         <NavbarProfileSection />
       </Flex>

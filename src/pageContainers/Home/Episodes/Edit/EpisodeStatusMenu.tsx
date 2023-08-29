@@ -17,7 +17,7 @@ const EpisodeStatusMenu = ({
   const episodeStatus = episode.status;
   const trpcContext = trpcClient.useContext();
 
-  const { mutate: updateEpisodeStatus, isLoading: updateEpisodeStatusLoading } =
+  const { mutate: updateEpisodeStatus } =
     trpcClient.episode.updateEpisodeStatus.useMutation(
       handleUseMutationAlerts({
         successText: "Status updated",

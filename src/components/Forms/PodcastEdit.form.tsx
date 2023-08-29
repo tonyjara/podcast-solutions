@@ -9,7 +9,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { validatePodcastEdit } from "../Validations/PodcastEdit.validate";
 import { useSession } from "next-auth/react";
 import FormControlledSelect from "./FormControlled/FormControlledSelect";
-import { languageOptions, podcastCategoriesOptions } from "@/lib/Constants";
+import { languageOptions } from "@/lib/Constants";
 import FormControlledImageUpload from "./FormControlled/FormControlledImageUpload";
 import FormControlledSwitch from "./FormControlled/FormControlledSwitch";
 import FormControlledDatePicker from "./FormControlled/FormControlledDatePicker";

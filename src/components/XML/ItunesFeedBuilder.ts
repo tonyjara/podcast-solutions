@@ -26,7 +26,7 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
     pubDate: podcast.publishedAt,
     copyright: `Copyright ${podcast.author} ${new Date().getFullYear()}`,
     itunesType: podcast.type,
-    itunesCategory: [{ text: podcast.category }],
+    itunesCategory: podcast.categories.map((category) => ({ text: category })),
     itunesExplicit: podcast.explicit,
     itunesOwner: {
       name: podcast.author,

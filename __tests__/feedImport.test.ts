@@ -11,7 +11,9 @@ describe("test podcast feed parsing", () => {
     const feeds = [
       "https://media.rss.com/crimedivepodcast/feed.xml",
       "https://media.rss.com/thegroupchatlol/feed.xml",
-      "https://feed.syntax.fm/rss",
+      /* "https://feed.syntax.fm/rss", */ // one episode doesnt have enclosure
+      /* "https://howtopodcast.us/feed/", */ //no enclosures
+      "https://thepodcasthaven.com/feed/",
     ];
 
     for await (const rssUrl of feeds) {

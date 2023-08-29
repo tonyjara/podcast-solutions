@@ -37,7 +37,7 @@ model User {
   lastName     String
   image        String
   subscription Subscription?
-  Preferences  Preferences?
+  preferences  Preferences?
 
   audios   AudioFile[]
   podcasts Podcast[]
@@ -98,7 +98,7 @@ model Podcast {
   author      String
   slug        String      @unique
   description String
-  categories    String[]
+  categories  String[]
   language    String
   imageUrl    String
   explicit    Boolean
@@ -173,14 +173,64 @@ model Subscription {
   updatedAt DateTime @updatedAt
   active    Boolean
 
-  stripeSubscriptionId String
-  stripePriceIds       String[]
-  stripeCustomerId     String
-  payments             Payment[]
-  billableActions      BillableAction[]
+  stripeCustomerId  String
+  payments          Payment[]
+  creditActions     SubscriptionCreditsActions[]
+  subscriptionItems SubscriptionItem[]
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique // relation scalar field (used in the `@relation` attribute above)
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String  @unique
+  Product   Product @relation(fields: [productId], references: [id])
+  productId String  @unique
+}
+
+// This is based on stripe products
+model Product {
+  id          String   @id @default(cuid())
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  features    String
+  payAsYouGo  String
+  sortOrder   String
+  description String
+  name        String
+  planType    PlanType @default(FREE)
+
+  subscriptions Subscription[]
+
+  prices Price[]
+}
+
+model Price {
+  id                  String         @id @default(cuid())
+  active              Boolean
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  nickName            String
+  sortOrder           String
+  currency            String
+  unit_amount_decimal String
+  interval            String
+  tag                 StripePriceTag
+
+  subscriptionItems SubscriptionItem[]
+
+  productId String
+  Product   Product @relation(fields: [productId], references: [id])
+}
+
+model SubscriptionItem {
+  id        String         @id @default(cuid())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  active    Boolean
+  priceTag  StripePriceTag
+
+  Subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+  Price          Price?        @relation(fields: [priceId], references: [id])
+  priceId        String?
 }
 
 // Gets created whenever a checkout session is created, needs to be validated to display to user
@@ -200,62 +250,41 @@ model Payment {
   validatedBySuccessPage       Boolean   @default(false)
   confirmedByWebhookAt         DateTime?
 
-  User           User             @relation(fields: [userId], references: [id])
+  User           User          @relation(fields: [userId], references: [id])
   userId         String
-  billableAction BillableAction[]
-  Subscription   Subscription?    @relation(fields: [subscriptionId], references: [id])
+  Subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
   subscriptionId String?
 }
 
 // Are billed monthly
-model BillableAction {
-  id        String   @id @default(cuid())
+model SubscriptionCreditsActions {
+  //auto incrementing id
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  currenInputTokens   Decimal @default(0) @db.Decimal(19, 4)
-  previousInputTokens Decimal @default(0) @db.Decimal(19, 4)
-  inputTokensAmount   Decimal @default(0) @db.Decimal(19, 4)
+  currentAmount Decimal        @default(0) @db.Decimal(19, 4)
+  prevAmount    Decimal        @default(0) @db.Decimal(19, 4)
+  amount        Decimal        @default(0) @db.Decimal(19, 4)
+  tag           StripePriceTag
 
-  currentOutputTokens  Decimal @default(0) @db.Decimal(19, 4)
-  previousOutputTokens Decimal @default(0) @db.Decimal(19, 4)
-  outputTokensAmount   Decimal @default(0) @db.Decimal(19, 4)
-
-  currentTranscriptionMinutes  Decimal @default(0) @db.Decimal(19, 4)
-  previousTranscriptionMinutes Decimal @default(0) @db.Decimal(19, 4)
-  transcriptionMinutesAmount   Decimal @default(0) @db.Decimal(19, 4)
-
-  actionType BillingActionType
-
-  payment        Payment?     @relation(fields: [paymentId], references: [id])
-  paymentId      String?
-  Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
-  subscriptionId String
+  Subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
 }
 
 model FeatureFlags {
-  id            String  @id @default(cuid())
-  signupEnabled Boolean @default(true)
-  rssEnabled    Boolean @default(true)
-  maintenance   Boolean @default(false)
-}
-
-enum BillingActionType {
-  planIncrement
-  transcription
-  chatInput
-  chatOutput
-}
-
-enum MeasuredUnits {
-  minutes
-  hours
-  seconds
+  id                   String  @id @default(cuid())
+  signupEnabled        Boolean @default(true)
+  rssEnabled           Boolean @default(true)
+  transcriptionEnabled Boolean @default(true)
+  chatEnabled          Boolean @default(true)
+  maintenance          Boolean @default(false)
 }
 
 enum Role {
   admin
   user
+  mod
 }
 
 enum EpisodeStatus {
@@ -273,4 +302,24 @@ enum EpisodeType {
   full
   trailer
   bonus
+}
+
+enum StripePriceTag {
+  PLAN_FEE
+  TRANSCRIPTION_MINUTE
+  CHAT_INPUT
+  CHAT_OUTPUT
+  STORAGE_PER_GB
+}
+
+enum StripeInterval {
+  month
+  year
+}
+
+enum PlanType {
+  FREE
+  HOBBY
+  BASIC
+  PRO
 }

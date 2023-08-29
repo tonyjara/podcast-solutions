@@ -22,6 +22,7 @@ const CollapsableContainer = ({
   titleComponents,
   subTitle,
   tooltipText,
+  startCollapsed,
 }: {
   children: React.ReactNode;
   title: string;
@@ -29,8 +30,9 @@ const CollapsableContainer = ({
   titleComponents?: React.ReactNode | React.ReactNode[];
   subTitle?: string;
   tooltipText?: string;
+  startCollapsed?: boolean;
 }) => {
-  const [show, setShow] = React.useState(true);
+  const [show, setShow] = React.useState(startCollapsed ? false : true);
 
   const handleToggle = () => setShow(!show);
 

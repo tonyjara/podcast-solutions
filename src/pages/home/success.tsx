@@ -1,5 +1,4 @@
 import SuccessPage from "@/pageContainers/Home/SuccessPage.home";
-import { getServerAuthSession } from "@/server/auth";
 import { prisma } from "@/server/db";
 import { type GetServerSideProps } from "next";
 import Stripe from "stripe";

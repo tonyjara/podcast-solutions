@@ -28,8 +28,6 @@ export default function Plans({ prices, products }: PricingPageProps) {
       }),
     );
 
-  const { data: subscription } = trpcClient.users.getMySubsCription.useQuery();
-
   const handleCheckout = async (productId?: any, defaultPriceId?: any) => {
     if (!authenticated) return signIn();
     if (!productId || !defaultPriceId) return;
@@ -57,8 +55,8 @@ export default function Plans({ prices, products }: PricingPageProps) {
         py={10}
       >
         {reversedData.map((product, i) => {
-          const matchingPrice = prices.data.find(
-            (price) => price.id === product.default_price,
+          const productPrices = prices.data.filter(
+            (x) => x.product === product.id,
           );
           const features = product.metadata?.features;
           const payAsYouGo = product.metadata?.payAsYouGo;
@@ -73,9 +71,8 @@ export default function Plans({ prices, products }: PricingPageProps) {
               }}
               description={product.description ?? ""}
               autenticated={authenticated}
-              price={
-                matchingPrice?.unit_amount ? matchingPrice.unit_amount / 100 : 0
-              }
+              defaultPriceId={product.default_price?.toString() ?? ""}
+              prices={productPrices}
               title={product.name}
               features={features ? features.split(",") : []}
             />

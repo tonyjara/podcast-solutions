@@ -1,4 +1,4 @@
-import { Text, Box, Heading, Flex, VStack } from "@chakra-ui/react";
+import { Text, Heading, Flex, VStack } from "@chakra-ui/react";
 import Parser from "rss-parser";
 
 export default function PodcastImportCard({

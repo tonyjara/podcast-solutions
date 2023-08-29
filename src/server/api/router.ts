@@ -10,6 +10,8 @@ import { episodesRouter } from "./routers/episode.routes";
 import { transcriptionRouter } from "./routers/transcription.routes";
 import { chatGPTRouter } from "./routers/chatGPT.routes";
 import { rssRouter } from "./routers/rss.routes";
+import { stripeUsageRouter } from "./routers/stripe-usage.routes";
+import { seedRouter } from "./routers/seed.routes";
 
 /**
  * This is the primary router for your server.
@@ -20,6 +22,7 @@ export const appRouter = createTRPCRouter({
   auth: authRouter,
   chatGPT: chatGPTRouter,
   stripe: stripeRouter,
+  stripeUsage: stripeUsageRouter,
   users: usersRouter,
   admin: adminRouter,
   podcast: podcastRouter,
@@ -28,6 +31,7 @@ export const appRouter = createTRPCRouter({
   magicLinks: magicLinksRouter,
   transcriptions: transcriptionRouter,
   rss: rssRouter,
+  seed: seedRouter,
 });
 
 // export type definition of API

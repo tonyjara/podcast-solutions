@@ -1,4 +1,4 @@
-import { Episode } from "@prisma/client";
+import { Episode, EpisodeStatus, EpisodeType } from "@prisma/client";
 import * as z from "zod";
 
 export const validateEpisodeEdit: z.ZodType<Episode> = z.lazy(() =>
@@ -15,7 +15,7 @@ export const validateEpisodeEdit: z.ZodType<Episode> = z.lazy(() =>
     transcription: z.string(),
     imageUrl: z.string().min(1, { message: "Image URL is required" }),
     explicit: z.boolean(),
-    status: z.enum(["published", "draft"]),
+    status: z.nativeEnum(EpisodeStatus),
     userId: z.string(),
     podcastId: z.string(),
     selectedAudioFileId: z.string().nullable(),
@@ -27,7 +27,7 @@ export const validateEpisodeEdit: z.ZodType<Episode> = z.lazy(() =>
       .number({ invalid_type_error: "Episode number is required" })
       .min(1)
       .max(999999),
-    episodeType: z.enum(["full", "trailer", "bonus"]),
+    episodeType: z.nativeEnum(EpisodeType),
   }),
 );
 
@@ -40,7 +40,7 @@ export const defaultEpisodeValues: Episode = {
   transcription: "",
   imageUrl: "",
   explicit: false,
-  status: "published",
+  status: "draft",
   userId: "",
   podcastId: "",
   releaseDate: null,

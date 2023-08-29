@@ -1,4 +1,3 @@
-import { generatePodcastRssFeed } from "@/components/XML/ItunesFeedBuilder";
 import PodcastsPage from "@/pageContainers/Podcasts/PodcastsPage";
 import { prisma } from "@/server/db";
 import { GetServerSideProps } from "next";

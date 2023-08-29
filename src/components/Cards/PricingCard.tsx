@@ -1,3 +1,4 @@
+import { decimalDivBy100 } from "@/lib/utils/DecimalUtils";
 import {
   Text,
   Box,
@@ -12,10 +13,12 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { FaCheckCircle, FaDollarSign } from "react-icons/fa";
+import Stripe from "stripe";
 
 interface PricingCardProps {
   title: string;
-  price: number;
+  defaultPriceId: string;
+  prices: Stripe.Price[];
   features: string[];
   payAsYouGo: string[];
   description: string;
@@ -30,12 +33,15 @@ const PricingCard = ({
   payAsYouGo,
   popular,
   title,
-  price,
+  defaultPriceId,
   handleCheckout,
+  prices,
   features,
   autenticated,
 }: PricingCardProps) => {
-  /* const isSubscribedToThisPlan = subscriptionId && subscriptionId === ; */
+  const defaultPrice = prices.find((x) => x.id === defaultPriceId);
+  const otherPrices = prices.filter((x) => x.id !== defaultPriceId);
+
   return (
     <Box
       mb={4}
@@ -101,7 +107,7 @@ const PricingCard = ({
               $
             </Text>
             <Text fontSize="5xl" fontWeight="900">
-              {price}
+              {decimalDivBy100(defaultPrice?.unit_amount_decimal)}
             </Text>
             <Text fontSize="3xl" color="gray.500">
               /month
@@ -141,6 +147,22 @@ const PricingCard = ({
                 {x}
               </ListItem>
             ))}
+
+            {otherPrices
+              ?.sort(
+                (a, b) =>
+                  parseInt(a.metadata?.sortOrder ?? "0") -
+                  parseInt(b.metadata?.sortOrder ?? "0"),
+              )
+              .map((price) => {
+                return (
+                  <ListItem key={price.id}>
+                    <ListIcon as={FaDollarSign} color="green.500" />
+                    {decimalDivBy100(price.unit_amount_decimal)}{" "}
+                    {price.nickname}
+                  </ListItem>
+                );
+              })}
           </List>
           <Box w="80%" pt={7}>
             <Button

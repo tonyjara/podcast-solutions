@@ -29,12 +29,14 @@ export const parsePodcastFromFeed = (
     publishedAt: feed.pubData ? new Date(feed.pubDate) : new Date(),
     name: feed.title ?? "",
     email: feed.itunes?.owner?.email ?? email,
-    author: feed.itunes?.author ?? "",
+    author: feed.itunes?.author ?? feed.title ?? "",
     slug: slugify(feed.title ?? "", { lower: true }),
-    description: feed.description ?? "",
-    categories: feed.itunes?.categories ?? [],
+    description: feed.description?.length ? feed.description : feed.title ?? "",
+    categories: feed.itunes?.categories ?? ["Courses"],
     language: feed.language ?? "",
-    imageUrl: feed.itunes?.image ?? "",
+    imageUrl:
+      feed.itunes?.image ??
+      "https://res.cloudinary.com/tonyjara/image/upload/v1693264443/podcast-solutions/on2i87kict0sy7tictyl.jpg",
     explicit: feed.itunes?.explicit === "true" ? true : false,
     type: feed.itunes?.type ?? "episodic",
   };
@@ -88,7 +90,6 @@ export const parseEpisodesAndAudioFilesFromFeed = (
       return 0;
     };
 
-    if (!item.enclosure?.url.length) console.log(item);
     const episodeAudioFile: AudioFile = {
       id: audioFileId,
       createdAt: new Date(),

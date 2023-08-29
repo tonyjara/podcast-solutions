@@ -67,6 +67,7 @@ const AudioFileSelector = ({
               const { connectionString } = req.data;
 
               deleteAudioFile({
+                isHostedByPS: audioFile.isHostedByPS,
                 blobName: audioFile.blobName,
                 id: audioFile.id,
                 connectionString,

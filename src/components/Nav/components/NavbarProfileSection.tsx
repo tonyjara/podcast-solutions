@@ -15,7 +15,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
 import { signOut } from "next-auth/react";
-import NotificationIcon from "./NotificationIcon";
 
 const NavbarProfileSection = () => {
   const router = useRouter();

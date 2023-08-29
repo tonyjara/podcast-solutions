@@ -15,8 +15,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const stripe = new Stripe(stripeKey, {
     apiVersion: "2022-11-15",
   });
-  const products = await stripe.products.list();
-  const prices = await stripe.prices.list({ limit: 100 });
+  const products = await stripe.products.list({ limit: 100, active: true });
+  const prices = await stripe.prices.list({ limit: 100, active: true });
 
   return {
     props: { products, prices },

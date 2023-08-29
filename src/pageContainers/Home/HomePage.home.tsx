@@ -20,7 +20,7 @@ import { useState } from "react";
 
 export default function HomePage() {
   const dynamicTableProps = useDynamicTable();
-  const { onCopy, value, setValue, hasCopied } = useClipboard("");
+  const { onCopy, hasCopied } = useClipboard("");
 
   const { pageIndex, pageSize, sorting } = dynamicTableProps;
   const [whereFilterList, setWhereFilterList] = useState<
@@ -40,7 +40,7 @@ export default function HomePage() {
   const { data: selectedPodcast } =
     trpcClient.podcast.getMySelectedPodcast.useQuery();
 
-  const { data: episodes } =
+  const { data: episodes, isLoading: episodesAreLoading } =
     trpcClient.episode.getMySelectedPodcastEpisodes.useQuery({
       pageSize,
       pageIndex,
@@ -114,8 +114,20 @@ export default function HomePage() {
               <Flex gap={"20px"}>
                 <Button
                   onClick={onNewEpisodeOpen}
-                  backgroundColor={!episodes?.length ? "green.500" : undefined}
-                  className={episodes?.length ? undefined : "glow"}
+                  backgroundColor={
+                    episodes?.length ||
+                    episodesAreLoading ||
+                    whereFilterList.length
+                      ? undefined
+                      : "green.500"
+                  }
+                  className={
+                    episodes?.length ||
+                    episodesAreLoading ||
+                    whereFilterList.length
+                      ? undefined
+                      : "glow"
+                  }
                 >
                   Add episode
                 </Button>

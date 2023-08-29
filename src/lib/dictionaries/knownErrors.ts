@@ -28,7 +28,10 @@ export const knownErrors = (error: string) => {
   }
 
   console.error(error);
-  return "There was an error, please try again.";
+  /* return typeof error === "string" */
+  /*   ? error */
+  /*   : "There was an error, please try again."; */
+  return "Something went wrong, please try again.";
 };
 
 export const throwInternalServerError: (x: string) => never = (

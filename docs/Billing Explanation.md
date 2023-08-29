@@ -1,8 +1,8 @@
 # Billing Explanation
 
-This explanation is meant to clarify how the data schema works with the business logic.
+Billing is tied to stripe and is meant to have an accurate representation of the data that stripe has about usage.
+However usage records should only be only sent to stripe when a user has ran out of credits. Credits get added to a user according to their plan. Free users get no added credits.
 
-There are 2 types of products, **Subscription plants** and **Measured_Products**.
-The first one are the flat rates customers pay on a monthly/yearly rate.It includes a set amount of benefits, for example, the basic plan includes 500.000 input chat tokens.
+When a user signs up for a plan a subscription is created. With the subscription come the subscription items. This are related to the products and prices and are used to send usage records to stripe.
 
-The second one is a pay as you go product, everytime a billable action is executed, the quantity of the usage is stored. For example, when transcribing, the minutes used would be stored.
+PS id's are the same as stripe's ids

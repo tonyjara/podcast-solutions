@@ -4,7 +4,7 @@ import {
   myToast,
 } from "@/components/Toasts & Alerts/MyToast";
 import { trpcClient } from "@/utils/api";
-import { Button, Flex, Heading, Text } from "@chakra-ui/react";
+import { Button, Flex, Heading } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";

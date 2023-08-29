@@ -12,6 +12,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       subscription: true,
     },
   });
+  /* if (session?.user.role === "admin" && !user?.subscription?.active) { */
+  /*   return { */
+  /*     redirect: { */
+  /*       destination: "/admin/stripe/products", */
+  /*       permanent: false, */
+  /*     }, */
+  /*     props: {}, */
+  /*   }; */
+  /* } */
 
   if (!user?.subscription?.active) {
     return {

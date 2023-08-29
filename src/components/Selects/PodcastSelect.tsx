@@ -14,7 +14,7 @@ const PodcastSelect = () => {
     <div style={{ width: "100%", maxWidth: "200px" }}>
       <Select
         options={podcastsOptions}
-        onChange={(e) => {}}
+        onChange={() => {}}
         value={podcastsOptions?.find((x) => x.value === data?.id)}
         noOptionsMessage={() => "No options"}
         placeholder=""

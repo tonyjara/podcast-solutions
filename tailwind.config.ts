@@ -1,12 +1,12 @@
 import { type Config } from "tailwindcss";
 
 export default {
-  content: ["./src/**/*.{js,ts,jsx,tsx}"],
-  theme: {
-    fontFamily: {
-      serif: ["Literata", "serif", "system-ui"],
+    content: ["./src/**/*.{js,ts,jsx,tsx}"],
+    theme: {
+        fontFamily: {
+            serif: ["Literata", "serif", "system-ui"],
+        },
+        extend: {},
     },
-    extend: {},
-  },
-  plugins: [require("@tailwindcss/typography")],
+    plugins: [],
 } satisfies Config;

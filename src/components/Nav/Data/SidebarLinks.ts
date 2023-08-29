@@ -3,10 +3,8 @@ import { FiHome, FiSettings } from "react-icons/fi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { TbSeeding } from "react-icons/tb";
 import { FaCcStripe } from "react-icons/fa";
-import { VscPreview } from "react-icons/vsc";
-import { BsRss } from "react-icons/bs";
-import { Session } from "inspector";
 import { SessionUser } from "@/server/auth";
+import { BsSpeedometer2 } from "react-icons/bs";
 
 export interface LinkItemProps {
   name: string;
@@ -35,9 +33,21 @@ const AdminLinks: (isAdmin: boolean) => Array<LinkItemProps> = (isAdmin) => {
               dest: "/admin/seed",
             },
             {
-              name: "Stripe",
+              name: "Stripe Products",
               icon: FaCcStripe,
-              dest: "admin/stripe",
+              dest: "/admin/stripe/products",
+            },
+
+            {
+              name: "Stripe Prices",
+              icon: FaCcStripe,
+              dest: "/admin/stripe/prices",
+            },
+
+            {
+              name: "Usage Playground",
+              icon: BsSpeedometer2,
+              dest: "/admin/usage-playground",
             },
           ],
         },
@@ -51,11 +61,11 @@ export const SidebarLinks: (user: SessionUser) => Array<LinkItemProps> = (
   return [
     ...AdminLinks(user.role === "admin"),
     { name: "Home", icon: FiHome, dest: "/home" },
-    {
-      name: "Preview",
-      icon: VscPreview,
-      dest: "/home/preview",
-    },
+    /* { */
+    /*   name: "Preview", */
+    /*   icon: VscPreview, */
+    /*   dest: "/home/preview", */
+    /* }, */
     { name: "Settings", icon: FiSettings, dest: "/home/settings" },
   ];
 };

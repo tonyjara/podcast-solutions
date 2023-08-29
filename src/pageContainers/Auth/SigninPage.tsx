@@ -1,10 +1,9 @@
-import { signIn, getCsrfToken, getProviders } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import {
   Box,
   SimpleGrid,
   GridItem,
   chakra,
-  Center,
   Flex,
   Button,
 } from "@chakra-ui/react";

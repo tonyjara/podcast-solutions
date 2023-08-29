@@ -307,7 +307,7 @@ const DynamicTable = <T extends object>({
                                     });
                                 }}
                             >
-                                {row.getVisibleCells().map((cell, i) => {
+                                {row.getVisibleCells().map((cell) => {
                                     // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                                     const meta: any = cell.column.columnDef.meta;
 

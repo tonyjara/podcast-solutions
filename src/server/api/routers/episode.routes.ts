@@ -4,6 +4,7 @@ import { prisma } from "@/server/db";
 import { validateEpisodeEdit } from "@/components/Validations/EpisodeEdit.validate";
 import { EpisodeStatus } from "@prisma/client";
 import { handleSortEpisodes } from "./routeUtils/Sorting.routeUtils";
+import { TRPCError } from "@trpc/server";
 
 export const episodesRouter = createTRPCRouter({
   createEpisodeWithTitle: protectedProcedure
@@ -54,6 +55,15 @@ export const episodesRouter = createTRPCRouter({
   updateEpisodeStatus: protectedProcedure
     .input(z.object({ id: z.string(), status: z.nativeEnum(EpisodeStatus) }))
     .mutation(async ({ input }) => {
+      const episode = await prisma.episode.findUniqueOrThrow({
+        where: { id: input.id },
+      });
+      if (!episode.selectedAudioFileId && input.status) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Please select an audio file before publishing",
+        });
+      }
       return await prisma.episode.update({
         where: { id: input.id },
         data: {
