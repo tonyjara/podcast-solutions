@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "dev": "concurrently -n \"[lint,next]\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"tsc --noEmit --incremental --watch\" \"NODE_ENV=development && next dev \"",
     "test": "jest --watch",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe-webhook",
     "staging:stripe:listen": "stripe listen --forward-to https://staging.podcastsolutions.org/api/stripe-webhook",
@@ -14,6 +14,7 @@
     "prod": "env-cmd -f .env.prod  next dev",
     "prod:studio": "env-cmd -f .env.prod npx prisma studio",
     "staging:studio": "env-cmd -f .env.staging npx prisma studio",
+    "staging:reset": "env-cmd -f .env.staging npx prisma migrate reset",
     "staging": "env-cmd -f .env.staging concurrently -n \"[lint,next]\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"tsc --noEmit --incremental --watch\" \"NODE_ENV=development && next dev \""
   },
   "dependencies": {
@@ -92,6 +93,7 @@
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
     "autoprefixer": "^10.4.14",
+    "concurrently": "^8.2.1",
     "dotenv": "^16.3.1",
     "env-cmd": "^10.1.0",
     "eslint": "^8.47.0",
