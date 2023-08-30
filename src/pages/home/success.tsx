@@ -32,14 +32,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!checkoutSession.customer_details) return returnHome();
     if (checkoutSession.payment_status !== "paid") return returnHome();
 
-    const payment = await prisma.payment.findUniqueOrThrow({
-      where: { stripeSessionId: checkoutSession.id },
+    const paymentIntent = await prisma.paymentIntent.findUniqueOrThrow({
+      where: { id: checkoutSession.id },
     });
-    if (payment.validatedBySuccessPage) return returnHome();
+    if (paymentIntent.validatedBySuccessPage) return returnHome();
 
-    await prisma.payment.update({
+    await prisma.paymentIntent.update({
       where: {
-        stripeSessionId: checkoutSession.id,
+        id: checkoutSession.id,
       },
       data: {
         validatedBySuccessPage: true,

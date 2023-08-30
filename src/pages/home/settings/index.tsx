@@ -1,4 +1,5 @@
 import SettingsLayout from "@/components/Layouts/SettingsLayout";
+import { manageSubscription } from "@/lib/utils/SubscriptionManagementUtils";
 import ProfileSettingsPage from "@/pageContainers/Home/Settings/ProfileSettings.home.settings";
 import { getServerAuthSession } from "@/server/auth";
 import { prisma } from "@/server/db";
@@ -17,24 +18,12 @@ export default index;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerAuthSession(context);
-  const user = await prisma.user.findUnique({
-    where: { id: session?.user?.id },
-    include: {
-      subscription: true,
-    },
-  });
 
-  if (!user?.subscription?.active) {
-    return {
-      redirect: {
-        destination: "/home/plans",
-        permanent: false,
-      },
+  const subManager = await manageSubscription(session?.user.id);
+
+  return (
+    subManager ?? {
       props: {},
-    };
-  }
-
-  return {
-    props: {},
-  };
+    }
+  );
 };

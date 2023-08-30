@@ -10,7 +10,9 @@ export const validateAudioFile: z.ZodType<AudioFile> = z.lazy(
       name: z.string().min(1, { message: "Name is required" }),
       blobName: z.string(),
       url: z.string().min(1, { message: "URL is required" }),
-      userId: z.string().min(1, { message: "UserId is required" }),
+      subscriptionId: z
+        .string()
+        .min(1, { message: "Subscription id is required" }),
       episodeId: z.string().min(1, { message: "EpisodeId is required" }),
       isSelected: z.boolean(),
       length: z.number(),
@@ -23,17 +25,17 @@ export const validateAudioFile: z.ZodType<AudioFile> = z.lazy(
 );
 
 export const defaultAudioFile: (props: {
-  userId: string;
+  subscriptionId: string;
   episodeId: string;
   podcastId: string;
-}) => AudioFile = ({ userId, episodeId, podcastId }) => ({
+}) => AudioFile = ({ subscriptionId, episodeId, podcastId }) => ({
   id: "",
   createdAt: new Date(),
   updatedAt: new Date(),
   name: "",
   blobName: "",
   url: "",
-  userId,
+  subscriptionId,
   episodeId,
   isSelected: false,
   length: 0,

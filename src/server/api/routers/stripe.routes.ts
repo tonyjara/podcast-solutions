@@ -8,14 +8,14 @@ import {
 import Stripe from "stripe";
 import { TRPCError } from "@trpc/server";
 import { prisma } from "@/server/db";
-import { PlanType, Prisma, StripePriceTag } from "@prisma/client";
+import { PlanType, StripePriceTag } from "@prisma/client";
 import { throwInternalServerError } from "@/lib/dictionaries/knownErrors";
 import { createId } from "@paralleldrive/cuid2";
 import { validatePSStripeProductUpdate } from "@/components/Validations/StripeProductUpdate.validate";
 import { validateStripePriceEdit } from "@/components/Validations/StripePriceEdit.validate";
 import { validateStripePriceCreate } from "@/components/Validations/StripePriceCreate.validate";
 import { validateStripeProductCreate } from "@/components/Validations/StripeProductCreate.validate";
-import { decimalTimes100 } from "@/lib/utils/DecimalUtils";
+import { decimalDivBy100, decimalTimes100 } from "@/lib/utils/DecimalUtils";
 
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 const webUrl = process.env.NEXT_PUBLIC_WEB_URL;
@@ -41,7 +41,7 @@ export const stripeRouter = createTRPCRouter({
   }),
 
   //** Creates a checkout session and stores priceId and sessionId into a new payments row */
-  getSessionUrlAndCreatePayment: protectedProcedure
+  getSessionUrlAndCreatePaymentIntent: protectedProcedure
     .input(
       z.object({
         productId: z.string().min(1),
@@ -68,12 +68,6 @@ export const stripeRouter = createTRPCRouter({
       const prices = await stripe.prices.list({
         product: input.productId,
       });
-      const defaultPrice = prices.data.find(
-        (x) => x.id === input.defaultPriceId,
-      );
-
-      /* if (!defaultPrice?.unit_amount) */
-      /*   throwInternalServerError("No default price found"); */
 
       const line_items = prices.data.map((price) => {
         if (price.billing_scheme === "tiered") {
@@ -94,13 +88,17 @@ export const stripeRouter = createTRPCRouter({
         success_url: `${webUrl}/home/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${webUrl}/home/plans`,
       });
+      const defaultPrice = prices.data.find(
+        (x) => x.id === input.defaultPriceId,
+      );
 
-      await prisma.payment.create({
+      await prisma.paymentIntent.create({
         data: {
+          unit_amount_decimal: decimalDivBy100(
+            defaultPrice?.unit_amount_decimal ?? "0",
+          ),
           stripeProductId: input.productId,
-          stripeLineItems: line_items.map((x) => x.price),
-          stripeSessionId: session.id,
-          payedAmount: new Prisma.Decimal(defaultPrice?.unit_amount ?? 0), //The free plan doesnt have unit amount
+          id: session.id, // Only when created from a checkout session, session id becomes the id
           userId: user.id,
         },
       });

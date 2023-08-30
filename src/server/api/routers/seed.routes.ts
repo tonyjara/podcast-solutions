@@ -36,13 +36,17 @@ export const seedRouter = createTRPCRouter({
   restartAccount: adminProcedure.mutation(async ({ ctx }) => {
     if (!isDevEnv) return;
     const user = ctx.session.user;
-    await prisma.audioFile.deleteMany({ where: { userId: user.id } });
-    await prisma.episode.deleteMany({ where: { userId: user.id } });
-    await prisma.podcast.deleteMany({
-      where: { user: { every: { id: user.id } } },
-    });
     const subscription = await prisma.subscription.findUniqueOrThrow({
       where: { userId: user.id },
+    });
+    await prisma.audioFile.deleteMany({
+      where: { subscriptionId: subscription.id },
+    });
+    await prisma.episode.deleteMany({
+      where: { subscriptionId: subscription.id },
+    });
+    await prisma.podcast.deleteMany({
+      where: { subscriptionId: subscription.id },
     });
     await prisma.subscriptionCreditsActions.deleteMany({
       where: { subscriptionId: subscription.id },

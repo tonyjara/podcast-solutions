@@ -16,7 +16,7 @@ export const validateEpisodeEdit: z.ZodType<Episode> = z.lazy(() =>
     imageUrl: z.string().min(1, { message: "Image URL is required" }),
     explicit: z.boolean(),
     status: z.nativeEnum(EpisodeStatus),
-    userId: z.string(),
+    subscriptionId: z.string().min(1),
     podcastId: z.string(),
     selectedAudioFileId: z.string().nullable(),
     seasonNumber: z
@@ -41,7 +41,7 @@ export const defaultEpisodeValues: Episode = {
   imageUrl: "",
   explicit: false,
   status: "draft",
-  userId: "",
+  subscriptionId: "",
   podcastId: "",
   releaseDate: null,
   selectedAudioFileId: null,

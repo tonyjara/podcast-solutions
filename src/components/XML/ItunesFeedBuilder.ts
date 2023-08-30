@@ -1,3 +1,4 @@
+import { isScheduled } from "@/lib/utils/dateUtils";
 import { Prisma } from "@prisma/client";
 import { Podcast as MakePodcast } from "podcast";
 
@@ -43,7 +44,7 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
 
   podcast.episodes.forEach((episode) => {
     const audioFile = episode.audioFiles.at(0);
-    if (episode.releaseDate && audioFile) {
+    if (episode.releaseDate && !isScheduled(episode.releaseDate) && audioFile) {
       feed.addItem({
         title: episode.title,
         description: episode.showNotes,

@@ -49,7 +49,7 @@ const NewAudioFileModal = ({
     formState: { errors, isSubmitting, isDirty },
   } = useForm<AudioFile>({
     defaultValues: defaultAudioFile({
-      userId: user?.id ?? "",
+      subscriptionId: episode.subscriptionId ?? "",
       episodeId: episode.id,
       podcastId: episode.podcastId,
     }),

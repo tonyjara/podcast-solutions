@@ -1,3 +1,9 @@
+import { prisma } from "@/server/db";
+import {
+  PlanType,
+  StripePriceTag,
+  SubscriptionCreditsActions,
+} from "@prisma/client";
 import Decimal from "decimal.js";
 import Stripe from "stripe";
 
@@ -73,4 +79,59 @@ export const calculateAudioMinutes = (audioDuration: number) => {
   const decimalDuration = new Decimal(audioDuration);
   const minutes = decimalDuration.div(60).ceil().toNumber();
   return minutes;
+};
+
+export const creditsPerPlan = (planType: PlanType) => {
+  if (planType === "HOBBY") {
+    return {
+      chatInput: 50000,
+      chatOutput: 50000,
+      transcription: 60,
+    };
+  }
+  if (planType === "BASIC") {
+    return {
+      chatInput: 200000,
+      chatOutput: 200000,
+      transcription: 240,
+    };
+  }
+
+  if (planType === "PRO") {
+    return {
+      chatInput: 500000,
+      chatOutput: 500000,
+      transcription: 720,
+    };
+  }
+
+  return {
+    chatInput: 0,
+    chatOutput: 0,
+    transcription: 0,
+  };
+};
+
+export const addSubscriptionCredits = async ({
+  tag,
+  lastAction,
+  amount,
+  subscriptionId,
+}: {
+  tag: StripePriceTag;
+  lastAction: SubscriptionCreditsActions | null;
+  amount: number;
+  subscriptionId: string;
+}) => {
+  await prisma.subscriptionCreditsActions.create({
+    data: {
+      tag,
+      amount: new Decimal(amount),
+      prevAmount: lastAction?.currentAmount ?? new Decimal(0),
+      currentAmount: lastAction
+        ? lastAction?.currentAmount.add(new Decimal(amount))
+        : new Decimal(amount),
+      subscriptionId,
+    },
+  });
 };

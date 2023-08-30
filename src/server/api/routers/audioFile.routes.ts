@@ -14,9 +14,13 @@ export const audioFileRoute = createTRPCRouter({
       const preferences = await prisma.preferences.findUniqueOrThrow({
         where: { userId: user.id },
       });
+      const subscription = await prisma.subscription.findUniqueOrThrow({
+        where: { userId: user.id, active: true },
+      });
       const podcast = await prisma.podcast.findUniqueOrThrow({
         where: { id: preferences.selectedPodcastId },
       });
+
       const audioFile = await prisma.audioFile.create({
         data: {
           name: input.name,
@@ -24,7 +28,7 @@ export const audioFileRoute = createTRPCRouter({
           url: input.url,
           episodeId: input.episodeId,
           podcastId: podcast.id,
-          userId: user.id,
+          subscriptionId: subscription.id,
           length: input.length,
           duration: input.duration,
           type: input.type,
@@ -52,6 +56,9 @@ export const audioFileRoute = createTRPCRouter({
     .input(z.object({ name: z.string().min(3), episodeId: z.string().min(3) }))
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
+      const subscription = await prisma.subscription.findUniqueOrThrow({
+        where: { userId: user.id, active: true },
+      });
 
       const audioFile = await prisma.audioFile.findFirst({
         where: {
@@ -59,7 +66,7 @@ export const audioFileRoute = createTRPCRouter({
             lower: true,
           })}-audio-file`,
           episodeId: input.episodeId,
-          userId: user.id,
+          subscriptionId: subscription.id,
         },
       });
 
@@ -72,10 +79,9 @@ export const audioFileRoute = createTRPCRouter({
         episodeId: z.string().min(3),
       }),
     )
-    .mutation(async ({ input, ctx }) => {
-      const user = ctx.session.user;
+    .mutation(async ({ input }) => {
       await prisma.episode.update({
-        where: { id: input.episodeId, userId: user.id },
+        where: { id: input.episodeId },
         data: { selectedAudioFileId: input.audioFileId },
       });
       await prisma.audioFile.update({

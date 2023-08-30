@@ -139,10 +139,18 @@ export default function SignupCard() {
                                         errors={errors}
                                         labelComponent={
                                             <FormLabel ml={"10px"}>
-                                                I agree to Podcastsoluction's{" "}
+                                                I agree to Podcastsolution's{" "}
                                                 <Link href="/terms-of-service" target={"_blank"}>
                                                     <Text as={"span"} color={"blue.400"}>
                                                         Terms of Service
+                                                    </Text>
+                                                </Link>
+
+                                                {" "}
+                                                and{" "}
+                                                <Link href="/privacy-policy" target={"_blank"}>
+                                                    <Text as={"span"} color={"blue.400"}>
+                                                        Privacy Policy
                                                     </Text>
                                                 </Link>
                                             </FormLabel>

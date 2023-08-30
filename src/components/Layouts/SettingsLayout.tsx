@@ -5,6 +5,7 @@ import {
   Tab,
   Card,
   CardBody,
+  Box,
 } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -23,6 +24,8 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
   const routesDict = {
     "/home/settigs": 0,
     "/home/settings/preferences": 1,
+    "/home/settings/usage": 3,
+    "/home/settings/admin": 4,
   };
   useEffect(() => {
     //@ts-ignore
@@ -42,11 +45,15 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
           <Tab whiteSpace={"nowrap"}>Preferences</Tab>
         </Link>
         <Link href={portalUrl} target="_blank">
-          <Tab whiteSpace={"nowrap"}>Billing</Tab>
+          <Tab whiteSpace={"nowrap"}>Billing/Plan</Tab>
         </Link>
-        <Link href={"/home/settings/plans"}>
-          <Tab whiteSpace={"nowrap"}>Plans</Tab>
+
+        <Link href={"/home/settings/usage"}>
+          <Tab whiteSpace={"nowrap"}>Usage</Tab>
         </Link>
+        {/* <Link href={"/home/settings/plans"}> */}
+        {/*   <Tab whiteSpace={"nowrap"}>Plans</Tab> */}
+        {/* </Link> */}
 
         {isAdmin && (
           <>
@@ -57,9 +64,9 @@ const SettingsLayout = ({ children }: { children: React.ReactNode }) => {
         )}
       </TabList>
 
-      <Card backgroundColor={backgroundColor} borderRadius="8px">
-        <CardBody>{children}</CardBody>
-      </Card>
+      <Box backgroundColor={backgroundColor} borderRadius="8px">
+        <Box>{children}</Box>
+      </Box>
     </Tabs>
   );
 };

@@ -4,23 +4,35 @@ import { TRPCError } from "@trpc/server";
 
 export const knownErrors = (error: string) => {
   if (error.includes("Unique constraint failed")) {
-    return "This field already exists, please try again.";
+    return "The field is already in usae, please try another one.";
   }
 
   if (error.includes("No Account found")) {
-    return "No account found with this email, please try again.";
+    return error;
   }
   if (error.includes("User needs to wait more before new email")) {
-    return "You need to wait more before sending another request, please try again later.";
+    return error;
   }
 
   if (error.includes("User already has a subscription")) {
-    return "You already have a subscription, please contact support.";
+    return error;
   }
   if (
     error.includes("Too soon to generate a new link. Please check your email.")
   ) {
-    return "Too soon to generate a new link. Please check your email.";
+    return error;
+  }
+
+  if (error.includes("Please select an audio file before publishing")) {
+    return error;
+  }
+
+  if (
+    error.includes(
+      "You need to publish at least one non-scheduled episode to publish the podcast",
+    )
+  ) {
+    return error;
   }
 
   if (error.includes("Captcha failed")) {
@@ -28,9 +40,6 @@ export const knownErrors = (error: string) => {
   }
 
   console.error(error);
-  /* return typeof error === "string" */
-  /*   ? error */
-  /*   : "There was an error, please try again."; */
   return "Something went wrong, please try again.";
 };
 

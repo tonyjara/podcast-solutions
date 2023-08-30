@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const PreferencesPage = () => {
-    return (
-        <div>PreferencesPage</div>
-    )
-}
+  return <div></div>;
+};
 
-export default PreferencesPage
+export default PreferencesPage;

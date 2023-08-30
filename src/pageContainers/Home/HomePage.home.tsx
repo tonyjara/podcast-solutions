@@ -17,6 +17,7 @@ import { homeEpisodesColumns } from "@/components/DynamicTables/Columns/Episodes
 import NoPodcastAndPodcastEditModal from "./NoPodcastAndPodcastEditModal";
 import { BiRss } from "react-icons/bi";
 import { useState } from "react";
+import PodcastStatusMenu from "./PodcastStatusMenu";
 
 export default function HomePage() {
   const dynamicTableProps = useDynamicTable();
@@ -82,27 +83,33 @@ export default function HomePage() {
         whereFilterList={whereFilterList}
         setWhereFilterList={setWhereFilterList}
         customHeader={
-          <Flex px={{ base: "0px", md: "20px" }} flexDir={"column"}>
+          <Flex
+            px={{ base: "0px", md: "20px" }}
+            py={{ base: "10px", md: "0px" }}
+            flexDir={"column"}
+          >
             <Flex
               gap={"10px"}
               alignItems={"center"}
               justifyContent={"space-between"}
+              flexDir={{ base: "row", sm: "column", md: "column", lg: "row" }}
             >
-              <Flex alignItems={"center"} gap={"20px"}>
-                <Image
-                  src={selectedPodcast?.imageUrl}
-                  width={"50px"}
-                  onClick={onOpenNoPodcastAndPodcastEditModal}
-                  objectFit={"contain"}
-                  alt="Podcast logo/image"
-                  cursor={"pointer"}
-                  _hover={{ opacity: 0.8 }}
-                />
+              <Flex hideBelow={"sm"} alignItems={"center"} gap={"20px"}>
+                {selectedPodcast?.imageUrl && (
+                  <Image
+                    src={selectedPodcast?.imageUrl}
+                    width={"50px"}
+                    onClick={onOpenNoPodcastAndPodcastEditModal}
+                    objectFit={"contain"}
+                    alt="Podcast logo/image"
+                    cursor={"pointer"}
+                    _hover={{ opacity: 0.8 }}
+                  />
+                )}
                 <Heading
-                  hideBelow={"sm"}
                   gap={"10px"}
                   alignItems={"center"}
-                  maxW={"400px"}
+                  maxW={"500px"}
                   onClick={onOpenNoPodcastAndPodcastEditModal}
                   cursor={"pointer"}
                   _hover={{ opacity: 0.8 }}
@@ -112,6 +119,22 @@ export default function HomePage() {
                 </Heading>
               </Flex>
               <Flex gap={"20px"}>
+                {selectedPodcast?.imageUrl && (
+                  <Image
+                    hideFrom={"sm"}
+                    src={selectedPodcast?.imageUrl}
+                    width={"50px"}
+                    onClick={onOpenNoPodcastAndPodcastEditModal}
+                    objectFit={"contain"}
+                    alt="Podcast logo/image"
+                    cursor={"pointer"}
+                    _hover={{ opacity: 0.8 }}
+                  />
+                )}
+
+                {selectedPodcast && (
+                  <PodcastStatusMenu podcast={selectedPodcast} />
+                )}
                 <Button
                   onClick={onNewEpisodeOpen}
                   backgroundColor={

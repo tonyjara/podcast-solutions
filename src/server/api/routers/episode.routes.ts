@@ -15,6 +15,9 @@ export const episodesRouter = createTRPCRouter({
       const preferences = await prisma.preferences.findUniqueOrThrow({
         where: { userId: user.id },
       });
+      const subscription = await prisma.subscription.findUniqueOrThrow({
+        where: { userId: user.id, active: true },
+      });
       const podcast = await prisma.podcast.findUniqueOrThrow({
         where: { id: preferences.selectedPodcastId },
       });
@@ -27,7 +30,7 @@ export const episodesRouter = createTRPCRouter({
           explicit: podcast.explicit,
           status: "draft",
           podcast: { connect: { id: podcast.id } },
-          user: { connect: { id: user.id } },
+          subscription: { connect: { id: subscription.id } },
         },
       });
     }),
@@ -77,7 +80,7 @@ export const episodesRouter = createTRPCRouter({
     .query(async ({ input }) => {
       return await prisma.episode.findUnique({
         where: { id: input.id },
-        include: { audioFiles: true },
+        include: { audioFiles: { orderBy: { isSelected: "asc" } } },
       });
     }),
   countEpisodesFromSelectedPodcast: protectedProcedure

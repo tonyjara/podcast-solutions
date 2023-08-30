@@ -12,7 +12,7 @@ export default function Pricing({ prices, products }: PricingPageProps) {
   const authenticated = session?.status === "authenticated";
 
   const { mutate } =
-    trpcClient.stripe.getSessionUrlAndCreatePayment.useMutation(
+    trpcClient.stripe.getSessionUrlAndCreatePaymentIntent.useMutation(
       handleUseMutationAlerts({
         successText: "Redirecting to checkout...",
         callback: ({ url }) => {

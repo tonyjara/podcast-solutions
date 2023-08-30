@@ -1,10 +1,4 @@
-import {
-  Divider,
-  Icon,
-  IconButton,
-  Image,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Divider, IconButton, Image, useColorMode } from "@chakra-ui/react";
 import { AccordionIcon } from "@chakra-ui/react";
 import { AccordionPanel } from "@chakra-ui/react";
 import { Accordion, AccordionButton, AccordionItem } from "@chakra-ui/react";
@@ -16,9 +10,6 @@ import NavItemChild from "../components/NavItemChild";
 import { SidebarLinks } from "../Data/SidebarLinks";
 import PodcastSelect from "@/components/Selects/PodcastSelect";
 import Link from "next/link";
-import { MdOutlineUnpublished } from "react-icons/md";
-import { trpcClient } from "@/utils/api";
-import { AiOutlineCheckCircle } from "react-icons/ai";
 interface SidebarProps {
   minimized: boolean;
   setMinimized: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,8 +23,6 @@ const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
       ? "/assets/logo/black-logo.png"
       : "/assets/logo/white-logo.png";
 
-  const { data: selectedPodcast } =
-    trpcClient.podcast.getMySelectedPodcast.useQuery();
   return (
     <Box
       zIndex={2}
@@ -74,16 +63,18 @@ const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
           gap={2}
           justifyContent="space-between"
         >
-          <Icon
-            display={{ base: "none", md: minimized ? "none" : "flex" }}
-            fontSize="lg"
-            color={selectedPodcast?.active ? "green" : "red"}
-            as={
-              selectedPodcast?.active
-                ? AiOutlineCheckCircle
-                : MdOutlineUnpublished
-            }
-          />
+          {/* <Icon */}
+          {/*   display={{ base: "none", md: minimized ? "none" : "flex" }} */}
+          {/*   fontSize="lg" */}
+          {/*   color={ */}
+          {/*     selectedPodcast?.podcastStatus === "published" ? "green" : "red" */}
+          {/*   } */}
+          {/*   as={ */}
+          {/*     selectedPodcast?.active */}
+          {/*       ? AiOutlineCheckCircle */}
+          {/*       : MdOutlineUnpublished */}
+          {/*   } */}
+          {/* /> */}
           {!minimized && <PodcastSelect />}
           <IconButton
             aria-label="close drawer"

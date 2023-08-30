@@ -13,10 +13,15 @@ export type PodcastParserFeed = {
   [key: string]: any;
 }>;
 
-export const parsePodcastFromFeed = (
-  feed: PodcastParserFeed,
-  email: string,
-): Podcast => {
+export const parsePodcastFromFeed = ({
+  feed,
+  email,
+  subscriptionId,
+}: {
+  feed: PodcastParserFeed;
+  email: string;
+  subscriptionId: string;
+}): Podcast => {
   /* delete feed.items; */
   /* console.log(feed); */
   const podcastId = createId();
@@ -24,8 +29,10 @@ export const parsePodcastFromFeed = (
   const podcastFromFeed: Podcast = {
     id: podcastId,
     active: true,
+    podcastStatus: "unpublished",
     createdAt: new Date(),
     updatedAt: new Date(),
+    subscriptionId: subscriptionId,
     publishedAt: feed.pubData ? new Date(feed.pubDate) : new Date(),
     name: feed.title ?? "",
     email: feed.itunes?.owner?.email ?? email,
@@ -46,11 +53,15 @@ export const parsePodcastFromFeed = (
   return podcastFromFeed;
 };
 
-export const parseEpisodesAndAudioFilesFromFeed = (
-  feed: PodcastParserFeed,
-  userId: string,
-  podcastId: string,
-): { episodes: Episode[]; audioFiles: AudioFile[] } => {
+export const parseEpisodesAndAudioFilesFromFeed = ({
+  feed,
+  podcastId,
+  subscriptionId,
+}: {
+  feed: PodcastParserFeed;
+  podcastId: string;
+  subscriptionId: string;
+}): { episodes: Episode[]; audioFiles: AudioFile[] } => {
   /* console.log(feed.items[0]); */
   let episodes: Episode[] = [];
 
@@ -62,6 +73,7 @@ export const parseEpisodesAndAudioFilesFromFeed = (
     const podcastEpisode: Episode = {
       id: episodeId,
       createdAt: new Date(),
+      subscriptionId: subscriptionId,
       updatedAt: new Date(),
       releaseDate: item.pubDate ? new Date(item.pubDate) : new Date(),
       title: item.title ?? "",
@@ -75,7 +87,6 @@ export const parseEpisodesAndAudioFilesFromFeed = (
         ? parseInt(item.itunes.episode)
         : index + 1,
       episodeType: item.itunes?.episodeType ?? "full",
-      userId: userId,
       podcastId: podcastId,
       selectedAudioFileId: audioFileId,
     };
@@ -94,11 +105,11 @@ export const parseEpisodesAndAudioFilesFromFeed = (
       id: audioFileId,
       createdAt: new Date(),
       updatedAt: new Date(),
+      subscriptionId: subscriptionId,
       name: item.name ?? `audio-file-episode-${index + 1}`,
       length: handleParseInt(item.enclosure?.length),
       duration: handleParseInt(item.itunes?.duration),
       url: item.enclosure?.url ?? "",
-      userId: userId,
       podcastId: podcastId,
       episodeId: episodeId,
       type: "audio/mpeg",

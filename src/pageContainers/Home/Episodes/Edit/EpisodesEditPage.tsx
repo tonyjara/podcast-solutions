@@ -97,7 +97,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
             mb={"40px"}
             flexDir={{ base: "column", sm: "row" }}
           >
-            <Flex gap={"20px"}>
+            <Flex w="full" gap={"20px"}>
               <FormControlledEditableText
                 control={control}
                 errors={errors}

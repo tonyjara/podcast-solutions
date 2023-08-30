@@ -31,7 +31,7 @@ export interface pricing {
   features: string[];
 }
 
-export const podcastCategories: any = {
+export const podcastCategories = {
   Arts: [
     "Books",
     "Design",
@@ -141,16 +141,6 @@ export const podcastCategories: any = {
     "TV Reviews",
   ],
 };
-export const podcastCategoriesOptions = Object.keys(podcastCategories).map(
-  (key) => {
-    return {
-      label: key,
-      options: podcastCategories[key].map((category: any) => {
-        return { value: `${key}/${category}`, label: category };
-      }),
-    };
-  },
-);
 
 export const languageOptions = [
   { value: "af", label: "Afrikaans" },

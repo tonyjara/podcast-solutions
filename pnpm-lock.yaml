@@ -173,6 +173,9 @@ dependencies:
   stripe:
     specifier: ^12.18.0
     version: 12.18.0
+  stripe-event-types:
+    specifier: ^2.4.0
+    version: 2.4.0(stripe@12.18.0)
   superjson:
     specifier: 1.13.1
     version: 1.13.1
@@ -7238,6 +7241,14 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
     dev: true
+
+  /stripe-event-types@2.4.0(stripe@12.18.0):
+    resolution: {integrity: sha512-5ORZMW/WKjc31nsGMCUECOS+xVjtHhAFJJ8833ft3471hIjQrMbLMPBEb5AcJM8mKRRULpKmCVMDU0lLYrxERQ==}
+    peerDependencies:
+      stripe: '>=10.0.0'
+    dependencies:
+      stripe: 12.18.0
+    dev: false
 
   /stripe@12.18.0:
     resolution: {integrity: sha512-cYjgBM2SY/dTm8Lr6eMyyONaHTZHA/QjHxFUIW5WH8FevSRIGAVtXEmBkUXF1fsqe7QvvRgQSGSJZmjDacegGg==}

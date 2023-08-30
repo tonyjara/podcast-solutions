@@ -46,11 +46,13 @@ const NoPodcastAndPodcastEditModal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [podcasts, data, isOpen]);
 
+  const { data: prefs } = trpcClient.users.getMyPreferences.useQuery();
+
   return (
     <Modal
-      blockScrollOnMount={false}
       /* scrollBehavior="outside" */
-      /* closeOnOverlayClick={!podcasts?.length} */
+      blockScrollOnMount={false}
+      closeOnOverlayClick={prefs?.hasSeenOnboarding}
       onClose={onClose}
       size={"3xl"}
       isOpen={isOpen}
@@ -58,7 +60,7 @@ const NoPodcastAndPodcastEditModal = ({
       <ModalOverlay />
       <ModalContent>
         <ModalBody>
-          {scratchOrRss === "scratch" && (
+          {scratchOrRss === "scratch" && !podcasts?.length && (
             <PodcastNameForm goBack={() => setScratchOrRss(null)} />
           )}
           {!scratchOrRss && !podcasts?.length && (

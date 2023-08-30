@@ -2,7 +2,7 @@
 //   defaultAccountProfileData,
 //   validateAccountProfile,
 // } from '@/lib/validations/profileSettings.validate';
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import React from "react";
 
 const ProfileSettingsPage = () => {
@@ -50,19 +50,17 @@ const ProfileSettingsPage = () => {
       {/* <form onSubmit={handleSubmit(submitFunc)} noValidate> */}
       <Flex gap={"10px"}>
         {/* <TitleComponent title="Configuración de perfil" /> */}
-        <Button
-          // isDisabled={isLoading || isSubmitting || isLoadingProfile}
-          type="submit"
-          colorScheme="blue"
-          mr={3}
-        >
-          Guardar
-        </Button>
+        {/* <Button */}
+        {/*   // isDisabled={isLoading || isSubmitting || isLoadingProfile} */}
+        {/*   type="submit" */}
+        {/*   colorScheme="blue" */}
+        {/*   mr={3} */}
+        {/* > */}
+        {/*   Guardar */}
+        {/* </Button> */}
       </Flex>
       {/* {error && <Text color="red.300">{knownErrors(error.message)}</Text>} */}
-      <Text color={"gray.400"}>
-        La sesión será finalizada al guardar los cambios.
-      </Text>
+      <Text color={"gray.400"}></Text>
       {/* {user && (
           <FormControlledAvatarUpload
             control={control}

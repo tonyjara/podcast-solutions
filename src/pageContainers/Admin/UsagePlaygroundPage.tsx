@@ -1,20 +1,7 @@
 import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
+import UsageStats from "@/components/UsageStats";
 import { trpcClient } from "@/utils/api";
-import {
-  Box,
-  Button,
-  Flex,
-  FormLabel,
-  Heading,
-  Input,
-  SimpleGrid,
-  Stat,
-  StatLabel,
-  StatNumber,
-  VStack,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import Decimal from "decimal.js";
+import { Button, Flex, FormLabel, Input, VStack } from "@chakra-ui/react";
 import React, { useState } from "react";
 
 const UsagePlaygroundPage = () => {
@@ -37,7 +24,8 @@ const UsagePlaygroundPage = () => {
         },
       }),
     );
-  const { data: myUsage } = trpcClient.stripeUsage.getMyUsage.useQuery();
+  const { data: myUsage, isLoading } =
+    trpcClient.stripeUsage.getMyUsage.useQuery();
   const { mutate: postChatUsage } =
     trpcClient.stripeUsage.postChatUsage.useMutation(
       handleUseMutationAlerts({
@@ -138,54 +126,9 @@ const UsagePlaygroundPage = () => {
           </Button>
         </Flex>
       </VStack>
-      <Box>
-        <Heading mb={"20px"} maxW={"7xl"}>
-          Usage
-        </Heading>
-        <SimpleGrid columns={2} spacing={10}>
-          {myUsage?.map((item) => {
-            const value = item.data.reduce((acc: any, x: any) => {
-              return (acc += x.total_usage);
-            }, 0);
-
-            return (
-              <StatsCard
-                key={item.tag}
-                title={item.tag}
-                credits={item.credits}
-                value={value}
-              />
-            );
-          })}
-        </SimpleGrid>
-      </Box>
+      <UsageStats loading={isLoading} myUsage={myUsage} />
     </Flex>
   );
 };
 
 export default UsagePlaygroundPage;
-
-const StatsCard = ({
-  title,
-  value,
-  credits,
-}: {
-  title: string;
-  value: string;
-  credits?: Decimal;
-}) => {
-  return (
-    <Stat
-      px={{ base: 4, md: 8 }}
-      py={"5"}
-      shadow={"xl"}
-      border={"1px solid"}
-      borderColor={useColorModeValue("gray.800", "gray.500")}
-      rounded={"lg"}
-    >
-      <StatLabel>{title}</StatLabel>
-      <StatNumber> Credits: {credits?.toString() ?? 0}</StatNumber>
-      <StatNumber> Used: {value}</StatNumber>
-    </Stat>
-  );
-};

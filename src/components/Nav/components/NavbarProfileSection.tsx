@@ -48,6 +48,8 @@ const NavbarProfileSection = () => {
                 <MenuItem>
                   {data?.user.firstName} {data?.user.lastName}{" "}
                 </MenuItem>
+
+                <MenuItem>{data?.user.email}</MenuItem>
                 <MenuDivider />
                 <MenuItem onClick={() => router.push("/home/settings")}>
                   My Account

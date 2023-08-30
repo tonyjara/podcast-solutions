@@ -1,4 +1,5 @@
 import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
+import { isScheduled } from "@/lib/utils/dateUtils";
 import { trpcClient } from "@/utils/api";
 import { ChevronDownIcon, WarningIcon } from "@chakra-ui/icons";
 import { Menu, MenuButton, MenuList, MenuItem, Button } from "@chakra-ui/react";
@@ -40,11 +41,19 @@ const EpisodeStatusMenu = ({
     updateEpisodeStatus({ id: episode.id, status: "archived" });
   };
 
+  const episodeIsScheduled = isScheduled(episode.releaseDate);
+
   return (
     <Menu>
-      <MenuButton width={"100%"} as={Button} rightIcon={<ChevronDownIcon />}>
+      <MenuButton
+        maxW={"150px"}
+        width={"100%"}
+        as={Button}
+        rightIcon={<ChevronDownIcon />}
+      >
+        {episodeStatus === "published" && episodeIsScheduled && "Scheduled ⌛"}
+        {episodeStatus === "published" && !episodeIsScheduled && "Published 🟢"}
         {episodeStatus === "draft" && "Draft 🟠"}
-        {episodeStatus === "published" && "Published 🟢"}
         {episodeStatus === "archived" && "Archived ⚫"}
       </MenuButton>{" "}
       <MenuList>

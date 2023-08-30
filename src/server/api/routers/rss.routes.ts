@@ -37,40 +37,49 @@ export const rssRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session?.user;
+      return await prisma.$transaction(async (tx) => {
+        const subscription = await tx.subscription.findUniqueOrThrow({
+          where: { userId: user.id, active: true },
+        });
 
-      const parser = new Parser();
-      const feed = await parser.parseURL(input.rssFeedUrl);
-      const parsedPodcast = parsePodcastFromFeed(feed, user.email);
-      const parsedEpisodesWithAudioFiles = parseEpisodesAndAudioFilesFromFeed(
-        feed,
-        user.id,
-        parsedPodcast.id,
-      );
-      const parsedEpisodes = parsedEpisodesWithAudioFiles.episodes;
-      const parsedAudioFiles = parsedEpisodesWithAudioFiles.audioFiles;
-
-      const podcast = await prisma.podcast.create({
-        data: {
-          ...parsedPodcast,
-          user: {
-            connect: { id: user.id },
+        const parser = new Parser();
+        const feed = await parser.parseURL(input.rssFeedUrl);
+        const parsedPodcast = parsePodcastFromFeed({
+          feed,
+          email: user.email,
+          subscriptionId: subscription.id,
+        });
+        const parsedEpisodesWithAudioFiles = parseEpisodesAndAudioFilesFromFeed(
+          {
+            feed,
+            podcastId: parsedPodcast.id,
+            subscriptionId: subscription.id,
           },
-        },
-      });
+        );
+        const parsedEpisodes = parsedEpisodesWithAudioFiles.episodes;
+        const parsedAudioFiles = parsedEpisodesWithAudioFiles.audioFiles;
 
-      await prisma.episode.createMany({
-        data: parsedEpisodes,
-      });
-      await prisma.audioFile.createMany({
-        data: parsedAudioFiles,
-      });
+        const podcast = await tx.podcast.create({
+          data: {
+            ...parsedPodcast,
+            subscriptionId: subscription.id,
+          },
+        });
 
-      await prisma.preferences.upsert({
-        where: { userId: user.id },
-        create: { userId: user.id, selectedPodcastId: podcast.id },
-        update: { selectedPodcastId: podcast.id },
+        await tx.episode.createMany({
+          data: parsedEpisodes,
+        });
+        await tx.audioFile.createMany({
+          data: parsedAudioFiles,
+        });
+
+        await tx.preferences.upsert({
+          where: { userId: user.id },
+          create: { userId: user.id, selectedPodcastId: podcast.id },
+          update: { selectedPodcastId: podcast.id },
+        });
+        return podcast;
       });
-      return podcast;
     }),
 });
 

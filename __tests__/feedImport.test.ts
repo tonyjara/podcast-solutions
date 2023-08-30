@@ -11,9 +11,10 @@ describe("test podcast feed parsing", () => {
     const feeds = [
       "https://media.rss.com/crimedivepodcast/feed.xml",
       "https://media.rss.com/thegroupchatlol/feed.xml",
+      "https://media.rss.com/thenbanextpodcast/feed.xml",
       /* "https://feed.syntax.fm/rss", */ // one episode doesnt have enclosure
       /* "https://howtopodcast.us/feed/", */ //no enclosures
-      "https://thepodcasthaven.com/feed/",
+      /* "https://thepodcasthaven.com/feed/", also no enclosures */
     ];
 
     for await (const rssUrl of feeds) {
@@ -22,16 +23,21 @@ describe("test podcast feed parsing", () => {
 
       expect(feed.title).not.toBeUndefined();
 
-      const userId = createId();
-      const parsedPodcast = parsePodcastFromFeed(feed, "test@test.com");
+      const subscriptionId = createId();
+      const parsedPodcast = parsePodcastFromFeed({
+        feed,
+        email: "test@test.com",
+        subscriptionId,
+      });
 
       expect(parsedPodcast.active).toBe(true);
 
-      const episodesAndAudioFiles = parseEpisodesAndAudioFilesFromFeed(
+      const episodesAndAudioFiles = parseEpisodesAndAudioFilesFromFeed({
         feed,
-        parsedPodcast.id,
-        userId,
-      );
+        podcastId: parsedPodcast.id,
+
+        subscriptionId,
+      });
       const episodes = episodesAndAudioFiles.episodes;
       const audioFiles = episodesAndAudioFiles.audioFiles;
 
