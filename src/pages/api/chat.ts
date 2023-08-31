@@ -42,14 +42,14 @@ const handler = async (req: Request): Promise<Response | undefined> => {
       if (tokenCountAverage > 3000) {
         return "gpt-3.5-turbo-16k";
       }
-      if (tokenCountAverage > 14000) {
-        return "gpt-4-32k";
-      }
+      /* if (tokenCountAverage > 14000) { */
+      /*   return "gpt-4-32k"; */
+      /* } */
       return "gpt-3.5-turbo";
     };
 
     const payload: OpenAIStreamPayload = {
-      model: "gpt-3.5-turbo",
+      model: handleModel(),
       messages: messages,
       temperature: 0.7,
       max_tokens: 1000,

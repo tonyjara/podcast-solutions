@@ -1,18 +1,11 @@
-import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
-
 // import {
 //   defaultAccountProfileData,
 //   validateAccountProfile,
 // } from '@/lib/validations/profileSettings.validate';
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { signOut } from "next-auth/react";
-import { useSession } from "next-auth/react";
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { knownErrors } from "@/lib/dictionaries/knownErrors";
+import { Box, Flex, Text } from "@chakra-ui/react";
+import React from "react";
 
 const ProfileSettingsPage = () => {
-  const user = useSession().data?.user;
   // const context = trpcClient.useContext();
   // const {
   //   handleSubmit,
@@ -57,19 +50,17 @@ const ProfileSettingsPage = () => {
       {/* <form onSubmit={handleSubmit(submitFunc)} noValidate> */}
       <Flex gap={"10px"}>
         {/* <TitleComponent title="Configuración de perfil" /> */}
-        <Button
-          // isDisabled={isLoading || isSubmitting || isLoadingProfile}
-          type="submit"
-          colorScheme="blue"
-          mr={3}
-        >
-          Guardar
-        </Button>
+        {/* <Button */}
+        {/*   // isDisabled={isLoading || isSubmitting || isLoadingProfile} */}
+        {/*   type="submit" */}
+        {/*   colorScheme="blue" */}
+        {/*   mr={3} */}
+        {/* > */}
+        {/*   Guardar */}
+        {/* </Button> */}
       </Flex>
       {/* {error && <Text color="red.300">{knownErrors(error.message)}</Text>} */}
-      <Text color={"gray.400"}>
-        La sesión será finalizada al guardar los cambios.
-      </Text>
+      <Text color={"gray.400"}></Text>
       {/* {user && (
           <FormControlledAvatarUpload
             control={control}

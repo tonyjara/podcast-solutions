@@ -6,8 +6,10 @@ import {
   Heading,
   IconButton,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import React from "react";
+import { FiHelpCircle } from "react-icons/fi";
 import {
   TbLayoutBottombarCollapse,
   TbLayoutNavbarCollapse,
@@ -19,21 +21,25 @@ const CollapsableContainer = ({
   style,
   titleComponents,
   subTitle,
+  tooltipText,
+  startCollapsed,
 }: {
   children: React.ReactNode;
   title: string;
   style?: React.CSSProperties;
   titleComponents?: React.ReactNode | React.ReactNode[];
   subTitle?: string;
+  tooltipText?: string;
+  startCollapsed?: boolean;
 }) => {
-  const [show, setShow] = React.useState(true);
+  const [show, setShow] = React.useState(startCollapsed ? false : true);
 
   const handleToggle = () => setShow(!show);
 
   return (
     <Box style={style} w={"100%"}>
       <Flex
-        mb={"20px"}
+        my={"10px"}
         justifyContent={"space-between"}
         alignItems={"center"}
         gap={5}
@@ -48,6 +54,13 @@ const CollapsableContainer = ({
             onClick={handleToggle}
           />
           <Heading fontSize={"xl"}>{title}</Heading>
+          {tooltipText && (
+            <Tooltip label={tooltipText}>
+              <IconButton size={"sm"} aria-label="help popover">
+                <FiHelpCircle />
+              </IconButton>
+            </Tooltip>
+          )}
         </Flex>
         {titleComponents}
       </Flex>

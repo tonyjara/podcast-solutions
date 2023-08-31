@@ -9,10 +9,11 @@ import { useForm, useWatch } from "react-hook-form";
 import { validatePodcastEdit } from "../Validations/PodcastEdit.validate";
 import { useSession } from "next-auth/react";
 import FormControlledSelect from "./FormControlled/FormControlledSelect";
-import { languageOptions, podcastCategoriesOptions } from "@/lib/Constants";
+import { languageOptions } from "@/lib/Constants";
 import FormControlledImageUpload from "./FormControlled/FormControlledImageUpload";
 import FormControlledSwitch from "./FormControlled/FormControlledSwitch";
 import FormControlledDatePicker from "./FormControlled/FormControlledDatePicker";
+import FormControlledCategoriesSelect from "./FormControlled/FormControlledCategoriesSelect";
 
 const PodcastEditForm = ({
   podcast,
@@ -33,6 +34,7 @@ const PodcastEditForm = ({
     defaultValues: podcast,
     resolver: zodResolver(validatePodcastEdit),
   });
+
   const { mutate, isLoading } = trpcClient.podcast.editPodcast.useMutation(
     handleUseMutationAlerts({
       successText: "Podcast edited",
@@ -43,23 +45,30 @@ const PodcastEditForm = ({
       },
     }),
   );
+
   const { mutate: mutatePreferences, isLoading: isLoadingUpdate } =
     trpcClient.users.updateMyPreferences.useMutation({
       onSuccess: () => {
-        onClose();
+        trpcContext.invalidate();
       },
     });
+
+  const { data: prefs } = trpcClient.users.getMyPreferences.useQuery();
+
   const submitFunc = async (data: Podcast) => {
     mutate(data);
   };
 
   const slug = useWatch({ control, name: "slug" });
 
-  const handleSkipAndUpdatePreferences = () => {
-    mutatePreferences({
-      hasSeenOnboarding: true,
-      selectedPodcastId: podcast.id,
-    });
+  const handleClose = () => {
+    if (!prefs?.hasSeenOnboarding) {
+      mutatePreferences({
+        hasSeenOnboarding: true,
+        selectedPodcastId: podcast.id,
+      });
+    }
+    onClose();
   };
 
   return (
@@ -68,21 +77,27 @@ const PodcastEditForm = ({
       onSubmit={handleSubmit(submitFunc)}
       noValidate
     >
-      <Flex flexDir={"column"} gap={5}>
-        <Heading fontSize={"4xl"}>Tell us more about your podcast</Heading>
-        {!podcast.active && (
+      <Flex flexDir={"column"} gap={5} py={"10px"}>
+        {!podcast.active && !prefs?.hasSeenOnboarding ? (
+          <Heading fontSize={"4xl"}>Tell us more about your podcast</Heading>
+        ) : (
+          <Heading fontSize={"4xl"}>Edit your podcast details</Heading>
+        )}
+        {!podcast.active && !prefs?.hasSeenOnboarding && (
           <Text color={"orange.300"}>
             If you do not wish to publish your podcast through our platform and
             you just want to use our services you can skip this step.
           </Text>
         )}
 
-        <FormControlledSwitch
-          control={control}
-          errors={errors}
-          name="active"
-          label="Flip the switch to publish your podcast"
-        />
+        {/* Replaced with status */}
+        {/* <FormControlledSwitch */}
+        {/*   control={control} */}
+        {/*   errors={errors} */}
+        {/*   name="active" */}
+        {/*   label={podcastActive ? "Published" : "Inactive"} */}
+        {/*   helperText="Flip the switch to publish/unpublish your podcast." */}
+        {/* /> */}
 
         <FormControlledDatePicker
           control={control}
@@ -106,6 +121,7 @@ const PodcastEditForm = ({
             setValue={setValue}
             helperText="The image must be at least 1400 x 1400 pixels and at most 3000 x 3000 pixels, in JPEG or PNG format, and in the RGB color space with a minimum size of 500KB and a maximum size of 10MB."
             userId={user.id}
+            minW={1400}
           />
         )}
         <FormControlledText
@@ -127,13 +143,11 @@ const PodcastEditForm = ({
           name="author"
           label="Author"
         />
-        <FormControlledSelect
+        <FormControlledCategoriesSelect
           control={control}
           errors={errors}
-          name="category"
           label="Category"
-          options={podcastCategoriesOptions}
-          placeholder="Select a category"
+          helperText="Select up to 2 categories"
         />
 
         <FormControlledSelect
@@ -162,10 +176,10 @@ const PodcastEditForm = ({
         <Flex justifyContent={"space-between"} width={"100%"}>
           <Button
             disabled={isSubmitting || isLoadingUpdate}
-            onClick={handleSkipAndUpdatePreferences}
+            onClick={handleClose}
             size={"lg"}
           >
-            Skip for now
+            {prefs?.hasSeenOnboarding ? "Cancel" : "Skip for now"}
           </Button>
           <Button
             type="submit"

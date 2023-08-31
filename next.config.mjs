@@ -6,14 +6,14 @@ await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
 const config = {
-    reactStrictMode: true,
-    experimental: {
-        swcPlugins: [["next-superjson-plugin", {}]],
-    },
-    i18n: {
-        locales: ["en"],
-        defaultLocale: "en",
-    },
+  reactStrictMode: true,
+  experimental: {
+    swcPlugins: [["next-superjson-plugin", {}]],
+  },
+  i18n: {
+    locales: ["en"],
+    defaultLocale: "en",
+  },
 };
 
 export default config;

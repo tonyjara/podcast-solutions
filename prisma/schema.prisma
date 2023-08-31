@@ -37,12 +37,9 @@ model User {
   lastName     String
   image        String
   subscription Subscription?
-  Preferences  Preferences?
+  preferences  Preferences?
 
-  audios   AudioFile[]
-  podcasts Podcast[]
-  payment  Payment[]
-  episodes Episode[]
+  paymentIntents PaymentIntent[]
 
   accountId String  @unique
   account   Account @relation(fields: [accountId], references: [id])
@@ -88,49 +85,52 @@ model VerificationToken {
 }
 
 model Podcast {
-  id          String      @id @default(cuid())
-  active      Boolean     @default(false) // After edit it becomes active
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  publishedAt DateTime?
-  name        String
-  email       String
-  author      String
-  slug        String      @unique
-  description String
-  category    String
-  language    String
-  imageUrl    String
-  explicit    Boolean
-  type        PodcastType @default(episodic)
+  id            String        @id @default(cuid())
+  active        Boolean       @default(true) // can only be deactivated through moderation, affects rss feed
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  publishedAt   DateTime?
+  podcastStatus PodcastStatus @default(unpublished)
+  name          String
+  email         String
+  author        String
+  slug          String        @unique
+  description   String
+  categories    String[]
+  language      String
+  imageUrl      String
+  explicit      Boolean
+  type          PodcastType   @default(episodic)
 
-  user     User[]
-  audios   AudioFile[]
-  episodes Episode[]
+  audios         AudioFile[]
+  episodes       Episode[]
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
 }
 
 model Episode {
-  id            String        @id @default(cuid())
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  releaseDate   DateTime?
-  title         String
-  showNotes     String
-  transcription String
-  imageUrl      String
-  explicit      Boolean
-  status        EpisodeStatus @default(draft)
-  seasonNumber  Int?
-  episodeNumber Int?
-  episodeType   EpisodeType   @default(full)
-
-  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId              String
-  podcast             Podcast       @relation(fields: [podcastId], references: [id], onDelete: Cascade)
-  podcastId           String
-  audioFiles          AudioFile[]
-  chatMessages        EpisodeChat[]
+  id                  String        @id @default(cuid())
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  releaseDate         DateTime?
+  title               String
+  showNotes           String
+  transcription       String
+  imageUrl            String
+  explicit            Boolean
+  status              EpisodeStatus @default(draft)
+  seasonNumber        Int?
+  episodeNumber       Int?
+  episodeType         EpisodeType   @default(full)
   selectedAudioFileId String?
+
+  audioFiles   AudioFile[]
+  chatMessages EpisodeChat[]
+
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+  podcast        Podcast       @relation(fields: [podcastId], references: [id])
+  podcastId      String
 }
 
 model EpisodeChat {
@@ -145,24 +145,26 @@ model EpisodeChat {
 }
 
 model AudioFile {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  name       String
-  blobName   String
-  url        String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
-  episode    Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
-  episodeId  String
-  podcast    Podcast  @relation(fields: [podcastId], references: [id], onDelete: Cascade)
-  isSelected Boolean  @default(false)
-  length     Int //file size in bytes
-  duration   Int //in seconds
-  type       String   @default("audio/mpeg") //mp3
-  podcastId  String
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  name         String
+  blobName     String
+  url          String
+  isHostedByPS Boolean  @default(true)
+  isSelected   Boolean  @default(false)
+  length       Int //file size in bytes
+  duration     Int //in seconds
+  type         String   @default("audio/mpeg") //mp3
 
-  @@unique([blobName, userId])
+  episode        Episode       @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  episodeId      String
+  podcast        Podcast       @relation(fields: [podcastId], references: [id], onDelete: Cascade)
+  podcastId      String
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+
+  @@unique([blobName, subscriptionId])
 }
 
 //One row per user, if the user signed up after the 28th then move to the first of each month
@@ -172,95 +174,142 @@ model Subscription {
   updatedAt DateTime @updatedAt
   active    Boolean
 
-  stripeSubscriptionId String
-  stripePriceIds       String[]
-  stripeCustomerId     String
-  payments             Payment[]
-  billableActions      BillableAction[]
+  stripeCustomerId  String
+  creditActions     SubscriptionCreditsActions[]
+  subscriptionItems SubscriptionItem[]
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique // relation scalar field (used in the `@relation` attribute above)
+  eventCancelationId String?
+  cancelAt           DateTime?
+  canceledAt         DateTime?
+
+  audios   AudioFile[]
+  podcasts Podcast[]
+  episodes Episode[]
+
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String  @unique
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
 }
 
-// Gets created whenever a checkout session is created, needs to be validated to display to user
-model Payment {
+// This is based on stripe products
+model Product {
+  id          String   @id @default(cuid())
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  features    String
+  payAsYouGo  String
+  sortOrder   String
+  description String
+  name        String
+  planType    PlanType @default(FREE)
+
+  subscriptions Subscription[]
+
+  prices Price[]
+}
+
+model Price {
+  id                  String         @id @default(cuid())
+  active              Boolean
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  nickName            String
+  sortOrder           String
+  currency            String
+  unit_amount_decimal String
+  interval            String
+  tag                 StripePriceTag
+
+  subscriptionItems SubscriptionItem[]
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model SubscriptionItem {
+  id        String         @id @default(cuid())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  active    Boolean
+  priceTag  StripePriceTag
+
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+  price          Price?        @relation(fields: [priceId], references: [id])
+  priceId        String?
+}
+
+model PaymentIntent {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  payedAmount Decimal @default(0) @db.Decimal(19, 4)
-  invoiceId   String?
+  stripeProductId     String
+  unit_amount_decimal String
 
-  stripeSessionId              String    @unique
-  stripeLineItems              String[]
-  stripeProductId              String
-  stripeCheckouCompleteEventId String?
-  validatedByStripeWebhook     Boolean   @default(false)
-  validatedBySuccessPage       Boolean   @default(false)
-  confirmedByWebhookAt         DateTime?
+  validatedByWebhook     Boolean   @default(false)
+  validatedBySuccessPage Boolean   @default(false)
+  confirmedByWebhookAt   DateTime?
+  confirmationEventId    String?
 
-  User           User             @relation(fields: [userId], references: [id])
-  userId         String
-  billableAction BillableAction[]
-  Subscription   Subscription?    @relation(fields: [subscriptionId], references: [id])
-  subscriptionId String?
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
 // Are billed monthly
-model BillableAction {
-  id        String   @id @default(cuid())
+model SubscriptionCreditsActions {
+  //auto incrementing id
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  currenInputTokens   Decimal @default(0) @db.Decimal(19, 4)
-  previousInputTokens Decimal @default(0) @db.Decimal(19, 4)
-  inputTokensAmount   Decimal @default(0) @db.Decimal(19, 4)
+  currentAmount Decimal        @default(0) @db.Decimal(19, 4)
+  prevAmount    Decimal        @default(0) @db.Decimal(19, 4)
+  amount        Decimal        @default(0) @db.Decimal(19, 4)
+  tag           StripePriceTag
 
-  currentOutputTokens  Decimal @default(0) @db.Decimal(19, 4)
-  previousOutputTokens Decimal @default(0) @db.Decimal(19, 4)
-  outputTokensAmount   Decimal @default(0) @db.Decimal(19, 4)
-
-  currentTranscriptionMinutes  Decimal @default(0) @db.Decimal(19, 4)
-  previousTranscriptionMinutes Decimal @default(0) @db.Decimal(19, 4)
-  transcriptionMinutesAmount   Decimal @default(0) @db.Decimal(19, 4)
-
-  actionType BillingActionType
-
-  payment        Payment?     @relation(fields: [paymentId], references: [id])
-  paymentId      String?
-  Subscription   Subscription @relation(fields: [subscriptionId], references: [id])
-  subscriptionId String
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
 }
 
 model FeatureFlags {
-  id            String  @id @default(cuid())
-  signupEnabled Boolean @default(true)
-  rssEnabled    Boolean @default(true)
-  maintenance   Boolean @default(false)
+  id                   String  @id @default(cuid())
+  signupEnabled        Boolean @default(true)
+  rssEnabled           Boolean @default(true)
+  transcriptionEnabled Boolean @default(true)
+  chatEnabled          Boolean @default(true)
+  maintenance          Boolean @default(false)
 }
 
-enum BillingActionType {
-  planIncrement
-  transcription
-  chatInput
-  chatOutput
-}
-
-enum MeasuredUnits {
-  minutes
-  hours
-  seconds
-}
+model Logs {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    message   String
+    level     String
+    eventId   String
+    }
 
 enum Role {
   admin
   user
+  mod
 }
 
 enum EpisodeStatus {
   published
   draft
   archived
+}
+
+enum PodcastStatus {
+  published
+  unpublished
+  archived
+  private
+  unlisted
 }
 
 enum PodcastType {
@@ -272,4 +321,24 @@ enum EpisodeType {
   full
   trailer
   bonus
+}
+
+enum StripePriceTag {
+  PLAN_FEE
+  TRANSCRIPTION_MINUTE
+  CHAT_INPUT
+  CHAT_OUTPUT
+  STORAGE_PER_GB
+}
+
+enum StripeInterval {
+  month
+  year
+}
+
+enum PlanType {
+  FREE
+  HOBBY
+  BASIC
+  PRO
 }

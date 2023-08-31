@@ -6,7 +6,7 @@ import {
 } from "@/components/Toasts & Alerts/MyToast";
 import {
   defaultAudioFile,
-  vailidateAudioFile,
+  validateAudioFile,
 } from "@/components/Validations/Validate.AudioFile";
 import { trpcClient } from "@/utils/api";
 import {
@@ -49,11 +49,11 @@ const NewAudioFileModal = ({
     formState: { errors, isSubmitting, isDirty },
   } = useForm<AudioFile>({
     defaultValues: defaultAudioFile({
-      userId: user?.id ?? "",
+      subscriptionId: episode.subscriptionId ?? "",
       episodeId: episode.id,
       podcastId: episode.podcastId,
     }),
-    resolver: zodResolver(vailidateAudioFile),
+    resolver: zodResolver(validateAudioFile),
   });
   const handleClose = () => {
     reset();
@@ -61,7 +61,7 @@ const NewAudioFileModal = ({
     setFormProgress(0);
   };
 
-  const { mutate: createAudioFile } =
+  const { mutate: createAudioFile, isLoading } =
     trpcClient.audioFile.createAudioFileForEpisode.useMutation(
       handleUseMutationAlerts({
         successText: "Audio file created successfully!",
@@ -140,7 +140,7 @@ const NewAudioFileModal = ({
               </Collapse>
               <Flex justifyContent={"space-between"}>
                 <Button
-                  isLoading={isSubmitting}
+                  isLoading={isSubmitting || isLoading}
                   size="lg"
                   isDisabled={formProgress === 0}
                   alignSelf={"flex-end"}
@@ -156,20 +156,18 @@ const NewAudioFileModal = ({
                     size="lg"
                     alignSelf={"flex-end"}
                     onClick={handleCheckIfNameIsUnique}
-                    isDisabled={!isDirty}
+                    isDisabled={!isDirty || isLoading}
                   >
                     Next
                   </Button>
                 )}
                 {formProgress === 1 && (
                   <Button
-                    isLoading={isSubmitting}
+                    isLoading={isSubmitting || isLoading}
                     colorScheme="green"
                     size="lg"
                     alignSelf={"flex-end"}
-                    /* onClick={() => setFormProgress(1)} */
                     onClick={() => handleSubmit(submitFunc)()}
-                    /* isDisabled={formProgress === 1 || !isDirty} */
                   >
                     Upload to save
                   </Button>

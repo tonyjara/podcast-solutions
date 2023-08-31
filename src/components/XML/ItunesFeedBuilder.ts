@@ -1,7 +1,8 @@
+import { isScheduled } from "@/lib/utils/dateUtils";
 import { Prisma } from "@prisma/client";
 import { Podcast as MakePodcast } from "podcast";
 
-type PodcastTypeForFeed = Prisma.PodcastGetPayload<{
+export type PodcastTypeForFeed = Prisma.PodcastGetPayload<{
   include: {
     episodes: { include: { audioFiles: { where: { isSelected: true } } } };
   };
@@ -13,20 +14,20 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
   //Channel tags enclose podcasts, for episodes, use item tags
 
   const webUrl = process.env.NEXT_PUBLIC_WEB_URL;
-  if (!webUrl) throw new Error("NEXT_PUBLIC_WEB_URL is not set");
+  if (!webUrl) throw new Error("NEXT_PUBLIC_WEB_URL env is not set");
 
   const feed = new MakePodcast({
     title: podcast.name,
     description: podcast.description,
     language: podcast.language,
-    feedUrl: `${webUrl}/podcasts/${podcast.slug}`,
+    feedUrl: `${webUrl}/rss/${podcast.slug}`,
     siteUrl: `${webUrl}/podcasts/${podcast.slug}`,
     imageUrl: podcast.imageUrl,
     author: podcast.author,
     pubDate: podcast.publishedAt,
     copyright: `Copyright ${podcast.author} ${new Date().getFullYear()}`,
     itunesType: podcast.type,
-    itunesCategory: [{ text: podcast.category }],
+    itunesCategory: podcast.categories.map((category) => ({ text: category })),
     itunesExplicit: podcast.explicit,
     itunesOwner: {
       name: podcast.author,
@@ -43,7 +44,7 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
 
   podcast.episodes.forEach((episode) => {
     const audioFile = episode.audioFiles.at(0);
-    if (episode.releaseDate && audioFile) {
+    if (episode.releaseDate && !isScheduled(episode.releaseDate) && audioFile) {
       feed.addItem({
         title: episode.title,
         description: episode.showNotes,

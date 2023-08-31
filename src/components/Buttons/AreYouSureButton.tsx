@@ -21,6 +21,8 @@ interface props {
   customButton?: React.ReactNode;
   confirmButtonText?: string;
   isDisabled?: boolean;
+  rightIcon?: any;
+  leftIcon?: any;
 }
 
 const AreYouSureButton = ({
@@ -32,6 +34,8 @@ const AreYouSureButton = ({
   customButton,
   confirmButtonText,
   isDisabled,
+  leftIcon,
+  rightIcon,
 }: props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -43,7 +47,12 @@ const AreYouSureButton = ({
   return (
     <>
       {!customButton ? (
-        <Button isDisabled={isDisabled} onClick={onOpen}>
+        <Button
+          rightIcon={rightIcon}
+          leftIcon={leftIcon}
+          isDisabled={isDisabled}
+          onClick={onOpen}
+        >
           {buttonText}
         </Button>
       ) : (

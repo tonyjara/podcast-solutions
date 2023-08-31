@@ -7,14 +7,12 @@ import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
 import { type PricingPageProps } from "@/pages";
 
 export default function Pricing({ prices, products }: PricingPageProps) {
-  const notReversed = products.data ?? [];
-  const reversedData = [...notReversed].reverse();
   const session = useSession();
 
   const authenticated = session?.status === "authenticated";
 
   const { mutate } =
-    trpcClient.stripe.getSessionUrlAndCreatePayment.useMutation(
+    trpcClient.stripe.getSessionUrlAndCreatePaymentIntent.useMutation(
       handleUseMutationAlerts({
         successText: "Redirecting to checkout...",
         callback: ({ url }) => {
@@ -31,7 +29,7 @@ export default function Pricing({ prices, products }: PricingPageProps) {
   };
 
   return (
-    <Box py={12}>
+    <Box id="pricing" py={12}>
       <VStack spacing={2} textAlign="center">
         <Heading maxW="800px" as="h1" fontSize="4xl">
           Choose the plan that better fits your needs{" "}
@@ -50,31 +48,35 @@ export default function Pricing({ prices, products }: PricingPageProps) {
         spacing={{ base: 4, lg: 10 }}
         py={10}
       >
-        {reversedData.map((product, i) => {
-          const matchingPrice = prices.data.find(
-            (price) => price.id === product.default_price,
-          );
-          const features = product.metadata?.features;
-          const payAsYouGo = product.metadata?.payAsYouGo;
-          return (
-            <PricingCard
-              popular={i === 1}
-              key={product.id}
-              payAsYouGo={payAsYouGo ? payAsYouGo.split(",") : []}
-              handleCheckout={() => {
-                if (!product.default_price || !product.id) return;
-                return handleCheckout(product.id, product.default_price);
-              }}
-              description={product.description ?? ""}
-              autenticated={authenticated}
-              price={
-                matchingPrice?.unit_amount ? matchingPrice.unit_amount / 100 : 0
-              }
-              title={product.name}
-              features={features ? features.split(",") : []}
-            />
-          );
-        })}
+        {products.data
+          .sort(
+            (a: any, b: any) =>
+              (a.metadata?.sortOrder ?? "0") - (b.metadata?.sortOrder ?? "0"),
+          )
+          .map((product, i) => {
+            const productPrices = prices.data.filter(
+              (x) => x.product === product.id,
+            );
+            const features = product.metadata?.features;
+            const payAsYouGo = product.metadata?.payAsYouGo;
+            return (
+              <PricingCard
+                popular={i === 1}
+                key={product.id}
+                payAsYouGo={payAsYouGo ? payAsYouGo.split(",") : []}
+                handleCheckout={() => {
+                  if (!product.default_price || !product.id) return;
+                  return handleCheckout(product.id, product.default_price);
+                }}
+                description={product.description ?? ""}
+                autenticated={authenticated}
+                defaultPriceId={product.default_price?.toString() ?? ""}
+                prices={productPrices}
+                title={product.name}
+                features={features ? features.split(",") : []}
+              />
+            );
+          })}
       </Stack>
     </Box>
   );

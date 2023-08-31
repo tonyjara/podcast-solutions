@@ -5,7 +5,6 @@ import {
   protectedProcedure,
 } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
-import { TRPCError } from "@trpc/server";
 
 export const usersRouter = createTRPCRouter({
   getUserById: publicProcedure

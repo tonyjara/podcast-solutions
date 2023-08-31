@@ -77,6 +77,7 @@ export interface DynamicTableProps<T extends object> {
     whereFilterList?: any[];
     setWhereFilterList?: React.Dispatch<React.SetStateAction<any[]>>;
     rowActions?: (x: any) => void; // Function that takes row data and as parameter
+    customHeader?: React.ReactNode;
 }
 
 const DynamicTable = <T extends object>({
@@ -106,6 +107,7 @@ const DynamicTable = <T extends object>({
     whereFilterList,
     setWhereFilterList,
     rowActions,
+    customHeader,
 }: DynamicTableProps<T>) => {
     const [menuData, setMenuData] = useState<{
         x: number;
@@ -150,11 +152,16 @@ const DynamicTable = <T extends object>({
             backgroundColor={backgroundColor}
             maxH="calc(100vh - 80px)"
         >
-            {!noHeader && (
+            {customHeader}
+            {!noHeader && !customHeader && (
                 <CardHeader display="flex" w="100%" flexDirection="column">
                     <Flex flexDirection={{ base: "column", md: "row" }} gap="10px">
                         <Flex flexDirection={"column"}>
-                            <Flex alignItems={"center"} gap="20px" flexDirection={"row"}>
+                            <Flex
+                                alignItems={"center"}
+                                gap="10px"
+                                flexDirection={{ base: "column", md: "row" }}
+                            >
                                 {headerLeftComp}
                                 <TableTitleMenu
                                     globalFilter={globalFilter}
@@ -300,7 +307,7 @@ const DynamicTable = <T extends object>({
                                     });
                                 }}
                             >
-                                {row.getVisibleCells().map((cell, i) => {
+                                {row.getVisibleCells().map((cell) => {
                                     // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                                     const meta: any = cell.column.columnDef.meta;
 
@@ -354,8 +361,7 @@ const DynamicTable = <T extends object>({
                                     }
                                     icon={<CloseIcon />}
                                 >
-                                    Cerrar menú
-                                </MenuItem>
+                                    Close menu                </MenuItem>
                             </MenuGroup>
                             <MenuDivider />
                             <MenuGroup>

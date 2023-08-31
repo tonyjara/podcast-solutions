@@ -2,6 +2,9 @@ import { Button } from "@chakra-ui/react";
 import { type Column } from "@tanstack/react-table";
 import React from "react";
 import { BsFilter } from "react-icons/bs";
+import EpisodeStatusColumnFilter from "./ColumnFilters/EpisodeStatusColumnFilter";
+import InputContainsColumnFilter from "./ColumnFilters/InputContains.columnFilter";
+import EpisodeReleaseDateColumnFilter from "./ColumnFilters/EpisodeReleaseDate.columnFilter";
 
 export interface ColumnFilterProps {
   keyName?: string;
@@ -18,25 +21,28 @@ const ColumnFilter = (props: ColumnFilterProps) => {
 
   return (
     <div>
-      {column.id === "N." && (
+      {column.id === "episodeNumber" && (
         <Button
           leftIcon={<BsFilter />}
           size={"sm"}
           isDisabled={!whereFilterList.length}
           onClick={() => setWhereFilterList && setWhereFilterList([])}
         >
-          Borrar Filtros
+          Delete Filters
         </Button>
       )}
-      {/* {column.id === "status" && <MoneyRequestStatusColumnFilter {...props} />}{" "} */}
+      {column.id === "status" && <EpisodeStatusColumnFilter {...props} />}{" "}
+      {column.id === "title" && (
+        <InputContainsColumnFilter keyName="title" {...props} />
+      )}{" "}
+      {column.id === "releaseDate" && (
+        <EpisodeReleaseDateColumnFilter keyName="releaseDate" {...props} />
+      )}
       {/* {column.id === "Proyecto" && ( */}
       {/*     <MoneyRequestProjectsColumnFilter {...props} /> */}
       {/* )}{" "} */}
       {/* {column.id === "moneyRequestType" && ( */}
       {/*     <MoneyRequestTypeColumnFilter {...props} /> */}
-      {/* )}{" "} */}
-      {/* {column.id === "description" && ( */}
-      {/*     <InputContainsColumnFilter keyName="description" {...props} /> */}
       {/* )}{" "} */}
       {/* {column.id === "comments" && ( */}
       {/*     <InputContainsColumnFilter keyName="comments" {...props} /> */}

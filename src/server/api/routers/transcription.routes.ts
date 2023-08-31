@@ -2,7 +2,7 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { z } from "zod";
 import { Deepgram } from "@deepgram/sdk";
-import { Prisma } from "@prisma/client";
+import { appRouter } from "../router";
 
 const deepgramApiKey = process.env.DEEPGRAM_API_KEY;
 
@@ -14,7 +14,7 @@ export const transcriptionRouter = createTRPCRouter({
         episodeId: z.string().min(1),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       if (!deepgramApiKey) {
         throw new Error("Deepgram API key not set");
       }
@@ -37,6 +37,12 @@ export const transcriptionRouter = createTRPCRouter({
           /* detect_topics: true, */
         },
       );
+
+      const durationInSeconds = audioFile.duration;
+      const caller = appRouter.createCaller({ session: ctx.session, prisma });
+      await caller.stripeUsage.postAudioTranscriptionUsage({
+        durationInSeconds,
+      });
 
       //example of response from words
       /*       { */

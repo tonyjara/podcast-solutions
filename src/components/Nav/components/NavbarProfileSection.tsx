@@ -15,7 +15,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
 import { signOut } from "next-auth/react";
-import NotificationIcon from "./NotificationIcon";
 
 const NavbarProfileSection = () => {
   const router = useRouter();
@@ -34,9 +33,9 @@ const NavbarProfileSection = () => {
       />
 
       {/* <NotificationIcon /> */}
-      <Flex pl={"10px"} alignItems={"center"}>
-        <Menu>
-          {data && (
+      {data && (
+        <Flex pl={"10px"} alignItems={"center"}>
+          <Menu>
             <MenuButton
               py={2}
               transition="all 0.3s"
@@ -44,23 +43,25 @@ const NavbarProfileSection = () => {
             >
               <Avatar size={"sm"} src={data?.user.image ?? undefined} />
             </MenuButton>
-          )}
-          <Portal>
-            <MenuList>
-              <MenuItem>
-                {data?.user.firstName} {data?.user.lastName}{" "}
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem onClick={() => router.push("/home/settings")}>
-                My Account
-              </MenuItem>
+            <Portal>
+              <MenuList>
+                <MenuItem>
+                  {data?.user.firstName} {data?.user.lastName}{" "}
+                </MenuItem>
 
-              <MenuDivider />
-              <MenuItem onClick={() => signOut()}>Logout</MenuItem>
-            </MenuList>
-          </Portal>
-        </Menu>
-      </Flex>
+                <MenuItem>{data?.user.email}</MenuItem>
+                <MenuDivider />
+                <MenuItem onClick={() => router.push("/home/settings")}>
+                  My Account
+                </MenuItem>
+
+                <MenuDivider />
+                <MenuItem onClick={() => signOut()}>Logout</MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </Flex>
+      )}
     </Flex>
   );
 };

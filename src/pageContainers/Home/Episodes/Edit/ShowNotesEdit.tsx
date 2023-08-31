@@ -9,6 +9,7 @@ import { trpcClient } from "@/utils/api";
 import { Episode } from "@prisma/client";
 import React from "react";
 import { Control, useWatch } from "react-hook-form";
+import { SiOpenai } from "react-icons/si";
 
 const ShowNotesEdit = ({
   control,
@@ -20,6 +21,8 @@ const ShowNotesEdit = ({
   episode: Episode | null | undefined;
 }) => {
   const context = trpcClient.useContext();
+
+  const transcription = useWatch({ control, name: "transcription" });
 
   const { mutate: generateShowNotes, isLoading } =
     trpcClient.chatGPT.generateShowNotesFromTranscription.useMutation(
@@ -36,8 +39,9 @@ const ShowNotesEdit = ({
       title="Show Notes"
       titleComponents={
         <AreYouSureButton
-          isDisabled={isLoading}
-          buttonText="Generate Show Notes"
+          rightIcon={<SiOpenai fontSize={"sm"} />}
+          isDisabled={isLoading || !transcription.length}
+          buttonText="Generate"
           confirmAction={() => {
             if (!episode || !episode.transcription.length) {
               return myToast.error("Transcription is empty");

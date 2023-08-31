@@ -1,4 +1,4 @@
-import { type Podcast } from "@prisma/client";
+import { PodcastStatus, type Podcast } from "@prisma/client";
 import * as z from "zod";
 
 export const validatePodcastEdit: z.ZodType<Podcast> = z.lazy(() =>
@@ -7,6 +7,7 @@ export const validatePodcastEdit: z.ZodType<Podcast> = z.lazy(() =>
     active: z.boolean(),
     createdAt: z.date(),
     updatedAt: z.date(),
+    subscriptionId: z.string().min(1),
     publishedAt: z.date({
       required_error: "Please select a date",
       invalid_type_error: "Please select a date",
@@ -19,13 +20,17 @@ export const validatePodcastEdit: z.ZodType<Podcast> = z.lazy(() =>
       .string()
       .min(1, { message: "Description is required" })
       .max(3900),
-    category: z.string().min(1, { message: "Category is required" }),
+    categories: z
+      .string({ invalid_type_error: "Category is required" })
+      .array()
+      .min(1, { message: "Category is required" }),
     language: z.string().min(1, { message: "Language is required" }),
     imageUrl: z
       .string()
       .min(1, { message: "Please upload an image for your podcast." }),
     explicit: z.boolean(),
     type: z.enum(["episodic", "serial"]),
+    podcastStatus: z.nativeEnum(PodcastStatus),
   }),
 );
 
@@ -33,12 +38,14 @@ export const defaultPodcastValues: Podcast = {
   id: "",
   createdAt: new Date(),
   updatedAt: new Date(),
+  podcastStatus: "unpublished",
   name: "",
   email: "",
   author: "",
   slug: "",
   description: "",
-  category: "",
+  subscriptionId: "",
+  categories: [],
   language: "",
   imageUrl: "",
   explicit: false,

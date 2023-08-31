@@ -1,10 +1,4 @@
-import {
-  Divider,
-  Icon,
-  IconButton,
-  Image,
-  useColorMode,
-} from "@chakra-ui/react";
+import { Divider, IconButton, Image, useColorMode } from "@chakra-ui/react";
 import { AccordionIcon } from "@chakra-ui/react";
 import { AccordionPanel } from "@chakra-ui/react";
 import { Accordion, AccordionButton, AccordionItem } from "@chakra-ui/react";
@@ -16,26 +10,19 @@ import NavItemChild from "../components/NavItemChild";
 import { SidebarLinks } from "../Data/SidebarLinks";
 import PodcastSelect from "@/components/Selects/PodcastSelect";
 import Link from "next/link";
-import { MdOutlineUnpublished } from "react-icons/md";
-import { trpcClient } from "@/utils/api";
-import { AiOutlineCheckCircle } from "react-icons/ai";
 interface SidebarProps {
   minimized: boolean;
   setMinimized: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
-  const { data } = useSession();
-  const isAdmin = data?.user.role === "admin";
-
+  const user = useSession().data?.user;
   const { colorMode } = useColorMode();
   const logo =
     colorMode === "light"
       ? "/assets/logo/black-logo.png"
       : "/assets/logo/white-logo.png";
 
-  const { data: selectedPodcast } =
-    trpcClient.podcast.getMySelectedPodcast.useQuery();
   return (
     <Box
       zIndex={2}
@@ -76,16 +63,18 @@ const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
           gap={2}
           justifyContent="space-between"
         >
-          <Icon
-            display={{ base: "none", md: minimized ? "none" : "flex" }}
-            fontSize="lg"
-            color={selectedPodcast?.active ? "green" : "red"}
-            as={
-              selectedPodcast?.active
-                ? AiOutlineCheckCircle
-                : MdOutlineUnpublished
-            }
-          />
+          {/* <Icon */}
+          {/*   display={{ base: "none", md: minimized ? "none" : "flex" }} */}
+          {/*   fontSize="lg" */}
+          {/*   color={ */}
+          {/*     selectedPodcast?.podcastStatus === "published" ? "green" : "red" */}
+          {/*   } */}
+          {/*   as={ */}
+          {/*     selectedPodcast?.active */}
+          {/*       ? AiOutlineCheckCircle */}
+          {/*       : MdOutlineUnpublished */}
+          {/*   } */}
+          {/* /> */}
           {!minimized && <PodcastSelect />}
           <IconButton
             aria-label="close drawer"
@@ -104,57 +93,58 @@ const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
         </Flex>
       </Flex>
 
-      {SidebarLinks(isAdmin).map((link) => (
-        <div key={link.name}>
-          {link.children?.length && (
-            <Accordion allowToggle>
-              <AccordionItem>
-                {/* the column fixes annoying margin leftrover when minimized */}
-                <Flex
-                  flexDir={minimized ? "column" : "row"}
-                  justifyContent="space-between"
-                >
-                  <DesktopNavItem
-                    minimized={minimized}
-                    icon={link.icon}
-                    dest={link.dest}
-                    name={link.name}
-                    target={link.target}
-                  />
-
-                  <AccordionButton
-                    display={minimized ? "none" : "flex"}
-                    justifyContent={minimized ? "center" : "right"}
+      {user &&
+        SidebarLinks(user).map((link) => (
+          <div key={link.name}>
+            {link.children?.length && (
+              <Accordion allowToggle>
+                <AccordionItem>
+                  {/* the column fixes annoying margin leftrover when minimized */}
+                  <Flex
+                    flexDir={minimized ? "column" : "row"}
+                    justifyContent="space-between"
                   >
-                    {!minimized && <AccordionIcon />}
-                  </AccordionButton>
-                </Flex>
-                {link.children.map((x) => (
-                  <AccordionPanel key={x.name}>
-                    <NavItemChild
-                      icon={x.icon}
-                      name={x.name}
-                      dest={x.dest}
+                    <DesktopNavItem
                       minimized={minimized}
+                      icon={link.icon}
+                      dest={link.dest}
+                      name={link.name}
                       target={link.target}
                     />
-                  </AccordionPanel>
-                ))}
-              </AccordionItem>
-            </Accordion>
-          )}
-          {!link.children?.length && (
-            <DesktopNavItem
-              name={link.name}
-              minimized={minimized}
-              icon={link.icon}
-              dest={link.dest}
-              target={link.target}
-            />
-          )}
-          <Divider />
-        </div>
-      ))}
+
+                    <AccordionButton
+                      display={minimized ? "none" : "flex"}
+                      justifyContent={minimized ? "center" : "right"}
+                    >
+                      {!minimized && <AccordionIcon />}
+                    </AccordionButton>
+                  </Flex>
+                  {link.children.map((x) => (
+                    <AccordionPanel key={x.name}>
+                      <NavItemChild
+                        icon={x.icon}
+                        name={x.name}
+                        dest={x.dest}
+                        minimized={minimized}
+                        target={link.target}
+                      />
+                    </AccordionPanel>
+                  ))}
+                </AccordionItem>
+              </Accordion>
+            )}
+            {!link.children?.length && (
+              <DesktopNavItem
+                name={link.name}
+                minimized={minimized}
+                icon={link.icon}
+                dest={link.dest}
+                target={link.target}
+              />
+            )}
+            <Divider />
+          </div>
+        ))}
     </Box>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import es from "date-fns/locale/es";
 
 import type {
   Control,

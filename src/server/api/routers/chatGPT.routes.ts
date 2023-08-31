@@ -5,6 +5,7 @@ import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import { encode } from "gpt-tokenizer";
 import { systemMessage } from "@/lib/Constants";
 import { TRPCError } from "@trpc/server";
+import { appRouter } from "../router";
 
 export interface MessageSchema {
   role: "assistant" | "user" | "system";
@@ -66,7 +67,7 @@ export const chatGPTRouter = createTRPCRouter({
         ),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       await prisma.episodeChat.create({
         data: {
           role: "user",
@@ -78,7 +79,7 @@ export const chatGPTRouter = createTRPCRouter({
       const tokenCountAverage = encode(input.userContent).length;
 
       const handleModel = () => {
-        if (tokenCountAverage > 31000) {
+        if (tokenCountAverage > 16000) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Exceeded token limit",
@@ -87,10 +88,6 @@ export const chatGPTRouter = createTRPCRouter({
         if (tokenCountAverage > 3000) {
           return "gpt-3.5-turbo-16k";
         }
-        if (tokenCountAverage > 14000) {
-          return "gpt-4-32k";
-        }
-
         return "gpt-3.5-turbo";
       };
 
@@ -119,15 +116,11 @@ export const chatGPTRouter = createTRPCRouter({
         },
       });
 
-      //Response example
-      /*        data: { */
-      /*   id: 'chatcmpl-7nVW4pb3Yn0Y9hFySnr8OgtbZqUvZ', */
-      /*   object: 'chat.completion', */
-      /*   created: 1692033576, */
-      /*   model: 'gpt-3.5-turbo-16k-0613', */
-      /*   choices: [ [Object] ], */
-      /*   usage: { prompt_tokens: 3099, completion_tokens: 221, total_tokens: 3320 } */
-      /* } */
+      const inputTokens = chatCompletion.data.usage?.prompt_tokens || 0;
+      const outputTokens = chatCompletion.data.usage?.completion_tokens || 0;
+      const caller = appRouter.createCaller({ session: ctx.session, prisma });
+      await caller.stripeUsage.postChatUsage({ inputTokens, outputTokens });
+
       return { role: response.role, content: response.content };
     }),
   clearEpisodeChat: protectedProcedure
@@ -146,11 +139,11 @@ export const chatGPTRouter = createTRPCRouter({
         transcription: z.string().min(1),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const tokenCountAverage = encode(input.transcription).length;
 
       const handleModel = () => {
-        if (tokenCountAverage > 31000) {
+        if (tokenCountAverage > 16000) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Exceeded token limit",
@@ -160,10 +153,6 @@ export const chatGPTRouter = createTRPCRouter({
         if (tokenCountAverage > 3000) {
           return "gpt-3.5-turbo-16k";
         }
-        if (tokenCountAverage > 14000) {
-          return "gpt-4-32k";
-        }
-
         return "gpt-3.5-turbo";
       };
 
@@ -187,14 +176,19 @@ export const chatGPTRouter = createTRPCRouter({
         data: { showNotes: showNotes.content },
       });
 
-      //Response example
-      /*        data: { */
-      /*   id: 'chatcmpl-7nVW4pb3Yn0Y9hFySnr8OgtbZqUvZ', */
-      /*   object: 'chat.completion', */
-      /*   created: 1692033576, */
-      /*   model: 'gpt-3.5-turbo-16k-0613', */
-      /*   choices: [ [Object] ], */
-      /*   usage: { prompt_tokens: 3099, completion_tokens: 221, total_tokens: 3320 } */
-      /* } */
+      const inputTokens = chatCompletion.data.usage?.prompt_tokens || 0;
+      const outputTokens = chatCompletion.data.usage?.completion_tokens || 0;
+      const caller = appRouter.createCaller({ session: ctx.session, prisma });
+      await caller.stripeUsage.postChatUsage({ inputTokens, outputTokens });
     }),
 });
+
+//Chat completion response example
+/*        data: { */
+/*   id: 'chatcmpl-7nVW4pb3Yn0Y9hFySnr8OgtbZqUvZ', */
+/*   object: 'chat.completion', */
+/*   created: 1692033576, */
+/*   model: 'gpt-3.5-turbo-16k-0613', */
+/*   choices: [ [Object] ], */
+/*   usage: { prompt_tokens: 3099, completion_tokens: 221, total_tokens: 3320 } */
+/* } */

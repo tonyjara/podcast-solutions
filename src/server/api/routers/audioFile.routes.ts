@@ -2,21 +2,25 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { deleteAzureBlob } from "@/lib/utils/azure-delete-blob";
-import slugify from "@sindresorhus/slugify";
-import { vailidateAudioFile } from "@/components/Validations/Validate.AudioFile";
+import slugify from "slugify";
+import { validateAudioFile } from "@/components/Validations/Validate.AudioFile";
 
 export const audioFileRoute = createTRPCRouter({
   createAudioFileForEpisode: protectedProcedure
-    .input(vailidateAudioFile)
+    .input(validateAudioFile)
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
       if (!user) throw new Error("User not found");
       const preferences = await prisma.preferences.findUniqueOrThrow({
         where: { userId: user.id },
       });
+      const subscription = await prisma.subscription.findUniqueOrThrow({
+        where: { userId: user.id, active: true },
+      });
       const podcast = await prisma.podcast.findUniqueOrThrow({
         where: { id: preferences.selectedPodcastId },
       });
+
       const audioFile = await prisma.audioFile.create({
         data: {
           name: input.name,
@@ -24,7 +28,7 @@ export const audioFileRoute = createTRPCRouter({
           url: input.url,
           episodeId: input.episodeId,
           podcastId: podcast.id,
-          userId: user.id,
+          subscriptionId: subscription.id,
           length: input.length,
           duration: input.duration,
           type: input.type,
@@ -52,12 +56,17 @@ export const audioFileRoute = createTRPCRouter({
     .input(z.object({ name: z.string().min(3), episodeId: z.string().min(3) }))
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
+      const subscription = await prisma.subscription.findUniqueOrThrow({
+        where: { userId: user.id, active: true },
+      });
 
       const audioFile = await prisma.audioFile.findFirst({
         where: {
-          blobName: `${input.episodeId}-${slugify(input.name)}-audio-file`,
+          blobName: `${input.episodeId}-${slugify(input.name, {
+            lower: true,
+          })}-audio-file`,
           episodeId: input.episodeId,
-          userId: user.id,
+          subscriptionId: subscription.id,
         },
       });
 
@@ -70,10 +79,9 @@ export const audioFileRoute = createTRPCRouter({
         episodeId: z.string().min(3),
       }),
     )
-    .mutation(async ({ input, ctx }) => {
-      const user = ctx.session.user;
+    .mutation(async ({ input }) => {
       await prisma.episode.update({
-        where: { id: input.episodeId, userId: user.id },
+        where: { id: input.episodeId },
         data: { selectedAudioFileId: input.audioFileId },
       });
       await prisma.audioFile.update({
@@ -90,6 +98,7 @@ export const audioFileRoute = createTRPCRouter({
       z.object({
         id: z.string().min(3),
         blobName: z.string().min(3),
+        isHostedByPS: z.boolean(),
         connectionString: z.string().min(3),
         episodeId: z.string().min(3),
       }),
@@ -98,11 +107,13 @@ export const audioFileRoute = createTRPCRouter({
       try {
         const user = ctx.session.user;
 
-        await deleteAzureBlob({
-          containerName: user.id,
-          blobName: input.blobName,
-          connectionString: input.connectionString,
-        });
+        if (!input.isHostedByPS) {
+          await deleteAzureBlob({
+            containerName: user.id,
+            blobName: input.blobName,
+            connectionString: input.connectionString,
+          });
+        }
 
         const episode = await prisma.episode.findUnique({
           where: { id: input.episodeId },

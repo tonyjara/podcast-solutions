@@ -7,10 +7,9 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   Button,
-  MenuItem,
-} from '@chakra-ui/react';
-import { useSession } from 'next-auth/react';
-import React from 'react';
+} from "@chakra-ui/react";
+import { useSession } from "next-auth/react";
+import React from "react";
 
 interface props {
   onConfirm: () => void;
@@ -27,7 +26,7 @@ export function ButtonDeleteDialog({
 }: props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
-  const isAdmin = useSession().data?.user.role === 'ADMIN';
+  const isAdmin = useSession().data?.user.role === "ADMIN";
 
   const handleDelete = () => {
     onConfirm();
@@ -36,7 +35,7 @@ export function ButtonDeleteDialog({
 
   return (
     <>
-      <Button h="full" whiteSpace={'break-spaces'} onClick={onOpen}>
+      <Button h="full" whiteSpace={"break-spaces"} onClick={onOpen}>
         {buttonText}
       </Button>
 
@@ -54,7 +53,7 @@ export function ButtonDeleteDialog({
             <AlertDialogBody>
               {text ??
                 `Estas seguro/a? ${
-                  isAdmin ? 'esta operación no se puede deshacer' : ''
+                  isAdmin ? "esta operación no se puede deshacer" : ""
                 }`}
             </AlertDialogBody>
 

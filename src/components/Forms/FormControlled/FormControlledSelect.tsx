@@ -39,11 +39,7 @@ const FormControlledSelect = <T extends FieldValues>({
   ];
   return (
     <FormControl isInvalid={!!errors[name] || !!error}>
-      {label && (
-        <FormLabel fontSize={"md"} color={"gray.500"}>
-          {label}
-        </FormLabel>
-      )}
+      {label && <FormLabel fontSize={"md"}>{label}</FormLabel>}
       <Controller
         control={control}
         name={name}

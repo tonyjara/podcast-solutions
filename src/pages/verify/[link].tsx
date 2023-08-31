@@ -93,7 +93,7 @@ export default function SignupCard(props: {
         <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
           <Stack align={"center"}>
             <Heading fontSize={"4xl"} textAlign={"center"}>
-              {`Thanks for signing up ${firstName}!`}
+              {`Thanks for signing up, ${firstName}!`}
             </Heading>
             <Text fontSize={"xl"}>
               Please assign a password to your new account

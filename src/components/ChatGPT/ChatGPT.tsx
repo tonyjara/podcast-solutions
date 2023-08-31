@@ -103,7 +103,7 @@ export function ChatGPT({
               aria-label="Send message"
               type="submit"
               isDisabled={isLoading}
-              onClick={() => {}}
+              onClick={() => handleSubmitChat()}
             >
               <AiOutlineSend />
             </IconButton>

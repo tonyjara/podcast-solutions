@@ -8,13 +8,14 @@ import { prisma } from "@/server/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
-type SessionUser = Omit<Account, "password"> & {
+export type SessionUser = Omit<Account, "password"> & {
   id: string;
   accountId: string;
   firstName: string;
   lastName: string;
   image: string;
   email: string;
+  role: string;
 };
 declare module "next-auth" {
   interface Session {
@@ -84,6 +85,7 @@ export const authOptions: NextAuthOptions = {
         if (!matchesHash) return null;
         const sessionUser: SessionUser = {
           active: account.active,
+          role: account.role,
           isVerified: account.isVerified,
           createdAt: account.createdAt,
           updatedAt: account.updatedAt,

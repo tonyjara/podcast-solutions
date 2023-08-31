@@ -4,7 +4,8 @@ import { trpcClient } from "@/utils/api";
 import { Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
+import slugify from "slugify";
 import { z } from "zod";
 
 const validateName = z.object({
@@ -13,8 +14,11 @@ const validateName = z.object({
     .min(3, "Name must be at least 3 character")
     .max(100, "Name must be less than 100 characters"),
 });
+interface props {
+  goBack: () => void;
+}
 
-const PodcastNameForm = () => {
+const PodcastNameForm = (props: props) => {
   const trpcContext = trpcClient.useContext();
   const {
     handleSubmit,
@@ -36,6 +40,8 @@ const PodcastNameForm = () => {
     mutate(data);
   };
 
+  const name = useWatch({ control, name: "name" });
+
   return (
     <form onSubmit={handleSubmit(submitFunc)} noValidate>
       <Flex flexDir={"column"} gap={5}>
@@ -51,15 +57,36 @@ const PodcastNameForm = () => {
           label="Podcast Name"
           autoFocus={true}
         />
-        <Button
-          type="submit"
-          isLoading={isSubmitting}
-          colorScheme="green"
-          size="lg"
-          alignSelf={"flex-end"}
-        >
-          Next
-        </Button>
+        <Text fontSize={"xl"}>
+          This is how your feed URL will look like:{" "}
+          <Text as={"code"}>
+            https://podcastsolutions.org/rss/
+            <Text as={"span"} color={"green"}>
+              {slugify(name, { lower: true })}
+            </Text>
+          </Text>
+        </Text>
+        <Text color="red.300">This url cannot be changed later.</Text>
+
+        <Flex justifyContent={"space-between"}>
+          <Button
+            onClick={props.goBack}
+            isLoading={isSubmitting}
+            size="lg"
+            alignSelf={"flex-end"}
+          >
+            Prev
+          </Button>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            colorScheme="green"
+            size="lg"
+            alignSelf={"flex-end"}
+          >
+            Next
+          </Button>
+        </Flex>
       </Flex>
     </form>
   );

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import React from "react";
-import { Box, useColorModeValue, useDisclosure } from "@chakra-ui/react";
+import { Box, useDisclosure } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
 import DesktopSidebar from "./Desktop/DesktopSidebar";
 import MobileSidebar from "./Mobile/MobileSidebar";
