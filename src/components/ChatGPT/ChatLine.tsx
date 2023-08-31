@@ -93,7 +93,11 @@ export function ChatLine({
           w="85px"
           backgroundColor={toolbarBg}
         >
-          <CopyIcon cursor={"pointer"} onClick={handleCopy} />
+          <CopyIcon
+            _hover={{ opacity: "0.6" }}
+            cursor={"pointer"}
+            onClick={handleCopy}
+          />
           {/* <DeleteIcon /> */}
           <Checkbox
             isIndeterminate={!expandText}

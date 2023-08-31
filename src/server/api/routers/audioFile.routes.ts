@@ -10,7 +10,7 @@ export const audioFileRoute = createTRPCRouter({
     .input(validateAudioFile)
     .mutation(async ({ input, ctx }) => {
       const user = ctx.session.user;
-      if (!user) throw new Error("User not found");
+
       const preferences = await prisma.preferences.findUniqueOrThrow({
         where: { userId: user.id },
       });
@@ -131,5 +131,14 @@ export const audioFileRoute = createTRPCRouter({
       } catch (err) {
         console.error(err);
       }
+    }),
+  getEpisodeAudioFiles: protectedProcedure
+    .input(z.object({ episodeId: z.string().nullish() }))
+    .query(async ({ input }) => {
+      if (!input.episodeId) return [];
+      return await prisma.audioFile.findMany({
+        where: { episodeId: input.episodeId },
+        orderBy: { isSelected: "asc" },
+      });
     }),
 });
