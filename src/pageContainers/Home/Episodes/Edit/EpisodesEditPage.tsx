@@ -32,6 +32,7 @@ import EpisodeStatusMenu from "./EpisodeStatusMenu";
 import { AddIcon } from "@chakra-ui/icons";
 import FormControlledNumberInput from "@/components/Forms/FormControlled/FormControlledNumberInput";
 import FormControlledSelect from "@/components/Forms/FormControlled/FormControlledSelect";
+import useUnsavedChangesWarning from "@/lib/hooks/useUnsavedChangesWarning";
 
 export type EpisodeWithAudioFiles =
   | (Episode & {
@@ -56,6 +57,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
     defaultValues: defaultEpisodeValues,
     resolver: zodResolver(validateEpisodeEdit),
   });
+  useUnsavedChangesWarning(isDirty && !isSubmitting);
 
   const { mutate, isLoading } = trpcClient.episode.editEpisode.useMutation(
     handleUseMutationAlerts({
@@ -67,7 +69,10 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
   );
 
   const { data: fetchedEpisode } =
-    trpcClient.episode.getEpisodeWithAudioFiles.useQuery({ id: episode.id });
+    trpcClient.episode.getEpisodeWithAudioFiles.useQuery(
+      { id: episode.id },
+      { refetchOnWindowFocus: false },
+    );
 
   useEffect(() => {
     if (!fetchedEpisode) return;
@@ -77,7 +82,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedEpisode]);
 
-  const submitFunc = async (data: Episode) => {
+  const submitFunc = (data: Episode) => {
     mutate(data);
   };
 
@@ -88,7 +93,13 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
   return (
     <Box w="100%" display={"flex"} justifyContent={"center"} pb={"100px"}>
       <Flex maxW={"1000px"} flexDir={"column"} gap={13}>
-        <form onSubmit={handleSubmit(submitFunc)} noValidate>
+        <form
+          onKeyDown={(e) => {
+            e.key === "Enter" && e.preventDefault();
+          }}
+          onSubmit={handleSubmit(submitFunc)}
+          noValidate
+        >
           <Flex
             justifyContent={{ base: "flex-start", sm: "space-between" }}
             w="100%"
@@ -183,7 +194,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
             >
               <AudioFileSelector
                 errors={errors}
-                episode={fetchedEpisode}
+                episodeId={episode.id}
                 {...audioModalDisclosure}
               />
             </CollapsableContainer>

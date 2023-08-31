@@ -21,12 +21,12 @@ import { FieldErrors } from "react-hook-form";
 import { Episode } from "@prisma/client";
 
 const AudioFileSelector = ({
-  episode,
+  episodeId,
   isOpen,
   onClose,
   errors,
 }: {
-  episode: EpisodeWithAudioFiles;
+  episodeId: string | undefined;
   isOpen: boolean;
   onClose: () => void;
   errors: FieldErrors<Episode>;
@@ -38,7 +38,7 @@ const AudioFileSelector = ({
       handleUseMutationAlerts({
         successText: "Audio file deleted",
         callback: () => {
-          context.invalidate();
+          context.audioFile.invalidate();
         },
       }),
     );
@@ -48,9 +48,17 @@ const AudioFileSelector = ({
       handleUseMutationAlerts({
         successText: "Audio selected",
         callback: () => {
-          context.invalidate();
+          context.audioFile.invalidate();
         },
       }),
+    );
+
+  const { data: audioFiles } =
+    trpcClient.audioFile.getEpisodeAudioFiles.useQuery(
+      {
+        episodeId: episodeId,
+      },
+      { enabled: !!episodeId },
     );
   /* const handlePlaybackProgress = () => { */
   /*     const time = playerRef.current?.getCurrentTime(); */
@@ -59,73 +67,74 @@ const AudioFileSelector = ({
   return (
     <Box mb={"20px"}>
       <FormControl isInvalid={!!errors.selectedAudioFileId}>
-        {!episode?.audioFiles.length && <Text>You have 0 audio files</Text>}
+        {audioFiles?.length && <Text>You have 0 audio files</Text>}
         <VStack spacing={5}>
-          {episode?.audioFiles.map((audioFile) => {
-            const handleDeleteAudioFile = async () => {
-              const req = await axios("/api/get-connection-string");
-              const { connectionString } = req.data;
+          {episodeId &&
+            audioFiles?.map((audioFile) => {
+              const handleDeleteAudioFile = async () => {
+                const req = await axios("/api/get-connection-string");
+                const { connectionString } = req.data;
 
-              deleteAudioFile({
-                isHostedByPS: audioFile.isHostedByPS,
-                blobName: audioFile.blobName,
-                id: audioFile.id,
-                connectionString,
-                episodeId: episode.id,
-              });
-            };
-            const handleSelectAudioFile = () => {
-              if (episode.selectedAudioFileId === audioFile.id) return;
+                deleteAudioFile({
+                  isHostedByPS: audioFile.isHostedByPS,
+                  blobName: audioFile.blobName,
+                  id: audioFile.id,
+                  connectionString,
+                  episodeId,
+                });
+              };
+              const handleSelectAudioFile = () => {
+                if (audioFile.isSelected) return;
 
-              selectEpisode({
-                episodeId: episode.id,
-                audioFileId: audioFile.id,
-              });
-            };
+                selectEpisode({
+                  episodeId,
+                  audioFileId: audioFile.id,
+                });
+              };
 
-            return (
-              <Flex width="100%" flexDir={"column"} key={audioFile.id}>
-                <Text fontWeight={"bold"}>{audioFile.name}</Text>
-                <Flex
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  gap={"20px"}
-                >
-                  <Checkbox
-                    onChange={handleSelectAudioFile}
-                    size={"lg"}
-                    isChecked={episode.selectedAudioFileId === audioFile.id}
-                  />
-                  <ReactPlayer
-                    ref={playerRef}
-                    url={audioFile.url}
-                    controls={true}
-                    height={"30px"}
-                    width={"100%"}
-                  />
-                  <AreYouSureButton
-                    title={"Delete audio file"}
-                    modalContent={
-                      "Are you sure you want to delete this audio file? This action cannot be undone."
-                    }
-                    confirmAction={handleDeleteAudioFile}
-                    confirmButtonText={"Delete"}
-                    customButton={
-                      <IconButton
-                        size={"sm"}
-                        aria-label="delete audio button"
-                        icon={<DeleteIcon />}
-                      />
-                    }
-                  />
+              return (
+                <Flex width="100%" flexDir={"column"} key={audioFile.id}>
+                  <Text fontWeight={"bold"}>{audioFile.name}</Text>
+                  <Flex
+                    justifyContent={"space-between"}
+                    alignItems={"center"}
+                    gap={"20px"}
+                  >
+                    <Checkbox
+                      onChange={handleSelectAudioFile}
+                      size={"lg"}
+                      isChecked={audioFile.isSelected}
+                    />
+                    <ReactPlayer
+                      ref={playerRef}
+                      url={audioFile.url}
+                      controls={true}
+                      height={"30px"}
+                      width={"100%"}
+                    />
+                    <AreYouSureButton
+                      title={"Delete audio file"}
+                      modalContent={
+                        "Are you sure you want to delete this audio file? This action cannot be undone."
+                      }
+                      confirmAction={handleDeleteAudioFile}
+                      confirmButtonText={"Delete"}
+                      customButton={
+                        <IconButton
+                          size={"sm"}
+                          aria-label="delete audio button"
+                          icon={<DeleteIcon />}
+                        />
+                      }
+                    />
+                  </Flex>
                 </Flex>
-              </Flex>
-            );
-          })}
+              );
+            })}
         </VStack>
-        {episode && (
+        {episodeId && (
           <NewAudioFileModal
-            episode={episode}
+            episodeId={episodeId}
             isOpen={isOpen}
             onClose={onClose}
           />

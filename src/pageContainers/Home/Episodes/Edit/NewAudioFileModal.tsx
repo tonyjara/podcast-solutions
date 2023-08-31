@@ -22,7 +22,7 @@ import {
   Collapse,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AudioFile, Episode } from "@prisma/client";
+import { AudioFile } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -30,11 +30,11 @@ import { useForm } from "react-hook-form";
 const NewAudioFileModal = ({
   isOpen,
   onClose,
-  episode,
+  episodeId,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  episode: Episode;
+  episodeId: string;
 }) => {
   const user = useSession().data?.user;
   const [formProgress, setFormProgress] = React.useState(0);
@@ -49,9 +49,7 @@ const NewAudioFileModal = ({
     formState: { errors, isSubmitting, isDirty },
   } = useForm<AudioFile>({
     defaultValues: defaultAudioFile({
-      subscriptionId: episode.subscriptionId ?? "",
-      episodeId: episode.id,
-      podcastId: episode.podcastId,
+      episodeId: episodeId,
     }),
     resolver: zodResolver(validateAudioFile),
   });
@@ -66,7 +64,7 @@ const NewAudioFileModal = ({
       handleUseMutationAlerts({
         successText: "Audio file created successfully!",
         callback: () => {
-          trpcContext.invalidate();
+          trpcContext.audioFile.invalidate();
           handleClose();
         },
       }),
@@ -87,7 +85,7 @@ const NewAudioFileModal = ({
   const handleCheckIfNameIsUnique = () => {
     checkIfNameIsUnique({
       name: getValues("name"),
-      episodeId: episode.id,
+      episodeId,
     });
   };
 
@@ -134,7 +132,7 @@ const NewAudioFileModal = ({
                     helperText="Upload your audio file here, only mp3 files are allowed."
                     userId={user.id}
                     uploadCallback={() => handleSubmit(submitFunc)()}
-                    episodeId={episode.id}
+                    episodeId={episodeId}
                   />
                 )}
               </Collapse>

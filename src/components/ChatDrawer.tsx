@@ -49,6 +49,11 @@ const ChatDrawer = ({ episode }: { episode: Episode | undefined | null }) => {
     setInput((x) => x + episode.transcription);
   };
 
+  const handleCopyShowNotes = () => {
+    if (!episode?.showNotes.length) return;
+    setInput((x) => x + episode.showNotes);
+  };
+
   const handleClearHistory = () => {
     if (!episode) return;
     clearHistory({ episodeId: episode.id });
@@ -84,15 +89,28 @@ const ChatDrawer = ({ episode }: { episode: Episode | undefined | null }) => {
             <DrawerCloseButton />
           </DrawerHeader>
 
-          <Box backgroundColor={toolbarBg} p="10px">
+          <Box
+            display={"flex"}
+            gap={"10px"}
+            backgroundColor={toolbarBg}
+            p="10px"
+          >
             <Button
               onClick={handleCopyTranscription}
               size={"sm"}
               alignSelf={"start"}
             >
-              Paste Transcription
+              Copy Transcription
             </Button>
-            <Button onClick={handleClearHistory} ml={"10px"} size={"sm"}>
+
+            <Button
+              onClick={handleCopyShowNotes}
+              size={"sm"}
+              alignSelf={"start"}
+            >
+              Copy Show notes
+            </Button>
+            <Button onClick={handleClearHistory} size={"sm"}>
               Clear history
             </Button>
           </Box>

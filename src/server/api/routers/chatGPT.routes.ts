@@ -156,7 +156,7 @@ export const chatGPTRouter = createTRPCRouter({
         return "gpt-3.5-turbo";
       };
 
-      const content = `Using this podcast transcription: "${input.transcription}", please generate show notes IN THE SAME LANGAUAGE AS THE TRANSCRIPTION, similar to the ones that podcasts have.  Return only the show notes in HTML format.`;
+      const content = `Using this podcast transcription, auto detect the language and generate show notes that reflect the transcription content, similar to what podcasts have.  Return only the show notes in HTML format. The show notes should be in the same language as the transcription. Here's the transcript: "${input.transcription}" `;
 
       const chatCompletion = await openai.createChatCompletion({
         model: handleModel(),
