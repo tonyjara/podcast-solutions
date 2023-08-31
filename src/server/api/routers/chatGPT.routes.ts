@@ -156,7 +156,7 @@ export const chatGPTRouter = createTRPCRouter({
         return "gpt-3.5-turbo";
       };
 
-      const content = `Using this podcast transcription: "${input.transcription}", please generate show notes similar to the ones that podcasts have.  Return only the show notes in HTML format.`;
+      const content = `Using this podcast transcription: "${input.transcription}", please generate show notes IN THE SAME LANGAUAGE AS THE TRANSCRIPTION, similar to the ones that podcasts have.  Return only the show notes in HTML format.`;
 
       const chatCompletion = await openai.createChatCompletion({
         model: handleModel(),
