@@ -60,6 +60,11 @@ const ShowNotesEdit = ({
         control={control}
         errors={errors}
         name="showNotes"
+        label={
+          transcription.length
+            ? undefined
+            : "To generate show notes, first generate a transcription"
+        }
       />
     </CollapsableContainer>
   );

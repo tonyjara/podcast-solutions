@@ -12,11 +12,12 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { SiOpenai } from "react-icons/si";
-import { ChatGPT } from "./ChatGPT/ChatGPT";
+import { ChatGPTInputTextArea } from "./ChatGPT/ChatGPTInputTextArea";
 import { Episode } from "@prisma/client";
 import { trpcClient } from "@/utils/api";
 import { handleUseMutationAlerts } from "./Toasts & Alerts/MyToast";
 import { ChatGPTMessage } from "./ChatGPT/ChatLine";
+import { UseFormGetValues, UseFormSetValue } from "react-hook-form";
 
 // default first message to display in UI (not necessary to define the prompt)
 export const initialMessages: ChatGPTMessage[] = [
@@ -25,7 +26,15 @@ export const initialMessages: ChatGPTMessage[] = [
     content: "Hi! I can assist you with generating the summary, and show notes",
   },
 ];
-const ChatDrawer = ({ episode }: { episode: Episode | undefined | null }) => {
+const ChatDrawer = ({
+  episode,
+  setValue,
+  getValues,
+}: {
+  episode: Episode | undefined | null;
+  setValue: UseFormSetValue<Episode>;
+  getValues: UseFormGetValues<Episode>;
+}) => {
   const context = trpcClient.useContext();
   const [showButtonText, setShowButtonText] = useState(false);
   const [input, setInput] = useState("");
@@ -115,8 +124,10 @@ const ChatDrawer = ({ episode }: { episode: Episode | undefined | null }) => {
             </Button>
           </Box>
           <DrawerBody p="0px">
-            <ChatGPT
+            <ChatGPTInputTextArea
               input={input}
+              setValue={setValue}
+              getValues={getValues}
               setInput={setInput}
               episodeId={episode?.id}
               messages={messages}

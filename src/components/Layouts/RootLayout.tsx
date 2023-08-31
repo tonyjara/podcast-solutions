@@ -8,12 +8,16 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathName = router.pathname.split("/");
   const title = pathName[pathName.length - 1];
+  const defaultText = `PS ${
+    process.env.NODE_ENV === "development" ? "DEV" : ""
+  }`;
+
   const handleTitles = (x: string) => {
     const titlesDictionary: any = {
       ["home"]: "Home",
       ["seed"]: "Seed",
     };
-    return (x = titlesDictionary[x] ? `PS ${titlesDictionary[x]}` : "PS");
+    return titlesDictionary[x] ?? defaultText;
   };
   return (
     <>

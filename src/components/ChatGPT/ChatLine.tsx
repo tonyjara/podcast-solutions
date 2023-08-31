@@ -2,6 +2,7 @@ import { CopyIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
+  Button,
   Checkbox,
   Flex,
   IconButton,
@@ -13,12 +14,16 @@ import {
 import { useState } from "react";
 import { SiOpenai } from "react-icons/si";
 import { myToast } from "../Toasts & Alerts/MyToast";
+import { Episode } from "@prisma/client";
+import { UseFormSetValue, UseFormGetValues } from "react-hook-form";
 type ChatGPTAgent = "user" | "system" | "assistant";
 
 export interface ChatGPTMessage {
   role: ChatGPTAgent;
   content: string;
   imageUrl?: string;
+  setValue?: UseFormSetValue<Episode>;
+  getValues?: UseFormGetValues<Episode>;
 }
 
 // loading placeholder animation for the chat line
@@ -47,6 +52,8 @@ export function ChatLine({
   role = "assistant",
   content,
   imageUrl,
+  setValue,
+  getValues,
 }: ChatGPTMessage) {
   const isAssistant = role === "assistant";
   const [showToolbar, setShowToolbar] = useState(false);
@@ -63,6 +70,12 @@ export function ChatLine({
     myToast.success("Copied to clipboard");
     onCopy();
   };
+  const handleAddToShowNotes = () => {
+    if (!setValue || !getValues) return;
+    const showNotes = getValues("showNotes");
+
+    setValue("showNotes", showNotes + content);
+  };
 
   return (
     <Box
@@ -75,7 +88,7 @@ export function ChatLine({
         /* p="10px" */
         display={showToolbar ? "flex" : "none"}
         right={"0"}
-        marginBottom={"-45px"}
+        marginBottom={"-57px"}
         marginTop={"5px"}
         justifyContent="end"
         gap={"20px"}
@@ -90,9 +103,12 @@ export function ChatLine({
           alignItems={"center"}
           zIndex={9999999}
           p="10px"
-          w="85px"
+          /* w="85px" */
           backgroundColor={toolbarBg}
         >
+          <Button onClick={handleAddToShowNotes} size={"sm"}>
+            Add to show notes
+          </Button>
           <CopyIcon
             _hover={{ opacity: "0.6" }}
             cursor={"pointer"}
