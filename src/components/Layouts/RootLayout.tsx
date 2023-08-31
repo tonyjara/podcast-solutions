@@ -8,15 +8,12 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathName = router.pathname.split("/");
   const title = pathName[pathName.length - 1];
-  const isDevEnv = process.env.NODE_ENV;
   const handleTitles = (x: string) => {
     const titlesDictionary: any = {
-      ["home"]: "PS Home",
+      ["home"]: "Home",
       ["seed"]: "Seed",
     };
-    return (x = titlesDictionary[x]
-      ? `${titlesDictionary[x]}${isDevEnv ? " DEV" : ""}`
-      : `PS${isDevEnv ? " DEV" : ""}`);
+    return (x = titlesDictionary[x] ? `PS ${titlesDictionary[x]}` : "PS");
   };
   return (
     <>
