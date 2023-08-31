@@ -5,6 +5,19 @@ import MillisecondsCell from "../DynamicCells/MilliSecondsCell";
 
 const columnHelper = createColumnHelper<Logs>();
 
+const handleLevelColor = (level: string) => {
+  switch (level) {
+    case "INFO":
+      return "green.300";
+    case "WARN":
+      return "yellow.300";
+    case "ERROR":
+      return "red.300";
+    default:
+      return "gray";
+  }
+};
+
 export const adminLogsColumn = () => [
   columnHelper.accessor("createdAt", {
     cell: (x) => <MillisecondsCell date={x.getValue()} />,
@@ -13,7 +26,12 @@ export const adminLogsColumn = () => [
   }),
 
   columnHelper.accessor("level", {
-    cell: (x) => <TextCell text={x.getValue() ?? "-"} />,
+    cell: (x) => (
+      <TextCell
+        color={handleLevelColor(x.getValue())}
+        text={x.getValue() ?? "-"}
+      />
+    ),
     header: "level",
     sortingFn: "text",
   }),
