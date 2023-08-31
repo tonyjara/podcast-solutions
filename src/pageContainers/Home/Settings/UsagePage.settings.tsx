@@ -21,7 +21,7 @@ const UsagePage = () => {
         >
           <UsageStats
             myUsage={myUsage}
-            loading={isLoading || isFetching || !myUsage?.length}
+            loading={isLoading || isFetching || !myUsage?.length || !myUsage}
           />
         </Flex>
       </Flex>

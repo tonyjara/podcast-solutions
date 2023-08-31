@@ -80,7 +80,7 @@ export const magicLinksRouter = createTRPCRouter({
         });
       }
       if (isDevEnv) {
-        console.log("Verification Link: ", link);
+        console.info("Verification Link: ", link);
       }
 
       return { status: "successs", sentAt: verificationLink.createdAt };

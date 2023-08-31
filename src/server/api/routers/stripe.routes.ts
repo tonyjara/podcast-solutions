@@ -16,6 +16,7 @@ import { validateStripePriceEdit } from "@/components/Validations/StripePriceEdi
 import { validateStripePriceCreate } from "@/components/Validations/StripePriceCreate.validate";
 import { validateStripeProductCreate } from "@/components/Validations/StripeProductCreate.validate";
 import { decimalDivBy100, decimalTimes100 } from "@/lib/utils/DecimalUtils";
+import { createServerLog } from "@/server/serverUtils";
 
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 const webUrl = process.env.NEXT_PUBLIC_WEB_URL;
@@ -52,6 +53,12 @@ export const stripeRouter = createTRPCRouter({
       const user = ctx.session.user;
       if (!stripeKey || !webUrl || !user || !user.email)
         throwInternalServerError("Missing Stripe key or web url");
+      const product = await prisma.product.findFirst(); // Prevents signung up if no products exist
+      if (!product) {
+        await createServerLog("No products found", "ERROR");
+        throwInternalServerError("No products found");
+      }
+
       //fail if user already has a subscription
       const existingSubscription = await prisma.subscription.findFirst({
         where: {

@@ -1,5 +1,6 @@
 // This is a dictionary that replaces known error with usable text messages
 
+import { createServerLog } from "@/server/serverUtils";
 import { TRPCError } from "@trpc/server";
 
 export const knownErrors = (error: string) => {

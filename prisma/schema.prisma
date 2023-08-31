@@ -283,6 +283,15 @@ model FeatureFlags {
   maintenance          Boolean @default(false)
 }
 
+model Logs {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    message   String
+    level     String
+    eventId   String
+    }
+
 enum Role {
   admin
   user

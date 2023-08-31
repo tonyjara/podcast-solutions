@@ -22,8 +22,6 @@ export const parsePodcastFromFeed = ({
   email: string;
   subscriptionId: string;
 }): Podcast => {
-  /* delete feed.items; */
-  /* console.log(feed); */
   const podcastId = createId();
 
   const podcastFromFeed: Podcast = {
@@ -62,7 +60,6 @@ export const parseEpisodesAndAudioFilesFromFeed = ({
   podcastId: string;
   subscriptionId: string;
 }): { episodes: Episode[]; audioFiles: AudioFile[] } => {
-  /* console.log(feed.items[0]); */
   let episodes: Episode[] = [];
 
   let audioFiles: AudioFile[] = [];
