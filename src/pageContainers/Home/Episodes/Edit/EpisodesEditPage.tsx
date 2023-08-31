@@ -51,6 +51,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
     handleSubmit,
     control,
     setValue,
+    getValues,
     reset,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<Episode>({
@@ -234,7 +235,11 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
           </VStack>
         </form>
       </Flex>
-      <ChatDrawer episode={fetchedEpisode} />
+      <ChatDrawer
+        setValue={setValue}
+        getValues={getValues}
+        episode={fetchedEpisode}
+      />
     </Box>
   );
 };

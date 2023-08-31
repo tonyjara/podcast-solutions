@@ -11,19 +11,25 @@ import { AiOutlineSend } from "react-icons/ai";
 import { useSession } from "next-auth/react";
 import { BiTrash } from "react-icons/bi";
 import { trpcClient } from "@/utils/api";
+import { Episode } from "@prisma/client";
+import { UseFormSetValue, UseFormGetValues } from "react-hook-form";
 
-export function ChatGPT({
+export function ChatGPTInputTextArea({
   input,
   setInput,
   episodeId,
   messages,
   setMessages,
+  getValues,
+  setValue,
 }: {
   input: string;
   setInput: Dispatch<SetStateAction<string>>;
   episodeId: string | undefined;
   messages: ChatGPTMessage[];
   setMessages: Dispatch<SetStateAction<ChatGPTMessage[]>>;
+  setValue: UseFormSetValue<Episode>;
+  getValues: UseFormGetValues<Episode>;
 }) {
   const user = useSession().data?.user;
   const textBlockBg = useColorModeValue("teal.500", "gray.800");
@@ -62,6 +68,8 @@ export function ChatGPT({
       <Box marginBottom={"150px"}>
         {messages.map(({ content, role }, index) => (
           <ChatLine
+            setValue={setValue}
+            getValues={getValues}
             key={index}
             role={role}
             content={content}
