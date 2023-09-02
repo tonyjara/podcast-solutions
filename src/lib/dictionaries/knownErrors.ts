@@ -39,6 +39,10 @@ export const knownErrors = (error: string) => {
     return "Captcha failed, please try again.";
   }
 
+  if (error.includes("Email already verified.")) {
+    return "Email already verified, please login";
+  }
+
   console.error(error);
   return "Something went wrong, please try again.";
 };
