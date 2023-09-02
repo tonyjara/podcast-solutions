@@ -5,6 +5,7 @@ import { TbSeeding } from "react-icons/tb";
 import { FaCcStripe } from "react-icons/fa";
 import { SessionUser } from "@/server/auth";
 import { BsSpeedometer2 } from "react-icons/bs";
+import { AiOutlineFundView } from "react-icons/ai";
 
 export interface LinkItemProps {
   name: string;
@@ -55,17 +56,18 @@ const AdminLinks: (isAdmin: boolean) => Array<LinkItemProps> = (isAdmin) => {
     : [];
 };
 
-export const SidebarLinks: (user: SessionUser) => Array<LinkItemProps> = (
+export const SidebarLinks: (
   user: SessionUser,
-) => {
+  selectedPodcastSlug: string,
+) => Array<LinkItemProps> = (user: SessionUser, selectedPodcastSlug) => {
   return [
     ...AdminLinks(user.role === "admin"),
     { name: "Home", icon: FiHome, dest: "/home" },
-    /* { */
-    /*   name: "Preview", */
-    /*   icon: VscPreview, */
-    /*   dest: "/home/preview", */
-    /* }, */
+    {
+      name: "Preview",
+      icon: AiOutlineFundView,
+      dest: `/podcasts/${selectedPodcastSlug}`,
+    },
     { name: "Settings", icon: FiSettings, dest: "/home/settings" },
   ];
 };

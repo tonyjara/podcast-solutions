@@ -10,8 +10,9 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import NewAudioFileModal from "./NewAudioFileModal";
-import ReactPlayer from "react-player";
-import { EpisodeWithAudioFiles } from "./EpisodesEditPage";
+import ReactPlayerRef from "react-player";
+import dynamic from "next/dynamic";
+const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 import { DeleteIcon } from "@chakra-ui/icons";
 import AreYouSureButton from "@/components/Buttons/AreYouSureButton";
 import { trpcClient } from "@/utils/api";
@@ -32,7 +33,7 @@ const AudioFileSelector = ({
   errors: FieldErrors<Episode>;
 }) => {
   const context = trpcClient.useContext();
-  const playerRef = React.useRef<ReactPlayer>(null);
+  const playerRef = React.useRef<ReactPlayerRef>(null);
   const { mutate: deleteAudioFile } =
     trpcClient.audioFile.deleteAudioFile.useMutation(
       handleUseMutationAlerts({
@@ -67,7 +68,7 @@ const AudioFileSelector = ({
   return (
     <Box mb={"20px"}>
       <FormControl isInvalid={!!errors.selectedAudioFileId}>
-        {audioFiles?.length && <Text>You have 0 audio files</Text>}
+        {!audioFiles?.length && <Text>You have 0 audio files</Text>}
         <VStack spacing={5}>
           {episodeId &&
             audioFiles?.map((audioFile) => {

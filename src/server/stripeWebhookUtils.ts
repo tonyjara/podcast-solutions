@@ -151,14 +151,14 @@ export const handleSubscriptionUpdated = async ({
             where: { id: subscription.id },
             data: {
                 active: handleActiveState(),
-                cancelAt: subscriptionEvent.cancel_at
+                cancellAt: subscriptionEvent.cancel_at
                     ? fromUnixTime(subscriptionEvent.cancel_at ?? 0)
                     : null,
 
-                canceledAt: subscriptionEvent.canceled_at
+                cancelledAt: subscriptionEvent.canceled_at
                     ? fromUnixTime(subscriptionEvent.canceled_at ?? 0)
                     : null,
-                eventCancelationId: subscriptionEvent.cancel_at ? event.id : null,
+                eventCancellationId: subscriptionEvent.cancel_at ? event.id : null,
             },
         });
         await createServerLog(

@@ -58,7 +58,7 @@ const DesktopNavItem = ({
             variant="ghost"
           />
 
-          <Text pl={minimized ? 0 : 4} fontSize="12px">
+          <Text fontWeight={"bold"} pl={minimized ? 0 : 4} fontSize="12px">
             {!minimized && name}
           </Text>
         </Flex>

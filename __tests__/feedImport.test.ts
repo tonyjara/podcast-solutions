@@ -9,10 +9,11 @@ import Parser from "rss-parser";
 describe("test podcast feed parsing", () => {
   it("tests parsed feed", async () => {
     const feeds = [
-      "https://media.rss.com/crimedivepodcast/feed.xml",
-      "https://media.rss.com/thegroupchatlol/feed.xml",
-      "https://media.rss.com/thenbanextpodcast/feed.xml",
-      /* "https://feed.syntax.fm/rss", */ // one episode doesnt have enclosure
+      /* "https://media.rss.com/crimedivepodcast/feed.xml", */
+      /* "https://media.rss.com/thegroupchatlol/feed.xml", */
+      /* "https://media.rss.com/thenbanextpodcast/feed.xml", */
+
+      "https://feed.syntax.fm/rss", // one episode doesnt have enclosure
       /* "https://howtopodcast.us/feed/", */ //no enclosures
       /* "https://thepodcasthaven.com/feed/", also no enclosures */
     ];

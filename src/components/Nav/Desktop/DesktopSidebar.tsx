@@ -10,6 +10,7 @@ import NavItemChild from "../components/NavItemChild";
 import { SidebarLinks } from "../Data/SidebarLinks";
 import PodcastSelect from "@/components/Selects/PodcastSelect";
 import Link from "next/link";
+import { trpcClient } from "@/utils/api";
 interface SidebarProps {
   minimized: boolean;
   setMinimized: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,6 +18,8 @@ interface SidebarProps {
 
 const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
   const user = useSession().data?.user;
+  const { data: mySelectedPodcast } =
+    trpcClient.podcast.getMySelectedPodcast.useQuery();
   const { colorMode } = useColorMode();
   const logo =
     colorMode === "light"
@@ -94,7 +97,7 @@ const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
       </Flex>
 
       {user &&
-        SidebarLinks(user).map((link) => (
+        SidebarLinks(user, mySelectedPodcast?.slug ?? "").map((link) => (
           <div key={link.name}>
             {link.children?.length && (
               <Accordion allowToggle>

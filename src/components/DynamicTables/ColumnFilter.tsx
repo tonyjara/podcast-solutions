@@ -1,7 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import { type Column } from "@tanstack/react-table";
 import React from "react";
-import { BsFilter } from "react-icons/bs";
 import EpisodeStatusColumnFilter from "./ColumnFilters/EpisodeStatusColumnFilter";
 import InputContainsColumnFilter from "./ColumnFilters/InputContains.columnFilter";
 import EpisodeReleaseDateColumnFilter from "./ColumnFilters/EpisodeReleaseDate.columnFilter";
@@ -23,12 +22,11 @@ const ColumnFilter = (props: ColumnFilterProps) => {
     <div>
       {column.id === "episodeNumber" && (
         <Button
-          leftIcon={<BsFilter />}
           size={"sm"}
           isDisabled={!whereFilterList.length}
           onClick={() => setWhereFilterList && setWhereFilterList([])}
         >
-          Delete Filters
+          Clear
         </Button>
       )}
       {column.id === "status" && <EpisodeStatusColumnFilter {...props} />}{" "}
@@ -38,16 +36,6 @@ const ColumnFilter = (props: ColumnFilterProps) => {
       {column.id === "releaseDate" && (
         <EpisodeReleaseDateColumnFilter keyName="releaseDate" {...props} />
       )}
-      {/* {column.id === "Proyecto" && ( */}
-      {/*     <MoneyRequestProjectsColumnFilter {...props} /> */}
-      {/* )}{" "} */}
-      {/* {column.id === "moneyRequestType" && ( */}
-      {/*     <MoneyRequestTypeColumnFilter {...props} /> */}
-      {/* )}{" "} */}
-      {/* {column.id === "comments" && ( */}
-      {/*     <InputContainsColumnFilter keyName="comments" {...props} /> */}
-      {/* )}{" "} */}
-      {/* {column.id === "createdAt" && <FromToDateColumnFilter {...props} />}{" "} */}
     </div>
   );
 };

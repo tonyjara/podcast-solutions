@@ -181,6 +181,56 @@ export const chatGPTRouter = createTRPCRouter({
       const caller = appRouter.createCaller({ session: ctx.session, prisma });
       await caller.stripeUsage.postChatUsage({ inputTokens, outputTokens });
     }),
+
+  generateKeyWordsFromShowNotes: protectedProcedure
+    .input(
+      z.object({
+        episodeId: z.string().min(1),
+        showNotes: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const tokenCountAverage = encode(input.showNotes).length;
+
+      const handleModel = () => {
+        if (tokenCountAverage > 16000) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Exceeded token limit",
+          });
+        }
+
+        if (tokenCountAverage > 3000) {
+          return "gpt-3.5-turbo-16k";
+        }
+        return "gpt-3.5-turbo";
+      };
+
+      const content = `Using this podcast's show notes, generate a comma separated text string of keywords that are relevant for this podcast's discoverability. Keywords are not sentences they are a single word. Only respond with the comma separated list. This are the show notes: ${input.showNotes}. The comma separated list should not be longer than 12 words. I repeat, it should NOT go over 12 words.`;
+
+      const chatCompletion = await openai.createChatCompletion({
+        model: handleModel(),
+        messages: [systemMessage, { role: "user", content }],
+      });
+
+      const keywords = chatCompletion.data.choices[0]?.message;
+      if (!keywords) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "No keywords generated",
+        });
+      }
+
+      await prisma.episode.update({
+        where: { id: input.episodeId },
+        data: { keywords: keywords.content },
+      });
+
+      const inputTokens = chatCompletion.data.usage?.prompt_tokens || 0;
+      const outputTokens = chatCompletion.data.usage?.completion_tokens || 0;
+      const caller = appRouter.createCaller({ session: ctx.session, prisma });
+      await caller.stripeUsage.postChatUsage({ inputTokens, outputTokens });
+    }),
 });
 
 //Chat completion response example

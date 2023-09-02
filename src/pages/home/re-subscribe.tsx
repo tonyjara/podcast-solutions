@@ -25,10 +25,10 @@ const ReSubscribe = ({ subscription }: props) => {
         </Heading>
         <Text color={"gray.500"}>
           Your subscription has been cancelled since{" "}
-          {format(subscription.cancelAt ?? new Date(), "MM/dd/yy")} we're going
+          {format(subscription.cancellAt ?? new Date(), "MM/dd/yy")} we're going
           to keep your account as is until{" "}
           {format(
-            addMonths(subscription.cancelAt ?? new Date(), 3),
+            addMonths(subscription.cancellAt ?? new Date(), 3),
             "MM/dd/yy",
           )}{" "}
           . If you'd like to re-subscribe, you can do so below.

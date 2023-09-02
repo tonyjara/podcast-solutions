@@ -34,7 +34,8 @@ export const transcriptionRouter = createTRPCRouter({
           /* smart_format: true, */
           /* paragraphs: true, */
           /* utterances: true, */
-          /* detect_topics: true, */
+          /* detect_topics: true, //does not work */
+          /* summarize: true, // works terribly */
         },
       );
 

@@ -19,6 +19,7 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
   const feed = new MakePodcast({
     title: podcast.name,
     description: podcast.description,
+    generator: "Podcast Solution's RSS Feed Generator 1.0",
     language: podcast.language,
     feedUrl: `${webUrl}/rss/${podcast.slug}`,
     siteUrl: `${webUrl}/podcasts/${podcast.slug}`,
@@ -47,11 +48,12 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
     if (episode.releaseDate && !isScheduled(episode.releaseDate) && audioFile) {
       feed.addItem({
         title: episode.title,
+        itunesTitle: episode.title,
         description: episode.showNotes,
-        url: episode.audioFiles.at(0)?.url, // link to the item
+        url: `${webUrl}/podcasts/${podcast.slug}/${episode.id}`, // link to the item
 
         guid: audioFile.url, // optional - defaults to url
-        /* categories: ["Category 1", "Category 2", "Category 3", "Category 4"], // optional - array of item categories */
+        itunesKeywords: episode.keywords,
         /* author: "Guest Author", // optional - defaults to feed author property */
         date: episode.releaseDate, // any format that js Date can parse.
         /* lat: 33.417974, //optional latitude field for GeoRSS */
@@ -64,6 +66,8 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
         }, // optional enclosure
         /* itunesAuthor: "Max Nowack", */
         itunesExplicit: episode.explicit,
+        itunesEpisode: episode.episodeNumber ?? 1,
+        itunesSeason: episode.seasonNumber ?? 1,
         /* itunesSubtitle: "I am a sub title", */
         /* itunesSummary: "I am a summary", */
         itunesDuration: audioFile.duration,

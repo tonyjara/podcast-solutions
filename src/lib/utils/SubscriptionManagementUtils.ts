@@ -8,8 +8,8 @@ export const manageSubscription = async (userId: string | undefined) => {
   });
 
   if (
-    subscription?.cancelAt &&
-    isAfter(new Date(), subscription?.cancelAt) &&
+    subscription?.cancellAt &&
+    isAfter(new Date(), subscription?.cancellAt) &&
     subscription?.active
   ) {
     await prisma.subscription.update({
