@@ -28,6 +28,7 @@ export const validateEpisodeEdit: z.ZodType<Episode> = z.lazy(() =>
       .min(1)
       .max(999999),
     episodeType: z.nativeEnum(EpisodeType),
+    keywords: z.string(),
   }),
 );
 
@@ -48,4 +49,5 @@ export const defaultEpisodeValues: Episode = {
   seasonNumber: 1,
   episodeNumber: 1,
   episodeType: "full",
+  keywords: "",
 };

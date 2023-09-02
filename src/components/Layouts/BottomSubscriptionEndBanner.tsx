@@ -21,8 +21,8 @@ const BottomSubscriptionEndBanner = () => {
   const shouldShowBanner =
     showBanner &&
     !!user &&
-    mySubscription?.cancelAt &&
-    isBefore(new Date(), mySubscription.cancelAt);
+    mySubscription?.cancellAt &&
+    isBefore(new Date(), mySubscription.cancellAt);
 
   return (
     <Box
@@ -46,7 +46,7 @@ const BottomSubscriptionEndBanner = () => {
           {" "}
           <Text hideBelow={"md"} fontWeight={"bold"}>
             Your subscription ends{" "}
-            {format(mySubscription?.cancelAt ?? new Date(), "MM/dd/yy")}
+            {format(mySubscription?.cancellAt ?? new Date(), "MM/dd/yy")}
           </Text>
           <Text hideFrom={"md"} fontWeight={"bold"}>
             Plan about to expire

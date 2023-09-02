@@ -14,6 +14,7 @@ import FormControlledImageUpload from "./FormControlled/FormControlledImageUploa
 import FormControlledSwitch from "./FormControlled/FormControlledSwitch";
 import FormControlledDatePicker from "./FormControlled/FormControlledDatePicker";
 import FormControlledCategoriesSelect from "./FormControlled/FormControlledCategoriesSelect";
+import FormControlledRichTextBlock from "./FormControlled/FormControlledRichTextBlock";
 
 const PodcastEditForm = ({
   podcast,
@@ -158,14 +159,20 @@ const PodcastEditForm = ({
           options={languageOptions}
         />
 
-        <FormControlledText
+        {/* <FormControlledText */}
+        {/*   control={control} */}
+        {/*   errors={errors} */}
+        {/*   name="description" */}
+        {/*   label="Description" */}
+        {/*   isTextArea */}
+        {/* /> */}
+
+        <FormControlledRichTextBlock
           control={control}
           errors={errors}
           name="description"
-          label="Description"
-          isTextArea
+          label={"Description"}
         />
-
         <FormControlledSwitch
           control={control}
           errors={errors}

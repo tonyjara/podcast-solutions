@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { validateEpisodeEdit } from "@/components/Validations/EpisodeEdit.validate";
 import { EpisodeStatus } from "@prisma/client";
@@ -23,6 +27,8 @@ export const episodesRouter = createTRPCRouter({
       });
       return await prisma.episode.create({
         data: {
+          episodeNumber: 1,
+          seasonNumber: 1,
           title: input.title,
           showNotes: "",
           transcription: "",
@@ -133,6 +139,49 @@ export const episodesRouter = createTRPCRouter({
         where: {
           podcastId: preferences.selectedPodcastId,
           AND: [...(input?.whereFilterList ?? [])],
+        },
+      });
+
+      return episodes;
+    }),
+
+  countEpisodesWithPodcastId: publicProcedure
+    .input(
+      z.object({
+        podcastId: z.string(),
+      }),
+    )
+    .query(async ({ input }) => {
+      return await prisma.episode.count({
+        where: {
+          podcastId: input.podcastId,
+        },
+      });
+    }),
+
+  getEpisodesWithPodcastId: publicProcedure
+    .input(
+      z.object({
+        pageIndex: z.number().nullish(),
+        pageSize: z.number().min(1).max(100).nullish(),
+        podcastId: z.string().min(1),
+      }),
+    )
+    .query(async ({ input }) => {
+      const pageSize = input.pageSize ?? 10;
+      const pageIndex = input.pageIndex ?? 0;
+
+      const episodes = await prisma.episode.findMany({
+        take: pageSize,
+        skip: pageIndex * pageSize,
+        orderBy: { releaseDate: "desc" },
+        include: { audioFiles: true },
+        where: {
+          podcastId: input.podcastId,
+          status: "published",
+          releaseDate: {
+            lte: new Date(),
+          },
         },
       });
 

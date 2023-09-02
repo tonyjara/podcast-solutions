@@ -70,6 +70,7 @@ export const parseEpisodesAndAudioFilesFromFeed = ({
     const podcastEpisode: Episode = {
       id: episodeId,
       createdAt: new Date(),
+      keywords: item.itunes?.keywords ?? "",
       subscriptionId: subscriptionId,
       updatedAt: new Date(),
       releaseDate: item.pubDate ? new Date(item.pubDate) : new Date(),

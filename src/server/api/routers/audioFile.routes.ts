@@ -141,4 +141,13 @@ export const audioFileRoute = createTRPCRouter({
         orderBy: { isSelected: "asc" },
       });
     }),
+
+  getSelectedAudioFileForEpisode: protectedProcedure
+    .input(z.object({ episodeId: z.string().nullish() }))
+    .query(async ({ input }) => {
+      if (!input.episodeId) return null;
+      return await prisma.audioFile.findFirst({
+        where: { episodeId: input.episodeId, isSelected: true },
+      });
+    }),
 });

@@ -62,7 +62,9 @@ const NavItemChild = ({
               fontSize="20px"
             />
           )}
-          <Text fontSize="12px">{!minimized && name}</Text>
+          <Text fontWeight={"bold"} fontSize="12px">
+            {!minimized && name}
+          </Text>
         </Flex>
       </Tooltip>
     </Link>

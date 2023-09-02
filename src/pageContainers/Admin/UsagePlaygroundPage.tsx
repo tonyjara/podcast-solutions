@@ -20,7 +20,7 @@ const UsagePlaygroundPage = () => {
       handleUseMutationAlerts({
         successText: "subscription fetched",
         callback: (data) => {
-          console.log(data);
+          console.info(data);
         },
       }),
     );

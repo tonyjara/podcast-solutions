@@ -119,10 +119,11 @@ model Episode {
   imageUrl            String
   explicit            Boolean
   status              EpisodeStatus @default(draft)
-  seasonNumber        Int?
-  episodeNumber       Int?
+  seasonNumber        Int 
+  episodeNumber       Int
   episodeType         EpisodeType   @default(full)
   selectedAudioFileId String?
+  keywords            String @default("")
 
   audioFiles   AudioFile[]
   chatMessages EpisodeChat[]
@@ -178,9 +179,9 @@ model Subscription {
   creditActions     SubscriptionCreditsActions[]
   subscriptionItems SubscriptionItem[]
 
-  eventCancelationId String?
-  cancelAt           DateTime?
-  canceledAt         DateTime?
+  eventCancellationId String?
+  cancellAt           DateTime?
+  cancelledAt         DateTime?
 
   audios   AudioFile[]
   podcasts Podcast[]

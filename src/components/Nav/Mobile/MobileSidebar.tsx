@@ -9,6 +9,7 @@ import NavItemChild from "../components/NavItemChild";
 import { SidebarLinks } from "../Data/SidebarLinks";
 import PodcastSelect from "@/components/Selects/PodcastSelect";
 import Link from "next/link";
+import { trpcClient } from "@/utils/api";
 interface SidebarProps {
   onClose: () => void;
   isOpen: boolean;
@@ -16,7 +17,8 @@ interface SidebarProps {
 
 const MobileSidebar = ({ onClose, isOpen }: SidebarProps) => {
   const user = useSession().data?.user;
-  /* const isAdmin = data?.user.role === "admin"; */
+  const { data: mySelectedPodcast } =
+    trpcClient.podcast.getMySelectedPodcast.useQuery();
 
   const { colorMode } = useColorMode();
   const logo =
@@ -67,7 +69,7 @@ const MobileSidebar = ({ onClose, isOpen }: SidebarProps) => {
           </Flex>
 
           {user &&
-            SidebarLinks(user).map((link) => (
+            SidebarLinks(user, mySelectedPodcast?.slug ?? "").map((link) => (
               <div key={link.name}>
                 {link.children?.length && (
                   <Accordion allowToggle>
