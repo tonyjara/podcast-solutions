@@ -162,13 +162,11 @@ export default function HomePage() {
                 </Button>
               </Flex>
             </Flex>
-
             <Text hideBelow={"sm"} as="em" py="10px" px="5px">
               {handleSubtitleText()}{" "}
             </Text>
           </Flex>
         }
-        title={selectedPodcast?.name}
         data={episodes ?? []}
         columns={homeEpisodesColumns()}
         count={count ?? 0}

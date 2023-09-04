@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps<{
       subscription: {
         select: { active: true, cancelledAt: true, userId: true },
       },
-      podcast: true,
+      podcast: { include: { directories: true } },
     },
   });
   if (!episode) return { notFound: true };

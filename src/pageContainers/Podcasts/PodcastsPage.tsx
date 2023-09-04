@@ -4,8 +4,9 @@ import { Flex } from "@chakra-ui/react";
 import { Podcast } from "@prisma/client";
 import EpisodesPlaylist from "@/components/EpisodesPlaylist";
 import PodcastInfo from "@/components/PodcastInfo";
+import { PodcastWithDirectories } from "@/pages/podcasts/[slug]";
 
-const PodcastsPage = ({ podcast }: { podcast: Podcast }) => {
+const PodcastsPage = ({ podcast }: { podcast: PodcastWithDirectories }) => {
   const dynamicTableProps = useDynamicTable();
 
   const { pageIndex, pageSize } = dynamicTableProps;

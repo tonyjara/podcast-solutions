@@ -361,7 +361,8 @@ const DynamicTable = <T extends object>({
                                     }
                                     icon={<CloseIcon />}
                                 >
-                                    Close menu                </MenuItem>
+                                    Close menu{" "}
+                                </MenuItem>
                             </MenuGroup>
                             <MenuDivider />
                             <MenuGroup>

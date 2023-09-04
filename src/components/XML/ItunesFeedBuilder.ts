@@ -76,7 +76,7 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
           /* { "podcast:transcript": episode.transcription }, */ //Needs a url
           {
             "itunes:image": episode.imageUrl,
-            "podcast:transcript": episode.transcription,
+            /* "podcast:transcript": episode.transcription, */
             "podcast:guid": episode.id,
           },
         ],

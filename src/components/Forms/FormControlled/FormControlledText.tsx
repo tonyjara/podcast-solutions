@@ -27,6 +27,7 @@ interface InputProps<T extends FieldValues> {
   hidden?: boolean;
   autoFocus?: boolean;
   isRequired?: boolean;
+  maxW?: string;
 }
 
 const FormControlledText = <T extends FieldValues>(props: InputProps<T>) => {
@@ -44,6 +45,7 @@ const FormControlledText = <T extends FieldValues>(props: InputProps<T>) => {
     hidden,
     autoFocus,
     isRequired,
+    maxW,
   } = props;
 
   const splitName = name.split(".");
@@ -60,6 +62,7 @@ const FormControlledText = <T extends FieldValues>(props: InputProps<T>) => {
       isRequired={isRequired}
       hidden={hidden}
       isInvalid={!!reduceErrors.message}
+      maxW={maxW}
     >
       <FormLabel fontSize={"md"}>{label}</FormLabel>
       <Controller

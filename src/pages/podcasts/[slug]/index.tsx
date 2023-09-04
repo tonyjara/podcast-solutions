@@ -2,8 +2,13 @@ import { isScheduled } from "@/lib/utils/dateUtils";
 import PodcastsPage from "@/pageContainers/Podcasts/PodcastsPage";
 import { getServerAuthSession } from "@/server/auth";
 import { prisma } from "@/server/db";
+import { Prisma } from "@prisma/client";
 import { GetServerSideProps } from "next";
 export default PodcastsPage;
+
+export type PodcastWithDirectories = Prisma.PodcastGetPayload<{
+  include: { directories: true };
+}>;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const q = ctx.query as { slug: string };
@@ -12,6 +17,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const podcast = await prisma.podcast.findUnique({
     where: { slug: q.slug, active: true },
     include: {
+      directories: true,
       subscription: { select: { active: true, userId: true } },
     },
   });

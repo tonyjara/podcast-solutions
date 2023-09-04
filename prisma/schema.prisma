@@ -106,6 +106,42 @@ model Podcast {
   episodes       Episode[]
   subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
   subscriptionId String?
+  directories    Directories?
+}
+
+// Links from podcasts directories and social media
+model Directories {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  websiteUrl   String
+  // Social Media
+  twitterUrl   String
+  facebookUrl  String
+  instagramUrl String
+  youtubeUrl   String
+
+  // Podcast Directories
+  spotifyUrl        String @default("")
+  applePodcastsUrl  String @default("")
+  googlePodcastsUrl String @default("")
+  stitcherUrl       String @default("")
+  tuneinUrl         String @default("")
+  pocketCastsUrl    String @default("")
+  overcastUrl       String @default("")
+  castroUrl         String @default("")
+  castboxUrl        String @default("")
+  podchaserUrl      String @default("")
+  deezerUrl         String @default("")
+  podfriendUrl      String @default("")
+  amazonMusicUrl    String @default("")
+  podcastAddictUrl  String @default("")
+  breakerUrl        String @default("")
+  radiopublicUrl    String @default("")
+
+  podcast   Podcast @relation(fields: [podcastId], references: [id])
+  podcastId String  @unique
 }
 
 model Episode {
@@ -119,11 +155,11 @@ model Episode {
   imageUrl            String
   explicit            Boolean
   status              EpisodeStatus @default(draft)
-  seasonNumber        Int 
+  seasonNumber        Int
   episodeNumber       Int
   episodeType         EpisodeType   @default(full)
   selectedAudioFileId String?
-  keywords            String @default("")
+  keywords            String        @default("")
 
   audioFiles   AudioFile[]
   chatMessages EpisodeChat[]
@@ -285,13 +321,13 @@ model FeatureFlags {
 }
 
 model Logs {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    message   String
-    level     String
-    eventId   String
-    }
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  message   String
+  level     String
+  eventId   String
+}
 
 enum Role {
   admin
