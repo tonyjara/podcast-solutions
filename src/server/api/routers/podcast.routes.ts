@@ -6,6 +6,7 @@ import { validatePodcastEdit } from "@/components/Validations/PodcastEdit.valida
 import { PodcastStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { isScheduled } from "@/lib/utils/dateUtils";
+import { validateDirectories } from "@/components/Validations/Directories.validate";
 
 export const podcastRouter = createTRPCRouter({
   createPodcastWithName: protectedProcedure
@@ -118,4 +119,73 @@ export const podcastRouter = createTRPCRouter({
       where: { id: preferences.selectedPodcastId },
     });
   }),
+
+  getMyDirectories: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    const preferences = await prisma.preferences.findUnique({
+      where: { userId: userId },
+    });
+    if (!preferences) return null;
+    return await prisma.directories.findUnique({
+      where: { podcastId: preferences.selectedPodcastId },
+    });
+  }),
+  upsertDirectories: protectedProcedure
+    .input(validateDirectories)
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session.user;
+      const preferences = await prisma.preferences.findUnique({
+        where: { userId: user.id },
+      });
+      if (!preferences) return null;
+
+      await prisma.directories.upsert({
+        where: { id: input.id },
+        create: {
+          websiteUrl: input.websiteUrl,
+          twitterUrl: input.twitterUrl,
+          facebookUrl: input.facebookUrl,
+          instagramUrl: input.instagramUrl,
+          youtubeUrl: input.youtubeUrl,
+          spotifyUrl: input.spotifyUrl,
+          applePodcastsUrl: input.applePodcastsUrl,
+          googlePodcastsUrl: input.googlePodcastsUrl,
+          stitcherUrl: input.stitcherUrl,
+          tuneinUrl: input.tuneinUrl,
+          pocketCastsUrl: input.pocketCastsUrl,
+          overcastUrl: input.overcastUrl,
+          castroUrl: input.castroUrl,
+          castboxUrl: input.castboxUrl,
+          podchaserUrl: input.podchaserUrl,
+          deezerUrl: input.deezerUrl,
+          podfriendUrl: input.podfriendUrl,
+          podcastAddictUrl: input.podcastAddictUrl,
+          breakerUrl: input.breakerUrl,
+          radiopublicUrl: input.radiopublicUrl,
+          podcastId: preferences.selectedPodcastId,
+        },
+        update: {
+          websiteUrl: input.websiteUrl,
+          twitterUrl: input.twitterUrl,
+          facebookUrl: input.facebookUrl,
+          instagramUrl: input.instagramUrl,
+          youtubeUrl: input.youtubeUrl,
+          spotifyUrl: input.spotifyUrl,
+          applePodcastsUrl: input.applePodcastsUrl,
+          googlePodcastsUrl: input.googlePodcastsUrl,
+          stitcherUrl: input.stitcherUrl,
+          tuneinUrl: input.tuneinUrl,
+          pocketCastsUrl: input.pocketCastsUrl,
+          overcastUrl: input.overcastUrl,
+          castroUrl: input.castroUrl,
+          castboxUrl: input.castboxUrl,
+          podchaserUrl: input.podchaserUrl,
+          deezerUrl: input.deezerUrl,
+          podfriendUrl: input.podfriendUrl,
+          podcastAddictUrl: input.podcastAddictUrl,
+          breakerUrl: input.breakerUrl,
+          radiopublicUrl: input.radiopublicUrl,
+        },
+      });
+    }),
 });

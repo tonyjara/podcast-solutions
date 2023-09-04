@@ -8,23 +8,27 @@ import {
   useClipboard,
   Tag,
   Box,
+  useDisclosure,
 } from "@chakra-ui/react";
 
-import { Podcast } from "@prisma/client";
 import { BiRss } from "react-icons/bi";
 import EpisodeBreadCrumbs from "./EpisodeBreadCrubs";
 import HtmlParser from "@/components/HtmlParser";
 import dynamic from "next/dynamic";
+import { PodcastWithDirectories } from "@/pages/podcasts/[slug]";
+import { FaShareAlt } from "react-icons/fa";
+import ListenOnModal from "@/components/ListenOnModal";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 export default function EpisodePage({
   episode,
   podcast,
 }: {
-  podcast: Podcast;
+  podcast: PodcastWithDirectories;
   episode: EpisodeWithAudioFiles;
 }) {
   const { onCopy, hasCopied } = useClipboard("");
+  const { onOpen, onClose, isOpen } = useDisclosure();
   const handleCopyFeed = () => {
     const feedUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/rss/${podcast.slug}`;
     navigator.clipboard.writeText(feedUrl);
@@ -86,7 +90,7 @@ export default function EpisodePage({
             </Box>
           </Flex>
         </Flex>
-        <Box>
+        <Flex gap={"20px"}>
           <Button
             onClick={handleCopyFeed}
             leftIcon={<BiRss color="orange" />}
@@ -95,7 +99,18 @@ export default function EpisodePage({
           >
             {hasCopied ? "Copied!" : "Copy Feed"}{" "}
           </Button>
-        </Box>
+
+          {podcast.directories && (
+            <Button
+              onClick={() => onOpen()}
+              leftIcon={<FaShareAlt />}
+              maxW={"200px"}
+              size={"sm"}
+            >
+              Listen on
+            </Button>
+          )}
+        </Flex>
 
         {selectedAudioFile?.url && (
           <Box my={"20px"}>
@@ -108,6 +123,14 @@ export default function EpisodePage({
           </Box>
         )}
       </Flex>
+
+      {podcast.directories && (
+        <ListenOnModal
+          onClose={onClose}
+          isOpen={isOpen}
+          directories={podcast.directories}
+        />
+      )}
     </Flex>
   );
 }

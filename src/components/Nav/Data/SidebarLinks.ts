@@ -2,7 +2,7 @@ import type { IconType } from "react-icons";
 import { FiHome, FiSettings } from "react-icons/fi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { TbSeeding } from "react-icons/tb";
-import { FaCcStripe } from "react-icons/fa";
+import { FaCcStripe, FaShareAlt } from "react-icons/fa";
 import { SessionUser } from "@/server/auth";
 import { BsSpeedometer2 } from "react-icons/bs";
 import { AiOutlineFundView } from "react-icons/ai";
@@ -63,6 +63,7 @@ export const SidebarLinks: (
   return [
     ...AdminLinks(user.role === "admin"),
     { name: "Home", icon: FiHome, dest: "/home" },
+    { name: "Distribution", icon: FaShareAlt, dest: "/home/distribution" },
     {
       name: "Preview",
       icon: AiOutlineFundView,

@@ -8,15 +8,22 @@ import {
   useClipboard,
   HStack,
   Tag,
-  Box,
+  useDisclosure,
 } from "@chakra-ui/react";
 
-import { Podcast } from "@prisma/client";
 import { BiRss } from "react-icons/bi";
 import HtmlParser from "./HtmlParser";
+import { FaShareAlt } from "react-icons/fa";
+import ListenOnModal from "./ListenOnModal";
+import { PodcastWithDirectories } from "@/pages/podcasts/[slug]";
 
-export default function PodcastInfo({ podcast }: { podcast: Podcast }) {
+export default function PodcastInfo({
+  podcast,
+}: {
+  podcast: PodcastWithDirectories;
+}) {
   const { onCopy, hasCopied } = useClipboard("");
+  const { onOpen, onClose, isOpen } = useDisclosure();
   const handleCopyFeed = () => {
     const feedUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/rss/${podcast.slug}`;
     navigator.clipboard.writeText(feedUrl);
@@ -26,6 +33,7 @@ export default function PodcastInfo({ podcast }: { podcast: Podcast }) {
     <Container maxW={"5xl"} mb={"30px"}>
       <Flex mb={"20px"} gap={"20px"} flexDir={{ base: "column", sm: "row" }}>
         <Flex flexDir={"column"} alignSelf={"start"}>
+          {/* Tried to optimize this but can't because image might come from infinite sources */}
           <Image
             maxW={{ base: "100%", sm: "200px", md: "300px" }}
             rounded={"md"}
@@ -52,7 +60,7 @@ export default function PodcastInfo({ podcast }: { podcast: Podcast }) {
           </HStack>
         </Flex>
       </Flex>
-      <Box>
+      <Flex gap={"20px"}>
         <Button
           onClick={handleCopyFeed}
           leftIcon={<BiRss color="orange" />}
@@ -61,7 +69,25 @@ export default function PodcastInfo({ podcast }: { podcast: Podcast }) {
         >
           {hasCopied ? "Copied!" : "Copy Feed"}{" "}
         </Button>
-      </Box>
+
+        {podcast.directories && (
+          <Button
+            onClick={() => onOpen()}
+            leftIcon={<FaShareAlt />}
+            maxW={"200px"}
+            size={"sm"}
+          >
+            Listen on
+          </Button>
+        )}
+      </Flex>
+      {podcast.directories && (
+        <ListenOnModal
+          onClose={onClose}
+          isOpen={isOpen}
+          directories={podcast.directories}
+        />
+      )}
     </Container>
   );
 }
