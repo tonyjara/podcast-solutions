@@ -1,9 +1,12 @@
 import { couponsColumns } from "@/components/DynamicTables/Columns/CouponsColumns";
-import DynamicTable from "@/components/DynamicTables/DynamicTable";
+import { CouponsRowOptions } from "@/components/DynamicTables/Columns/RowOptions/CouponRowOptions";
+import DynamicTable, {
+  RowOptionsType,
+} from "@/components/DynamicTables/DynamicTable";
 import { useDynamicTable } from "@/components/DynamicTables/UseDynamicTable";
 import CreateCouponForm from "@/components/Forms/CreateCoupon.Form";
 import { trpcClient } from "@/utils/api";
-import { Box, Text, Button, Flex } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { Prisma } from "@prisma/client";
 import React, { useState } from "react";
 
@@ -24,14 +27,26 @@ const CouponsPage = () => {
   const { data: count } = trpcClient.admin.countCoupons.useQuery({
     whereFilterList,
   });
+  const rowOptionsFunction: RowOptionsType = ({ x, setMenuData }) => {
+    return (
+      <CouponsRowOptions
+        x={x}
+        /* onExpReturnOpen={onExpenseReturnOpen} */
+        setMenuData={setMenuData}
+      />
+    );
+  };
+
   return (
     <Box>
       <DynamicTable
         title="Coupons"
+        loading={isLoading}
         whereFilterList={whereFilterList}
         setWhereFilterList={setWhereFilterList}
         headerComp={<CreateCouponForm />}
-        columns={couponsColumns()}
+        columns={couponsColumns({ pageIndex, pageSize })}
+        rowOptions={rowOptionsFunction}
         data={coupons ?? []}
         count={count}
         {...dynamicTableProps}
