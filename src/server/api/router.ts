@@ -13,6 +13,7 @@ import { rssRouter } from "./routers/rss.routes";
 import { stripeUsageRouter } from "./routers/stripe-usage.routes";
 import { seedRouter } from "./routers/seed.routes";
 import { logsRouter } from "./routers/logs.routes";
+import { couponsRouter } from "./routers/coupons.routes";
 
 /**
  * This is the primary router for your server.
@@ -21,6 +22,7 @@ import { logsRouter } from "./routers/logs.routes";
  */
 export const appRouter = createTRPCRouter({
   auth: authRouter,
+  coupons: couponsRouter,
   chatGPT: chatGPTRouter,
   stripe: stripeRouter,
   stripeUsage: stripeUsageRouter,

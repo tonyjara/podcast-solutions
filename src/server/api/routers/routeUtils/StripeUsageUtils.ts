@@ -1,9 +1,12 @@
 import { prisma } from "@/server/db";
 import {
   PlanType,
+  Prisma,
+  PrismaClient,
   StripePriceTag,
   SubscriptionCreditsActions,
 } from "@prisma/client";
+import { DefaultArgs } from "@prisma/client/runtime/library";
 import Decimal from "decimal.js";
 import Stripe from "stripe";
 
@@ -117,13 +120,18 @@ export const addSubscriptionCredits = async ({
   lastAction,
   amount,
   subscriptionId,
+  tx,
 }: {
   tag: StripePriceTag;
   lastAction: SubscriptionCreditsActions | null;
   amount: number;
   subscriptionId: string;
+  tx?: Omit<
+    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+    "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+  >;
 }) => {
-  await prisma.subscriptionCreditsActions.create({
+  await (tx ? tx : prisma).subscriptionCreditsActions.create({
     data: {
       tag,
       amount: new Decimal(amount),

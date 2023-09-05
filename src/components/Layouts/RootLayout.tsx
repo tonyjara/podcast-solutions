@@ -8,7 +8,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathName = router.pathname.split("/");
   const title = pathName[pathName.length - 1];
-  const defaultText = `PS ${
+  const defaultText = `Podcast Solutions ${
     process.env.NODE_ENV === "development" ? "DEV" : ""
   }`;
 
