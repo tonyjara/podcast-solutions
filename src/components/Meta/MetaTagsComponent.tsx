@@ -18,14 +18,15 @@ const MetaTagsComponent = ({ title, description, imageSrc, date }: props) => {
       ? "http://localhost:3000"
       : "https://podcastsolutions.org";
 
-  const imageUrl = origin + (imageSrc ?? "/assets/birbs/metabackground.jpg");
+  const imageUrl = origin + (imageSrc ?? "/assets/meta/ps-cover.png");
+  /* const imageUrl = imageSrc ?? origin + "/assets/meta/ps-cover.png"; */
 
   const metaDescription = (
     description ??
-    "Podcasting made easy, don't waste your time with tasks that can easily be automated, find editors, transcribe your podcasts, generate shownotes, one click uploads to podcasting platforms, scheduled uploads, just one click away. "
+    "The simplest and easiest podcast hosting platform, schedule uploads, transcribe your audio, generate AI content and more. "
   ).substring(0, 150);
 
-  const myTitle = title ? `PS - ${title}` : "Podcast Solutions";
+  const myTitle = title ?? "Podcast Solutions";
   const currentUrl = `${WEB_URL}${pathname}`;
 
   return (

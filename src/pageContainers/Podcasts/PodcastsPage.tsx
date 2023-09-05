@@ -1,10 +1,10 @@
 import { useDynamicTable } from "@/components/DynamicTables/UseDynamicTable";
 import { trpcClient } from "@/utils/api";
 import { Flex } from "@chakra-ui/react";
-import { Podcast } from "@prisma/client";
 import EpisodesPlaylist from "@/components/EpisodesPlaylist";
 import PodcastInfo from "@/components/PodcastInfo";
 import { PodcastWithDirectories } from "@/pages/podcasts/[slug]";
+import MetaTagsComponent from "@/components/Meta/MetaTagsComponent";
 
 const PodcastsPage = ({ podcast }: { podcast: PodcastWithDirectories }) => {
   const dynamicTableProps = useDynamicTable();
@@ -25,6 +25,11 @@ const PodcastsPage = ({ podcast }: { podcast: PodcastWithDirectories }) => {
 
   return (
     <Flex w="100%" flexDir={"column"} alignContent={"center"}>
+      <MetaTagsComponent
+        title={podcast.name}
+        imageSrc={podcast.imageUrl}
+        description={podcast.description}
+      />
       <PodcastInfo podcast={podcast} />
       <EpisodesPlaylist
         episodes={episodes ?? []}

@@ -18,6 +18,7 @@ import dynamic from "next/dynamic";
 import { PodcastWithDirectories } from "@/pages/podcasts/[slug]";
 import { FaShareAlt } from "react-icons/fa";
 import ListenOnModal from "@/components/ListenOnModal";
+import MetaTagsComponent from "@/components/Meta/MetaTagsComponent";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 export default function EpisodePage({
@@ -39,6 +40,11 @@ export default function EpisodePage({
   );
   return (
     <Flex w="100%" justifyContent={"center"} flexDir={"row"}>
+      <MetaTagsComponent
+        title={episode.title}
+        imageSrc={episode.imageUrl}
+        description={episode.showNotes}
+      />
       <Flex w="100%" maxW={"1000px"} flexDir={"column"}>
         <EpisodeBreadCrumbs
           episodeTitle={episode.title}

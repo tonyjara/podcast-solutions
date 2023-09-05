@@ -11,21 +11,25 @@ import RootLayout from "@/components/Layouts/RootLayout";
 import { trpcClient } from "@/utils/api";
 import { Toaster } from "react-hot-toast";
 import "../styles/customize-progress-bar.css";
+import MetaTagsComponent from "@/components/Meta/MetaTagsComponent";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <SessionProvider session={session}>
-      <ChakraProvider theme={theme}>
-        <NextNProgress height={4} />
-        <Toaster />
-        <RootLayout>
-          <Component {...pageProps} />
-        </RootLayout>
-      </ChakraProvider>
-    </SessionProvider>
+    <>
+      <MetaTagsComponent />
+      <SessionProvider session={session}>
+        <ChakraProvider theme={theme}>
+          <NextNProgress height={4} />
+          <Toaster />
+          <RootLayout>
+            <Component {...pageProps} />
+          </RootLayout>
+        </ChakraProvider>
+      </SessionProvider>
+    </>
   );
 };
 
