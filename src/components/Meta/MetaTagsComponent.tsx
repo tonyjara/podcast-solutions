@@ -8,9 +8,16 @@ interface props {
   description?: string;
   imageSrc?: string;
   date?: Date;
+  id?: string;
 }
 
-const MetaTagsComponent = ({ title, description, imageSrc, date }: props) => {
+const MetaTagsComponent = ({
+  id,
+  title,
+  description,
+  imageSrc,
+  date,
+}: props) => {
   const pathname = usePathname();
   const origin = typeof window === "undefined" ? "" : window.location.origin;
   const WEB_URL =
@@ -18,55 +25,103 @@ const MetaTagsComponent = ({ title, description, imageSrc, date }: props) => {
       ? "http://localhost:3000"
       : "https://podcastsolutions.org";
 
-  const imageUrl = origin + (imageSrc ?? "/assets/birbs/metabackground.jpg");
+  const imageUrl = origin + (imageSrc ?? "/assets/meta/ps-cover.png");
+  /* const imageUrl = imageSrc ?? origin + "/assets/meta/ps-cover.png"; */
 
+  const metaKey = (key: string) => (id ? key + id : key);
   const metaDescription = (
     description ??
-    "Podcasting made easy, don't waste your time with tasks that can easily be automated, find editors, transcribe your podcasts, generate shownotes, one click uploads to podcasting platforms, scheduled uploads, just one click away. "
+    "The simplest and easiest podcast hosting platform, schedule uploads, transcribe your audio, generate AI content and more. "
   ).substring(0, 150);
 
-  const myTitle = title ? `PS - ${title}` : "Podcast Solutions";
+  const myTitle = title ?? "Podcast Solutions";
   const currentUrl = `${WEB_URL}${pathname}`;
+  const domain = "https://podcastsolutions.org";
+  const author = "Podcast Solutions";
 
   return (
     <Head>
-      <link rel="canonical" href={currentUrl} />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="canonical" href={currentUrl} key={metaKey("canonical")} />
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+        key={metaKey("viewport")}
+      />
 
-      <title>{myTitle}</title>
+      <title key={metaKey("title")}>{myTitle}</title>
 
-      <meta name="author" content="Tony Jara" />
-      <meta name="description" content={metaDescription} />
+      <meta name="author" content={author} key={metaKey("author")} />
+      <meta
+        name="description"
+        content={metaDescription}
+        key={metaKey("description")}
+      />
       <meta name="theme-color" content="#46AC42" />
-      <meta name="image" property="og:image" content={imageUrl} />
+      <meta
+        name="image"
+        property="og:image"
+        content={imageUrl}
+        key={metaKey("image")}
+      />
       <meta property="og:image:alt" content={metaDescription} />
 
       {/* <!-- Facebook Meta Tags --> */}
-      <meta name="url" property="og:url" content={currentUrl} />
-      <meta name="type" property="og:type" content="website" />
-      <meta name="title" property="og:title" content={myTitle} />
+      <meta
+        name="url"
+        property="og:url"
+        content={currentUrl}
+        key={metaKey("fb-url")}
+      />
+      <meta
+        name="type"
+        property="og:type"
+        content="website"
+        key={metaKey("fb-type")}
+      />
+      <meta
+        name="title"
+        property="og:title"
+        content={myTitle}
+        key={metaKey("fb-title")}
+      />
       <meta
         name="description"
         property="og:description"
         content={metaDescription}
+        key={metaKey("fb-description")}
       />
-      {/* <meta name="image" property="og:image" content={imageUrl} /> */}
-      {/* <meta property="og:image:alt" content={metaDescription} /> */}
 
       {/* <!-- Twitter Meta Tags --> */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:domain" content="tonyjara.com" />
-      <meta name="twitter:url" content={currentUrl} />
-      <meta name="twitter:title" content={myTitle} />
-      <meta name="twitter:description" content={metaDescription} />
-      {/* <meta name="twitter:image" content={imageUrl} /> */}
-      {/* <meta name="twitter:image:alt" content={metaDescription} /> */}
+      <meta
+        name="twitter:card"
+        content="summary_large_image"
+        key={metaKey("twitter-card")}
+      />
+      <meta name="twitter:domain" content={domain} key={metaKey("domain")} />
+      <meta
+        name="twitter:url"
+        content={currentUrl}
+        key={metaKey("twitter-url")}
+      />
+      <meta
+        name="twitter:title"
+        content={myTitle}
+        key={metaKey("twitter-title")}
+      />
+      <meta
+        name="twitter:description"
+        content={metaDescription}
+        key={metaKey("twtitter-desc")}
+      />
+      <meta name="twitter:image" content={imageUrl} />
+      <meta name="twitter:image:alt" content={metaDescription} />
 
       {/* <!-- LinkedIn Meta Tags --> */}
       <meta
         name="publish_date"
         property="og:publish_date"
         content={date?.toISOString() ?? new Date().toISOString()}
+        key={metaKey("pubdate")}
       />
 
       <FaviconLinks />

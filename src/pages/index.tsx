@@ -13,10 +13,10 @@ export interface PricingPageProps {
 
 const Index = (props: PricingPageProps) => {
   return (
-    <div>
+    <>
       <Hero />
       <Pricing {...props} />
-    </div>
+    </>
   );
 };
 
