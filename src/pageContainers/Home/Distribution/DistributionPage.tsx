@@ -117,6 +117,13 @@ const DistributionPage = () => {
               Guide to upload to Apple Podcasts
             </Link>
 
+            <Link
+              mb={"20px"}
+              target="_blank"
+              href="https://podcastsconnect.apple.com/"
+            >
+              Apple Podcasts Connect
+            </Link>
             <FormControlledText
               maxW={"500px"}
               control={control}
@@ -130,6 +137,14 @@ const DistributionPage = () => {
               href="https://blog.podcastsolutions.org/upload-to-spotify"
             >
               Guide to upload to Spotify
+            </Link>
+
+            <Link
+              target="_blank"
+              href="https://podcasters.spotify.com/dash/home/"
+              mb={"20px"}
+            >
+              Spotify for Podcasters dashboard
             </Link>
 
             <FormControlledText

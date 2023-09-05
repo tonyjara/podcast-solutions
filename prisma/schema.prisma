@@ -32,6 +32,7 @@ model Account {
 
 model User {
   id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
   updatedAt    DateTime?     @updatedAt
   firstName    String
   lastName     String
@@ -46,11 +47,12 @@ model User {
 }
 
 model AccountVerificationLinks {
-  id               String   @id @default(cuid())
-  createdAt        DateTime @default(now())
+  id               String    @id @default(cuid())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime? @updatedAt
   verificationLink String
   email            String
-  hasBeenUsed      Boolean  @default(false)
+  hasBeenUsed      Boolean   @default(false)
 }
 
 model PasswordRecoveryLinks {
@@ -222,11 +224,29 @@ model Subscription {
   audios   AudioFile[]
   podcasts Podcast[]
   episodes Episode[]
+  coupons  Coupons[]
 
   user      User    @relation(fields: [userId], references: [id])
   userId    String  @unique
   product   Product @relation(fields: [productId], references: [id])
   productId String
+}
+
+model Coupons {
+  id             String    @id @default(cuid())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  couponCode     String    @unique @default(cuid())
+  hasBeenClaimed Boolean   @default(false)
+  claimedAt      DateTime?
+  expirationDate DateTime?
+
+  chatInputCredits     Int @default(0)
+  chatOutputCredits    Int @default(0)
+  transcriptionMinutes Int @default(0)
+
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
 }
 
 // This is based on stripe products

@@ -32,13 +32,16 @@ const UsageStats = ({
           }, 0);
 
           return (
-            <Skeleton key={item.tag} isLoaded={!loading}>
-              <StatsCard
-                title={item.tag}
-                credits={item.credits}
-                value={value}
-              />
-            </Skeleton>
+            item.tag !== "PLAN_FEE" &&
+            item.tag !== "STORAGE_PER_GB" && (
+              <Skeleton key={item.tag} isLoaded={!loading}>
+                <StatsCard
+                  title={item.tag}
+                  credits={item.credits}
+                  value={value}
+                />
+              </Skeleton>
+            )
           );
         })}
       </SimpleGrid>

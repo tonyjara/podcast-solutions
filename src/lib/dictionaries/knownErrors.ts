@@ -43,6 +43,10 @@ export const knownErrors = (error: string) => {
     return "Email already verified, please login";
   }
 
+  if (error.includes("Coupon not found or already claimed")) {
+    return error;
+  }
+
   console.error(error);
   return "Something went wrong, please try again.";
 };

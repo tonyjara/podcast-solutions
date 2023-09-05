@@ -1,3 +1,4 @@
+import ClaimCouponsForm from "@/components/Forms/ClaimCoupons.form";
 import SettingsLayout from "@/components/Layouts/SettingsLayout";
 import UsageStats from "@/components/UsageStats";
 import { trpcClient } from "@/utils/api";
@@ -23,6 +24,7 @@ const UsagePage = () => {
             myUsage={myUsage}
             loading={isLoading || isFetching || !myUsage?.length || !myUsage}
           />
+          <ClaimCouponsForm />
         </Flex>
       </Flex>
     </SettingsLayout>

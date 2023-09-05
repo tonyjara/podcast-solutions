@@ -6,69 +6,75 @@ import { FaCcStripe, FaShareAlt } from "react-icons/fa";
 import { SessionUser } from "@/server/auth";
 import { BsSpeedometer2 } from "react-icons/bs";
 import { AiOutlineFundView } from "react-icons/ai";
+import { BiSolidCoupon } from "react-icons/bi";
 
 export interface LinkItemProps {
-  name: string;
-  icon: IconType;
-  dest: string; //destination
-  target?: string;
-  children?: {
     name: string;
     icon: IconType;
     dest: string; //destination
     target?: string;
-  }[];
+    children?: {
+        name: string;
+        icon: IconType;
+        dest: string; //destination
+        target?: string;
+    }[];
 }
 
 const AdminLinks: (isAdmin: boolean) => Array<LinkItemProps> = (isAdmin) => {
-  return isAdmin
-    ? [
-        {
-          name: "Admin",
-          icon: MdOutlineAdminPanelSettings,
-          dest: "/admin",
-          children: [
+    return isAdmin
+        ? [
             {
-              name: "Seed",
-              icon: TbSeeding,
-              dest: "/admin/seed",
-            },
-            {
-              name: "Stripe Products",
-              icon: FaCcStripe,
-              dest: "/admin/stripe/products",
-            },
+                name: "Admin",
+                icon: MdOutlineAdminPanelSettings,
+                dest: "/admin",
+                children: [
+                    {
+                        name: "Seed",
+                        icon: TbSeeding,
+                        dest: "/admin/seed",
+                    },
+                    {
+                        name: "Coupons",
+                        icon: BiSolidCoupon,
+                        dest: "/admin/coupons",
+                    },
+                    {
+                        name: "Stripe Products",
+                        icon: FaCcStripe,
+                        dest: "/admin/stripe/products",
+                    },
 
-            {
-              name: "Stripe Prices",
-              icon: FaCcStripe,
-              dest: "/admin/stripe/prices",
-            },
+                    {
+                        name: "Stripe Prices",
+                        icon: FaCcStripe,
+                        dest: "/admin/stripe/prices",
+                    },
 
-            {
-              name: "Usage Playground",
-              icon: BsSpeedometer2,
-              dest: "/admin/usage-playground",
+                    {
+                        name: "Usage Playground",
+                        icon: BsSpeedometer2,
+                        dest: "/admin/usage-playground",
+                    },
+                ],
             },
-          ],
-        },
-      ]
-    : [];
+        ]
+        : [];
 };
 
 export const SidebarLinks: (
-  user: SessionUser,
-  selectedPodcastSlug: string,
+    user: SessionUser,
+    selectedPodcastSlug: string,
 ) => Array<LinkItemProps> = (user: SessionUser, selectedPodcastSlug) => {
-  return [
-    ...AdminLinks(user.role === "admin"),
-    { name: "Home", icon: FiHome, dest: "/home" },
-    { name: "Distribution", icon: FaShareAlt, dest: "/home/distribution" },
-    {
-      name: "Preview",
-      icon: AiOutlineFundView,
-      dest: `/podcasts/${selectedPodcastSlug}`,
-    },
-    { name: "Settings", icon: FiSettings, dest: "/home/settings" },
-  ];
+    return [
+        ...AdminLinks(user.role === "admin"),
+        { name: "Home", icon: FiHome, dest: "/home" },
+        { name: "Distribution", icon: FaShareAlt, dest: "/home/distribution" },
+        {
+            name: "Preview",
+            icon: AiOutlineFundView,
+            dest: `/podcasts/${selectedPodcastSlug}`,
+        },
+        { name: "Settings", icon: FiSettings, dest: "/home/settings" },
+    ];
 };

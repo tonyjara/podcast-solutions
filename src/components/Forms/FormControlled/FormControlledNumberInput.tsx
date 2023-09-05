@@ -24,6 +24,7 @@ interface InputProps<T extends FieldValues> {
   prefix?: string;
   hidden?: boolean;
   disable?: boolean;
+  maxW?: string;
 }
 
 const FormControlledNumberInput = <T extends FieldValues>({
@@ -38,6 +39,7 @@ const FormControlledNumberInput = <T extends FieldValues>({
   hidden,
   disable,
   maxLength,
+  maxW,
 }: InputProps<T>) => {
   const splitName = name.split(".");
   const reduceErrors = splitName.reduce((acc: any, curr: any) => {
@@ -51,6 +53,7 @@ const FormControlledNumberInput = <T extends FieldValues>({
   return (
     <FormControl
       display={hidden ? "none" : "block"}
+      maxW={maxW}
       isInvalid={!!reduceErrors.message}
     >
       <FormLabel fontSize={"md"}>{label}</FormLabel>
