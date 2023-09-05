@@ -1,4 +1,13 @@
-import { Box, Button, Flex, VStack, Text, Link, Icon } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  VStack,
+  Text,
+  Link,
+  Icon,
+  Spinner,
+} from "@chakra-ui/react";
 import React, { useEffect } from "react";
 import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
 import { trpcClient } from "@/utils/api";
@@ -29,7 +38,7 @@ const DistributionPage = () => {
     resolver: zodResolver(validateDirectories),
   });
 
-  const { data: fetchedDirectories } =
+  const { data: fetchedDirectories, isLoading: isLoadingFetchDirectories } =
     trpcClient.podcast.getMyDirectories.useQuery(undefined, {
       refetchOnWindowFocus: false,
     });
@@ -68,9 +77,12 @@ const DistributionPage = () => {
           noValidate
         >
           <Flex justifyContent={"space-between"} w="100%" mb={"20px"}>
-            <Text fontSize={{ base: "2xl", md: "4xl" }}>
-              Distribution Directories
-            </Text>
+            <Flex gap={"10px"} alignItems={"center"}>
+              <Text fontSize={{ base: "2xl", md: "4xl" }}>
+                Distribution Directories
+              </Text>
+              {isLoadingFetchDirectories && <Spinner />}
+            </Flex>
             <Button
               size={{ base: "sm", md: "md" }}
               onClick={() => handleSubmit(submitFunc)()}
