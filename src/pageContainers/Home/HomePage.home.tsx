@@ -6,6 +6,7 @@ import {
   Flex,
   Heading,
   Image,
+  Spinner,
   Text,
   useClipboard,
   useDisclosure,
@@ -38,7 +39,7 @@ export default function HomePage() {
   const { onOpen: onOpenNoPodcastAndPodcastEditModal } =
     NoPodcastAndEditToggles;
 
-  const { data: selectedPodcast } =
+  const { data: selectedPodcast, isLoading: selectedPodcastIsLoading } =
     trpcClient.podcast.getMySelectedPodcast.useQuery();
 
   const { data: episodes, isLoading: episodesAreLoading } =
@@ -79,6 +80,7 @@ export default function HomePage() {
     <div>
       <DynamicTable
         rowActions={handleRowClick}
+        loading={episodesAreLoading || selectedPodcastIsLoading}
         enableColumnFilters={true}
         whereFilterList={whereFilterList}
         setWhereFilterList={setWhereFilterList}
@@ -95,6 +97,8 @@ export default function HomePage() {
               flexDir={{ base: "row", sm: "column", md: "column", lg: "row" }}
             >
               <Flex hideBelow={"sm"} alignItems={"center"} gap={"20px"}>
+                {selectedPodcastIsLoading ||
+                  (episodesAreLoading && <Spinner />)}
                 {selectedPodcast?.imageUrl && (
                   <Image
                     src={selectedPodcast?.imageUrl}
