@@ -59,4 +59,9 @@ export const adminRouter = createTRPCRouter({
         },
       });
     }),
+  deleteCoupon: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      return await prisma.coupons.delete({ where: { id: input.id } });
+    }),
 });

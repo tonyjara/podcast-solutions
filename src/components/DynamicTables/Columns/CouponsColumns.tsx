@@ -17,7 +17,18 @@ type CouponsWithSubscriptionUser = Prisma.CouponsGetPayload<{
 
 const columnHelper = createColumnHelper<CouponsWithSubscriptionUser>();
 
-export const couponsColumns = () => [
+export const couponsColumns = ({
+  pageIndex,
+  pageSize,
+}: {
+  pageSize: number;
+  pageIndex: number;
+}) => [
+  columnHelper.display({
+    cell: (x) => x.row.index + 1 + pageIndex * pageSize,
+    header: "N.",
+  }),
+
   columnHelper.accessor("createdAt", {
     cell: (x) => <DateCell date={x.getValue()} />,
     header: "Created At",
