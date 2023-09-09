@@ -1,4 +1,4 @@
-import { Box, Stack, Heading, Text, VStack, Container } from "@chakra-ui/react";
+import { Stack, Heading, Text, VStack, Container } from "@chakra-ui/react";
 import { trpcClient } from "@/utils/api";
 import PricingCard from "@/components/Cards/PricingCard";
 import { useSession } from "next-auth/react";
@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 
 export default function Pricing({ prices, products }: PricingPageProps) {
   const session = useSession();
+  const user = session?.data?.user;
   const router = useRouter();
 
   const authenticated = session?.status === "authenticated";
@@ -24,6 +25,12 @@ export default function Pricing({ prices, products }: PricingPageProps) {
       }),
     );
 
+  const { data: mySubscription } = trpcClient.users.getMySubsCription.useQuery(
+    undefined,
+    {
+      enabled: !!user,
+    },
+  );
   const handleCheckout = async (productId?: any, defaultPriceId?: any) => {
     if (!authenticated) return router.push("/signup");
     if (!productId || !defaultPriceId) return;
@@ -36,7 +43,7 @@ export default function Pricing({ prices, products }: PricingPageProps) {
         <Heading maxW="800px" as="h1" fontSize="4xl">
           Choose the plan that better fits your needs{" "}
         </Heading>
-        <Text maxW="800px" fontSize="lg" color={"gray.500"}>
+        <Text maxW="800px" fontSize="lg">
           Cancel any time, no questions asked. All values are cumulative, if you
           don&apos;t use them they remain in your account for as long as your
           subscription is active, in case of suspending your subscription your
@@ -58,6 +65,7 @@ export default function Pricing({ prices, products }: PricingPageProps) {
           prices={[]}
           title={freePricingCard.title}
           features={freePricingCard.features}
+          currentPlan={authenticated && mySubscription?.isFreeTrial}
         />
         {products.data
           .sort(

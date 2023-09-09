@@ -75,17 +75,23 @@ export default function SignupCard() {
     myToast.success("Verification link sent, please check your email");
   };
 
+  const headingColor = useColorModeValue("brand.500", "brand.400");
   return (
     <Flex
       px="20px"
-      minH={"90vh"}
+      minH={"92vh"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
     >
       <form onSubmit={handleSubmit(submitFunc)} noValidate>
         <Stack spacing={8} py={{ base: 6, md: 12 }}>
           <Stack spacing={3} align={"center"}>
-            <Heading maxW={"500px"} fontSize={"4xl"} textAlign={"center"}>
+            <Heading
+              color={headingColor}
+              maxW={"500px"}
+              fontSize={"4xl"}
+              textAlign={"center"}
+            >
               Sign up{" "}
             </Heading>
             <Text>Free 30-day trial. No credit card required.</Text>
@@ -142,13 +148,13 @@ export default function SignupCard() {
                       <FormLabel ml={"10px"}>
                         I agree to Podcastsolution's{" "}
                         <Link href="/terms-of-service" target={"_blank"}>
-                          <Text as={"span"} color={"blue.400"}>
+                          <Text as={"span"} color={"hyperlink"}>
                             Terms of Service
                           </Text>
                         </Link>{" "}
                         and{" "}
                         <Link href="/privacy-policy" target={"_blank"}>
-                          <Text as={"span"} color={"blue.400"}>
+                          <Text as={"span"} color={"hyperlink"}>
                             Privacy Policy
                           </Text>
                         </Link>
@@ -184,10 +190,9 @@ export default function SignupCard() {
                     isDisabled={isLoading || isSubmitting}
                     loadingText="Submitting"
                     size="lg"
-                    bg={"blue.400"}
                     color={"white"}
                     _hover={{
-                      bg: "blue.500",
+                      bg: "brand.600",
                     }}
                     type="submit"
                   >
@@ -195,14 +200,11 @@ export default function SignupCard() {
                   </Button>
                 </Stack>
                 <Stack pt={6}>
-                  <Text align={"center"}>
-                    Already a user?{" "}
-                    <Link href={"/signin"}>
-                      <Text as={"span"} color={"blue.500"}>
-                        Login
-                      </Text>
-                    </Link>
-                  </Text>
+                  <Link href={"/signin"}>
+                    <Text as={"span"} color={"brand.600"}>
+                      Already a user? Login
+                    </Text>
+                  </Link>
                 </Stack>
               </Stack>
             )}

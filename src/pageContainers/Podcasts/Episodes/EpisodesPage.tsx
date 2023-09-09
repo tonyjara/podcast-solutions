@@ -21,6 +21,7 @@ import {
   EpisodeWithAudioFilesAndSubscription,
   PodcastWithDirectories,
 } from "@/pages/podcasts/[slug]/[episodeId]";
+import ShareButtons from "@/components/ShareButtons";
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 export default function EpisodePage({
@@ -95,19 +96,6 @@ export default function EpisodePage({
                 </Text>
               </Flex>
               <HtmlParser showMoreButton content={episode.showNotes} />
-              {/* <Box> */}
-              {/*   {episode.keywords.length > 0 && */}
-              {/*     episode.keywords.split(",").map((keyword) => ( */}
-              {/*       <Tag */}
-              {/*         whiteSpace={"nowrap"} */}
-              {/*         key={keyword} */}
-              {/*         size="sm" */}
-              {/*         colorScheme="teal" */}
-              {/*       > */}
-              {/*         {keyword} */}
-              {/*       </Tag> */}
-              {/*     ))} */}
-              {/* </Box> */}
             </Flex>
           </Flex>
           <Flex gap={"20px"}>
@@ -130,6 +118,7 @@ export default function EpisodePage({
                 Listen on
               </Button>
             )}
+            <ShareButtons title={episode.title} />
           </Flex>
 
           {selectedAudioFile?.url && (

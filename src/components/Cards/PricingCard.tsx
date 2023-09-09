@@ -26,6 +26,7 @@ export interface PricingCardProps {
   handleCheckout: () => void;
   autenticated: boolean;
   subscriptionId?: string;
+  currentPlan?: boolean;
 }
 
 const PricingCard = ({
@@ -38,6 +39,7 @@ const PricingCard = ({
   prices,
   features,
   autenticated,
+  currentPlan,
 }: PricingCardProps) => {
   const defaultPrice = prices.find((x) => x.id === defaultPriceId);
   const otherPrices = prices.filter((x) => x.id !== defaultPriceId);
@@ -62,7 +64,7 @@ const PricingCard = ({
             <Text
               textTransform="uppercase"
               /* bg={useColorModeValue("red.300", "red.700")} */
-              bg="orange.300"
+              bg="brand.300"
               px={3}
               py={1}
               /* color={useColorModeValue("gray.900", "gray.300")} */
@@ -85,7 +87,8 @@ const PricingCard = ({
             <Text
               textTransform="uppercase"
               /* bg={useColorModeValue("red.300", "red.700")} */
-              bg="orange.300"
+              bg="brand.300"
+              color={"brand.800"}
               px={3}
               py={1}
               /* color={useColorModeValue("gray.900", "gray.300")} */
@@ -127,7 +130,7 @@ const PricingCard = ({
           <List spacing={3} textAlign="start" px={12}>
             {features.map((x) => (
               <ListItem key={x}>
-                <ListIcon as={FaCheckCircle} color="green.500" />
+                <ListIcon as={FaCheckCircle} color="brand.500" />
                 {x}
               </ListItem>
             ))}
@@ -139,7 +142,10 @@ const PricingCard = ({
                 Pay as you go
               </Text>
               <Text
-                color={"gray.500"}
+                color={"#63748d"}
+                _dark={{
+                  color: "#95a0b1",
+                }}
                 fontWeight="500"
                 fontSize="md"
                 mb={"10px"}
@@ -150,7 +156,7 @@ const PricingCard = ({
               <List spacing={3} textAlign="start" px={12}>
                 {payAsYouGo?.map((x) => (
                   <ListItem key={x}>
-                    <ListIcon as={FaDollarSign} color="green.500" />
+                    <ListIcon as={FaDollarSign} color="brand.500" />
                     {x}
                   </ListItem>
                 ))}
@@ -164,7 +170,7 @@ const PricingCard = ({
                   .map((price) => {
                     return (
                       <ListItem key={price.id}>
-                        <ListIcon as={FaDollarSign} color="green.500" />
+                        <ListIcon as={FaDollarSign} color="brand.500" />
                         {decimalDivBy100(price.unit_amount_decimal)}{" "}
                         {price.nickname}
                       </ListItem>
@@ -174,14 +180,22 @@ const PricingCard = ({
             </>
           )}
           <Box w="80%" pt={7}>
-            <Button
-              onClick={handleCheckout}
-              w="full"
-              colorScheme="orange"
-              variant="solid"
-            >
-              {autenticated ? "Subscribe" : "Sign up"}
-            </Button>
+            {!currentPlan && (
+              <Button
+                onClick={handleCheckout}
+                w="full"
+                /* colorScheme="orange" */
+                variant="solid"
+              >
+                {autenticated ? "Subscribe" : "Sign up"}
+              </Button>
+            )}
+
+            {currentPlan && (
+              <Button w="full" colorScheme="gray" variant="solid">
+                Current Plan
+              </Button>
+            )}
           </Box>
         </VStack>
       </Box>

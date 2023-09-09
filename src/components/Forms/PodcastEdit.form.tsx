@@ -192,7 +192,6 @@ const PodcastEditForm = ({
             type="submit"
             size={"lg"}
             isLoading={isSubmitting || isLoading}
-            colorScheme="green"
           >
             Save
           </Button>

@@ -1,4 +1,4 @@
-import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+import { EditIcon, EmailIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import {
   IconButton,
   Flex,
@@ -11,10 +11,12 @@ import {
   useColorMode,
   Portal,
 } from "@chakra-ui/react";
+import { RxAvatar } from "react-icons/rx";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
 import { signOut } from "next-auth/react";
+import { BiLogOutCircle } from "react-icons/bi";
 
 const NavbarProfileSection = () => {
   const router = useRouter();
@@ -45,18 +47,25 @@ const NavbarProfileSection = () => {
             </MenuButton>
             <Portal>
               <MenuList>
-                <MenuItem>
+                <MenuItem pointerEvents={"none"} icon={<RxAvatar />}>
                   {data?.user.firstName} {data?.user.lastName}{" "}
                 </MenuItem>
 
-                <MenuItem>{data?.user.email}</MenuItem>
+                <MenuItem pointerEvents={"none"} icon={<EmailIcon />}>
+                  {data?.user.email}
+                </MenuItem>
                 <MenuDivider />
-                <MenuItem onClick={() => router.push("/home/settings")}>
-                  My Account
+                <MenuItem
+                  icon={<EditIcon />}
+                  onClick={() => router.push("/home/settings")}
+                >
+                  My Profile
                 </MenuItem>
 
                 <MenuDivider />
-                <MenuItem onClick={() => signOut()}>Logout</MenuItem>
+                <MenuItem icon={<BiLogOutCircle />} onClick={() => signOut()}>
+                  Logout
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>

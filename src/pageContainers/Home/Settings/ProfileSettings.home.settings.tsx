@@ -1,95 +1,131 @@
-// import {
-//   defaultAccountProfileData,
-//   validateAccountProfile,
-// } from '@/lib/validations/profileSettings.validate';
-import { Box, Flex, Text } from "@chakra-ui/react";
-import React from "react";
+import FormControlledAvatarUpload from "@/components/Forms/FormControlled/FormControlledAvatarUpload";
+import FormControlledText from "@/components/Forms/FormControlled/FormControlledText";
+import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
+import {
+  ProfileEditValues,
+  defaultProfileEditValues,
+  validateProfileEdit,
+} from "@/components/Validations/profileEdit.validate";
+import { trpcClient } from "@/utils/api";
+import {
+  Button,
+  Flex,
+  Stack,
+  useColorModeValue,
+  HStack,
+  Heading,
+  Box,
+} from "@chakra-ui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
-const ProfileSettingsPage = () => {
-  // const context = trpcClient.useContext();
-  // const {
-  //   handleSubmit,
-  //   control,
-  //   reset,
-  //   setValue,
-  //   formState: { errors, isSubmitting },
-  // } = useForm<FormAccountProfile>({
-  //   defaultValues: defaultAccountProfileData,
-  //   resolver: zodResolver(validateAccountProfile),
-  // });
+export default function UserProfileEdit() {
+  const user = useSession().data?.user;
 
-  // const { error, mutate, isLoading } =
-  // trpcClient.account.updateMyProfile.useMutation(
-  //   handleUseMutationAlerts({
-  //     successText: 'Su perfil ha sido actualizado! Favor ingrese nuevamente.',
-  //     callback: () => {
-  //       // handleOnClose();
-  //       reset();
-  //       context.invalidate();
-  //       signOut();
-  //     },
-  //   })
-  // );
+  const {
+    handleSubmit,
+    control,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ProfileEditValues>({
+    defaultValues: defaultProfileEditValues,
+    resolver: zodResolver(validateProfileEdit),
+  });
 
-  // const { data, isLoading: isLoadingProfile } =
-  //   trpcClient.account.getForProfileEdit.useQuery();
+  useEffect(() => {
+    if (!user) return;
+    reset({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarUrl: user.image,
+    });
 
-  // useEffect(() => {
-  //   if (!data) return;
-  //   reset(data);
-  //   return () => {};
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [data]);
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
-  // const submitFunc = async (data: FormAccountProfile) => {
-  //   mutate(data);
-  // };
-
-  return (
-    <Box w={"100%"} maxW={"600px"}>
-      {/* <form onSubmit={handleSubmit(submitFunc)} noValidate> */}
-      <Flex gap={"10px"}>
-        {/* <TitleComponent title="Configuración de perfil" /> */}
-        {/* <Button */}
-        {/*   // isDisabled={isLoading || isSubmitting || isLoadingProfile} */}
-        {/*   type="submit" */}
-        {/*   colorScheme="blue" */}
-        {/*   mr={3} */}
-        {/* > */}
-        {/*   Guardar */}
-        {/* </Button> */}
-      </Flex>
-      {/* {error && <Text color="red.300">{knownErrors(error.message)}</Text>} */}
-      <Text color={"gray.400"}></Text>
-      {/* {user && (
-          <FormControlledAvatarUpload
-            control={control}
-            errors={errors}
-            urlName="profile.avatarUrl"
-            label="Foto de perfil"
-            setValue={setValue}
-            helperText=""
-            userId={user.id}
-          />
-        )} */}
-      {/* <FormControlledText
-          control={control}
-          errors={errors}
-          name="displayName"
-          label="Nombre"
-          autoFocus={true}
-        /> */}
-
-      {/* <FormControlledText
-          control={control}
-          errors={errors}
-          name="email"
-          label="Correo"
-          autoFocus={true}
-        /> */}
-      {/* </form> */}
-    </Box>
+  const { mutate } = trpcClient.users.updateProfile.useMutation(
+    handleUseMutationAlerts({
+      successText: "Profile updated, please relog to see changes",
+      callback: () => {},
+    }),
   );
-};
+  const submitFunc = async (data: ProfileEditValues) => {
+    mutate(data);
+  };
+  const headingColor = useColorModeValue("brand.500", "brand.400");
+  return (
+    <form onSubmit={handleSubmit(submitFunc)} noValidate>
+      <Flex
+        minH={"85vh"}
+        align={"start"}
+        justify={"center"}
+        bg={useColorModeValue("gray.50", "gray.800")}
+      >
+        <Stack
+          spacing={8}
+          w={"full"}
+          maxW={"md"}
+          bg={useColorModeValue("white", "gray.700")}
+          rounded={"xl"}
+          boxShadow={"lg"}
+          p={6}
+          mt={12}
+          alignItems={"center"}
+        >
+          <Heading
+            color={headingColor}
+            lineHeight={1.1}
+            fontSize={{ base: "2xl", sm: "3xl" }}
+          >
+            Edit Profile
+          </Heading>
+          <Box>
+            {user && (
+              <FormControlledAvatarUpload
+                control={control}
+                errors={errors}
+                urlName="avatarUrl"
+                setValue={setValue}
+                userId={user?.id}
+              />
+            )}
+          </Box>
 
-export default ProfileSettingsPage;
+          <HStack>
+            <FormControlledText
+              isRequired
+              control={control}
+              name="firstName"
+              label="First Name"
+              errors={errors}
+            />
+
+            <FormControlledText
+              isRequired
+              control={control}
+              name="lastName"
+              label="Last Name"
+              errors={errors}
+            />
+          </HStack>
+          <Button
+            color={"white"}
+            isDisabled={isSubmitting}
+            type="submit"
+            w="full"
+            _hover={{
+              bg: "brand.600",
+            }}
+            _dark={{ color: "gray.800" }}
+          >
+            Save Changes
+          </Button>
+        </Stack>
+      </Flex>
+    </form>
+  );
+}

@@ -107,8 +107,8 @@ const DistributionPage = () => {
           <VStack alignItems={"flex-start"}>
             <Text color={"gray.500"} fontSize={"lg"} fontStyle={"italic"}>
               At the moment we do not offer automatic feed listing. You'll find
-              guides below some of the major platforms. You only need to list to
-              each platform once.
+              guides below to list on some of the major platforms. You only need
+              to list to each platform once.
             </Text>
 
             <Text

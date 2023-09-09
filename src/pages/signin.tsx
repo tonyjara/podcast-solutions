@@ -57,9 +57,11 @@ export default function SimpleCard() {
     reset();
     router.push("/home");
   };
+
+  const headingColor = useColorModeValue("brand.500", "brand.400");
   return (
     <Flex
-      minH={"90vh"}
+      minH={"92vh"}
       flexDir={"column"}
       align={"center"}
       justify={"start"}
@@ -73,7 +75,7 @@ export default function SimpleCard() {
         noValidate
       >
         <Stack spacing={8} py={{ base: 6, md: 12 }}>
-          <Heading fontSize={"4xl"} textAlign={"center"}>
+          <Heading color={headingColor} fontSize={"4xl"} textAlign={"center"}>
             Sign in to Podcast Solutions
           </Heading>
         </Stack>
@@ -113,12 +115,11 @@ export default function SimpleCard() {
               }
             />
             <Button
-              bg={"blue.400"}
-              color={"white"}
               type="submit"
               isDisabled={isSubmitting}
+              color={"white"}
               _hover={{
-                bg: "blue.500",
+                bg: "brand.600",
               }}
             >
               Sign in
@@ -127,7 +128,8 @@ export default function SimpleCard() {
 
           <Flex flexDir={"column"} pt="50px">
             <ChakraLink
-              color="blue.400"
+              color="brand.600"
+              _dark={{ color: "brand: 400" }}
               as={Link}
               /* pb="10px" */
               href="/forgot-my-password"
@@ -135,7 +137,13 @@ export default function SimpleCard() {
               Forgot your password?
             </ChakraLink>
 
-            <ChakraLink mt="10px" color="blue.400" as={Link} href="/signup">
+            <ChakraLink
+              mt="10px"
+              color="brand.600"
+              _dark={{ color: "brand: 400" }}
+              as={Link}
+              href="/signup"
+            >
               Sign up for a free Podcast Solutions account
             </ChakraLink>
           </Flex>

@@ -8,7 +8,12 @@ import Stripe from "stripe";
 import { TRPCError } from "@trpc/server";
 import { prisma } from "@/server/db";
 import Decimal from "decimal.js";
-import { UsageStats } from "@/components/UsageStats";
+
+export interface UsageStats {
+  tag: string;
+  credits: Decimal;
+  data: Stripe.UsageRecordSummary[];
+}
 
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 
@@ -88,6 +93,10 @@ export const stripeUsageRouter = createTRPCRouter({
         data: [],
       },
     ];
+    //For free trial
+    if (!PSSubscription.subscriptionItems.length) {
+      return summaries;
+    }
 
     let summariesWithUsage: UsageStats[] = [];
     for await (const summary of summaries) {
@@ -103,7 +112,9 @@ export const stripeUsageRouter = createTRPCRouter({
         item.id,
         { limit: 100 },
       );
-      summary.data = usage.data;
+      if (usage.data) {
+        summary.data = usage.data;
+      }
       summariesWithUsage.push(summary);
     }
 

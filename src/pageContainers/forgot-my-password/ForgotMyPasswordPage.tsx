@@ -62,10 +62,11 @@ export default function ForgotMyPasswordPage() {
     mutate(data);
   };
 
+  const headingColor = useColorModeValue("brand.500", "brand.400");
   return (
     <Flex
       px="20px"
-      minH={"90vh"}
+      minH={"92vh"}
       justify={"center"}
       bg={useColorModeValue("gray.50", "gray.800")}
     >
@@ -76,6 +77,7 @@ export default function ForgotMyPasswordPage() {
               maxW={"500px"}
               fontSize={{ base: "3xl", md: "4xl" }}
               textAlign={"center"}
+              color={headingColor}
             >
               Forgot your password?
             </Heading>
@@ -132,10 +134,9 @@ export default function ForgotMyPasswordPage() {
               isDisabled={isSubmitting || isLoading || disableButton}
               type="submit"
               w={"full"}
-              bg={"blue.400"}
               color={"white"}
               _hover={{
-                bg: "blue.500",
+                bg: "brand.600",
               }}
             >
               Send email
@@ -143,7 +144,7 @@ export default function ForgotMyPasswordPage() {
           </Stack>
           <Box pt="50px">
             <ChakraLink
-              color="blue.400"
+              color="brand.600"
               alignSelf={"center"}
               as={Link}
               href="/signin"

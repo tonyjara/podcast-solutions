@@ -78,7 +78,7 @@ export default function HomePage() {
   };
 
   return (
-    <Box p={{ base: 3, md: 10 }}>
+    <Box p={{ base: 3, md: 5 }}>
       <DynamicTable
         rowActions={handleRowClick}
         loading={episodesAreLoading || selectedPodcastIsLoading}
@@ -88,7 +88,8 @@ export default function HomePage() {
         customHeader={
           <Flex
             px={{ base: "0px", md: "20px" }}
-            py={{ base: "10px", md: "0px" }}
+            py={{ base: "10px", md: "10px" }}
+            mb={{ base: "20px", md: "20px" }}
             flexDir={"column"}
           >
             <Flex

@@ -18,6 +18,7 @@ import ListenOnModal from "./ListenOnModal";
 import { PodcastWithDirectoriesAndSubscription } from "@/pages/podcasts/[slug]";
 import SubscriptionRequiredFloat from "./SubscriptionRequiredFloat";
 import MetaTagsComponent from "./Meta/MetaTagsComponent";
+import ShareButtons from "./ShareButtons";
 
 export default function PodcastInfo({
   podcast,
@@ -66,14 +67,14 @@ export default function PodcastInfo({
             <HtmlParser content={podcast.description} />
             <HStack>
               {podcast.categories.map((category) => (
-                <Tag key={category} size="sm" colorScheme="teal">
+                <Tag key={category} size="sm">
                   {category}
                 </Tag>
               ))}
             </HStack>
           </Flex>
         </Flex>
-        <Flex gap={"20px"}>
+        <Flex gap={"20px"} flexDir={{ base: "column", md: "row" }}>
           <Button
             onClick={handleCopyFeed}
             leftIcon={<BiRss color="orange" />}
@@ -93,6 +94,7 @@ export default function PodcastInfo({
               Listen on
             </Button>
           )}
+          <ShareButtons title={podcast.name} />
         </Flex>
         {podcast.directories && (
           <ListenOnModal

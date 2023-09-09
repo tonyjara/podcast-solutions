@@ -10,3 +10,13 @@ export const compressPodcastImage = async (file: File) => {
 
   return compressedImage;
 };
+
+export const compressAvatar = async (file: File) => {
+  const compressedImage = await imageCompression(file, {
+    maxSizeMB: 0.1,
+    maxWidthOrHeight: 1000,
+    useWebWorker: true,
+  });
+
+  return compressedImage;
+};

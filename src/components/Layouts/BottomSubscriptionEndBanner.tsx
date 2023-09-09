@@ -29,12 +29,12 @@ const BottomSubscriptionEndBanner = () => {
     <Box
       display={shouldShowBanner ? "block" : "none"}
       position={"fixed"}
-      backgroundColor={useColorModeValue("gray.200", "gray.700")}
+      backgroundColor={useColorModeValue("gray.100", "gray.700")}
       bottom={0}
       width={"100%"}
       p="0px"
       m="0px"
-      height={"50px"}
+      height={"60px"}
     >
       {shouldShowBanner && (
         <Flex
@@ -62,11 +62,14 @@ const BottomSubscriptionEndBanner = () => {
             href={mySubscription.isFreeTrial ? newSubscriprionRoute : portalUrl}
             target={mySubscription.isFreeTrial ? undefined : "_blank"}
             size={"sm"}
-            colorScheme="green"
           >
             {mySubscription.isFreeTrial ? "Subscribe" : "Renew"}
           </Button>
-          <Button onClick={() => setShowBanner(false)} size={"sm"}>
+          <Button
+            bg="brand.700"
+            onClick={() => setShowBanner(false)}
+            size={"sm"}
+          >
             Dismiss
           </Button>
         </Flex>

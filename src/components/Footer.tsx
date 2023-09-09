@@ -36,7 +36,7 @@ const SocialButton = ({
       justifyContent={"center"}
       transition={"background 0.3s ease"}
       _hover={{
-        bg: useColorModeValue("blackAlpha.200", "whiteAlpha.200"),
+        bg: useColorModeValue("brand.600", "brand.200"),
       }}
     >
       <VisuallyHidden>{label}</VisuallyHidden>
@@ -50,8 +50,8 @@ export default function Footer() {
     <Box
       p="0px"
       m="0px"
-      bg={useColorModeValue("gray.50", "gray.900")}
-      color={useColorModeValue("gray.700", "gray.200")}
+      bg={useColorModeValue("brand.600", "gray.900")}
+      color={useColorModeValue("white", "gray.200")}
     >
       <Container
         as={Stack}

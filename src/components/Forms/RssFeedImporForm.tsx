@@ -82,7 +82,6 @@ const RssImportForm = (props: props) => {
                 importFeed({ rssFeedUrl });
               }}
               isLoading={isSubmitting || isImportingFeed}
-              colorScheme="green"
               size="lg"
               alignSelf={"flex-end"}
             >
@@ -115,7 +114,6 @@ const RssImportForm = (props: props) => {
               <Button
                 type="submit"
                 isLoading={isSubmitting || isLoadingFeed}
-                colorScheme="green"
                 size="lg"
                 alignSelf={"flex-end"}
               >

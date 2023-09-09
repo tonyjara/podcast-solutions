@@ -46,34 +46,27 @@ const MyTopBar = ({ onOpen, authenticated }: MobileProps) => {
         style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
       >
         <IconButton
-          display={{ base: "flex", md: "none" }}
+          hideFrom={"md"}
           onClick={onOpen}
           variant="outline"
           aria-label="open menu"
           icon={<FiMenu />}
         />
-        {!authenticated && (
-          <Image
-            onClick={() => router.push("/")}
-            ml={authenticated ? "80px" : "10px"}
-            hideBelow={"md"}
-            src={logo}
-            alt="logo"
-            width={"30px"}
-            height={"30px"}
-            cursor="pointer"
-            mr="10px"
-          />
-        )}
-        {/* {authenticated && ( */}
-        {/* )} */}
+        <Image
+          onClick={() => router.push("/")}
+          ml={{ base: "20px", md: "10px" }}
+          src={logo}
+          alt="logo"
+          width={"30px"}
+          height={"30px"}
+          cursor="pointer"
+        />
       </div>
       <Flex alignItems={"center"}>
         {!authenticated && (
           <HStack
             spacing={1}
             mr={1}
-            color="brand.500"
             display={{
               base: "none",
               md: "inline-flex",

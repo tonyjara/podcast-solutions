@@ -13,8 +13,14 @@ const HeroPage2 = () => {
     const mobilePic = "/assets/hero/hero-mobile2.jpeg";
     const desktopPic = "/assets/hero/hero-desktop2.jpeg";
     return (
-        <Box minH={"80vh"}>
-            <Box pos="relative" overflow="hidden" bg={bg} pb={{ base: 10, md: 0 }} my={{ base: 0, md: 10 }}>
+        <Box minH={"81vh"}>
+            <Box
+                pos="relative"
+                overflow="hidden"
+                bg={bg}
+                pb={{ base: 10, md: 0 }}
+                my={{ base: 0, md: 10 }}
+            >
                 <Box maxW="7xl" mx="auto">
                     <Box
                         pos="relative"
@@ -87,6 +93,7 @@ const HeroPage2 = () => {
                                         base: "4xl",
                                         sm: "5xl",
                                         md: "6xl",
+                                        xl: "7xl",
                                     }}
                                     letterSpacing="tight"
                                     lineHeight="short"
@@ -109,7 +116,7 @@ const HeroPage2 = () => {
                                             base: "block",
                                             xl: "inline",
                                         }}
-                                        color="brand.600"
+                                        color="brand.500"
                                         _dark={{
                                             color: "brand.400",
                                         }}
@@ -134,7 +141,8 @@ const HeroPage2 = () => {
                                         sm: "auto",
                                         lg: 0,
                                     }}
-                                    color="gray.500"
+                                    fontWeight="medium"
+                                /* color="gray.500" */
                                 >
                                     Host your podcast, manage your episodes, schedule uploads,
                                     transcribe your audio, generate AI content and more.{" "}
@@ -168,10 +176,14 @@ const HeroPage2 = () => {
                                                 md: "lg",
                                             }}
                                             rounded="md"
-                                            color="white"
-                                            bg="brand.600"
+                                            color="#0f0e0d"
+                                            bg="brand.500"
+                                            _dark={{
+                                                bg: "brand.400",
+                                                color: "gray.900",
+                                            }}
                                             _hover={{
-                                                bg: "brand.700",
+                                                bg: "brand.600",
                                             }}
                                             px={{
                                                 base: 8,
@@ -183,7 +195,7 @@ const HeroPage2 = () => {
                                             }}
                                             cursor="pointer"
                                         >
-                                            Get Started Free
+                                            Get Started for Free
                                         </chakra.a>
                                     </Box>
                                 </Box>
