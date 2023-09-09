@@ -9,6 +9,7 @@ import {
   creditsPerPlan,
 } from "./routeUtils/StripeUsageUtils";
 import { addMonths } from "date-fns";
+import { postToTelegramAnalyticsGroup } from "@/utils/TelegramUtils";
 
 export const authRouter = createTRPCRouter({
   signup: publicProcedure.input(validateVerify).mutation(async ({ input }) => {
@@ -83,6 +84,7 @@ export const authRouter = createTRPCRouter({
       subscriptionId: subscription.id,
     });
     await createServerLog(`User ${input.email} signed up`, "INFO");
+    await postToTelegramAnalyticsGroup(input.email, "SIGNUP");
     await prisma.accountVerificationLinks.updateMany({
       where: { id: input.linkId },
       data: { hasBeenUsed: true },

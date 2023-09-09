@@ -36,6 +36,8 @@ export const env = createEnv({
     STRIPE_SECRET_KEY: z.string().min(1),
     STRIPE_WEBHOOK_SECRET: z.string().min(1),
     DEEPGRAM_API_KEY: z.string().min(1),
+    TELEGRAM_BOT_TOKEN: z.string().min(1),
+    TELEGRAM_BOT_CHAT_ID: z.string().min(1),
   },
 
   /**
@@ -79,6 +81,8 @@ export const env = createEnv({
     NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL:
       process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL,
     DEEPGRAM_API_KEY: process.env.DEEPGRAM_API_KEY,
+    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+    TELEGRAM_BOT_CHAT_ID: process.env.TELEGRAM_BOT_CHAT_ID,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.

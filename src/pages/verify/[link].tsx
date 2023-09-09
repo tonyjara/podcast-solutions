@@ -154,6 +154,7 @@ export default function SignupCard(props: {
                   loadingText="Submitting"
                   size="lg"
                   color={"white"}
+                  _dark={{ color: "gray.800" }}
                   _hover={{
                     bg: "brand.600",
                   }}
