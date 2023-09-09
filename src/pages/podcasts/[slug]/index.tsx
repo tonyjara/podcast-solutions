@@ -6,8 +6,13 @@ import { Prisma } from "@prisma/client";
 import { GetServerSideProps } from "next";
 export default PodcastsPage;
 
-export type PodcastWithDirectories = Prisma.PodcastGetPayload<{
-  include: { directories: true };
+export type PodcastWithDirectoriesAndSubscription = Prisma.PodcastGetPayload<{
+  include: {
+    directories: true;
+    subscription: {
+      select: { active: true; userId: true; isFreeTrial: true };
+    };
+  };
 }>;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -18,7 +23,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     where: { slug: q.slug, active: true },
     include: {
       directories: true,
-      subscription: { select: { active: true, userId: true } },
+      subscription: {
+        select: { active: true, userId: true, isFreeTrial: true },
+      },
     },
   });
 
@@ -32,6 +39,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (
     !podcast?.active ||
     !podcast?.subscription?.active ||
+    podcast.subscription.isFreeTrial ||
     podcast?.podcastStatus !== "published" ||
     (podcast.publishedAt && isScheduled(podcast.publishedAt))
   ) {

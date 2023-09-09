@@ -45,7 +45,7 @@ interface InputProps<T extends FieldValues> {
   control: Control<T>;
   errors: any;
   name: Path<T>;
-  label: string;
+  label?: string;
   hidden?: boolean;
   setValue: SetFieldValue<T>;
   helperText?: string;

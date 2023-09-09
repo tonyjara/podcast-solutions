@@ -67,7 +67,13 @@ const DistributionPage = () => {
   const someError = Object.keys(errors).length > 0;
 
   return (
-    <Box w="100%" display={"flex"} justifyContent={"center"} pb={"100px"}>
+    <Box
+      p={{ base: 3, md: 10 }}
+      w="100%"
+      display={"flex"}
+      justifyContent={"center"}
+      pb={"100px"}
+    >
       <Flex maxW={"1000px"} w="100%" flexDir={"column"}>
         <form
           onKeyDown={(e) => {
@@ -101,8 +107,8 @@ const DistributionPage = () => {
           <VStack alignItems={"flex-start"}>
             <Text color={"gray.500"} fontSize={"lg"} fontStyle={"italic"}>
               At the moment we do not offer automatic feed listing. You'll find
-              guides below some of the major platforms. You only need to list to
-              each platform once.
+              guides below to list on some of the major platforms. You only need
+              to list to each platform once.
             </Text>
 
             <Text

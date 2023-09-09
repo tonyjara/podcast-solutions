@@ -82,17 +82,21 @@ export default function SignupCard(props: {
     mutate(data);
   };
 
+  const headingColor = useColorModeValue("brand.500", "brand.400");
   return (
     <Flex
-      minH={"80vh"}
+      minH={"92vh"}
+      flexDir={"column"}
       align={"center"}
-      justify={"center"}
+      justify={"start"}
       bg={useColorModeValue("gray.50", "gray.800")}
+      w="full"
+      px="20px"
     >
       <form onSubmit={handleSubmit(submitFunc)} noValidate>
-        <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
+        <Stack spacing={8} py={{ base: 6, md: 12 }}>
           <Stack align={"center"}>
-            <Heading fontSize={"4xl"} textAlign={"center"}>
+            <Heading color={headingColor} fontSize={"4xl"} textAlign={"center"}>
               {`Thanks for signing up, ${firstName}!`}
             </Heading>
             <Text fontSize={"xl"}>
@@ -149,10 +153,9 @@ export default function SignupCard(props: {
                   isDisabled={isLoading || isSubmitting}
                   loadingText="Submitting"
                   size="lg"
-                  bg={"blue.400"}
                   color={"white"}
                   _hover={{
-                    bg: "blue.500",
+                    bg: "brand.600",
                   }}
                   type="submit"
                 >

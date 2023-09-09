@@ -5,6 +5,7 @@ import {
   protectedProcedure,
 } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
+import { validateProfileEdit } from "@/components/Validations/profileEdit.validate";
 
 export const usersRouter = createTRPCRouter({
   getUserById: publicProcedure
@@ -53,6 +54,19 @@ export const usersRouter = createTRPCRouter({
         update: {
           hasSeenOnboarding: input.hasSeenOnboarding,
           selectedPodcastId: input.selectedPodcastId,
+        },
+      });
+    }),
+  updateProfile: protectedProcedure
+    .input(validateProfileEdit)
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.session.user.id;
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          firstName: input.firstName,
+          lastName: input.lastName,
+          image: input.avatarUrl,
         },
       });
     }),

@@ -1,3 +1,4 @@
+import { PricingCardProps } from "@/components/Cards/PricingCard";
 import { ChatCompletionRequestMessage } from "openai";
 
 export const systemMessage: ChatCompletionRequestMessage = {
@@ -324,3 +325,26 @@ export const languageOptions = [
   { value: "yo", label: "Yoruba" },
   { value: "zu", label: "Zulu" },
 ];
+
+export const freePricingCard: PricingCardProps = {
+  title: "Free",
+  defaultPriceId: "",
+  prices: [],
+  features:
+    "1 Podcast, 1 User, 1 Gb of  storage, Rss Feed, 50.000 Chat GPT I/O tokens, 3 hours of audio transcription".split(
+      ",",
+    ),
+  payAsYouGo: [],
+  description: "Try for a month, no credit card required.",
+  handleCheckout: () => {},
+  autenticated: false,
+};
+
+export const podcastBlogUrl = "https://blog.podcastsolutions.org";
+
+// Socials
+
+export const twitterUrl = "https://twitter.com/podcastsolu";
+export const instagramUrl = "https://www.instagram.com/podcastsolu";
+export const youtubeUrl =
+  "https://www.youtube.com/channel/UCKrBkFNOgqJ9g58VjAyfPCw";

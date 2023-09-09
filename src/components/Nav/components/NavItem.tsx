@@ -25,7 +25,7 @@ const NavItem = ({ target, icon, onClose, children, dest }: NavItemProps) => {
         role="group"
         cursor="pointer"
         _hover={{
-          bg: "cyan.400",
+          bg: "brand.400",
           color: "white",
         }}
         justifyContent={"left"}

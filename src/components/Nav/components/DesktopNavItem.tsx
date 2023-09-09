@@ -47,18 +47,18 @@ const DesktopNavItem = ({
         >
           <IconButton
             aria-label="icon"
-            colorScheme="teal"
-            icon={
-              <Icon
-                as={icon}
-                color={isCurrentLocation ? "teal.300" : undefined}
-                fontSize="20px"
-              />
-            }
-            variant="ghost"
+            icon={<Icon as={icon} fontSize="20px" />}
+            variant={isCurrentLocation && minimized ? "outline" : "ghost"}
           />
 
-          <Text fontWeight={"bold"} pl={minimized ? 0 : 4} fontSize="12px">
+          <Text
+            textDecor={isCurrentLocation ? "underline" : undefined}
+            fontWeight={"semibold"}
+            color={"brand.600"}
+            _dark={{ color: "brand.400" }}
+            pl={minimized ? 0 : 4}
+            fontSize="lg"
+          >
             {!minimized && name}
           </Text>
         </Flex>

@@ -2,6 +2,7 @@ import DynamicTable from "@/components/DynamicTables/DynamicTable";
 import { useDynamicTable } from "@/components/DynamicTables/UseDynamicTable";
 import { trpcClient } from "@/utils/api";
 import {
+  Box,
   Button,
   Flex,
   Heading,
@@ -77,7 +78,7 @@ export default function HomePage() {
   };
 
   return (
-    <div>
+    <Box p={{ base: 3, md: 5 }}>
       <DynamicTable
         rowActions={handleRowClick}
         loading={episodesAreLoading || selectedPodcastIsLoading}
@@ -87,7 +88,8 @@ export default function HomePage() {
         customHeader={
           <Flex
             px={{ base: "0px", md: "20px" }}
-            py={{ base: "10px", md: "0px" }}
+            py={{ base: "10px", md: "10px" }}
+            mb={{ base: "20px", md: "20px" }}
             flexDir={"column"}
           >
             <Flex
@@ -178,6 +180,6 @@ export default function HomePage() {
       />
       <NoPodcastAndPodcastEditModal {...NoPodcastAndEditToggles} />
       <NewEpisodeModal isOpen={isNewEpisodeOpen} onClose={onNewEpisodeClose} />
-    </div>
+    </Box>
   );
 }

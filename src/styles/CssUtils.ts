@@ -9,7 +9,7 @@ export const customScrollbar: Interpolation<any> = {
     width: "6px",
   },
   "&::-webkit-scrollbar-thumb": {
-    background: "#008080",
+    background: "#2a8800",
     borderRadius: "24px",
   },
 };

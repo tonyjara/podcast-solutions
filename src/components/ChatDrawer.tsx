@@ -39,7 +39,7 @@ const ChatDrawer = ({
   const [showButtonText, setShowButtonText] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatGPTMessage[]>(initialMessages);
-  const toolbarBg = useColorModeValue("teal.300", "gray.800");
+  const toolbarBg = useColorModeValue("brand.700", "gray.800");
 
   const { isOpen, onToggle, onClose } = useDisclosure();
 
@@ -120,7 +120,7 @@ const ChatDrawer = ({
               Copy Show notes
             </Button>
             <Button onClick={handleClearHistory} size={"sm"}>
-              Clear history
+              Clear
             </Button>
           </Box>
           <DrawerBody p="0px">

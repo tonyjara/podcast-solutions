@@ -32,7 +32,7 @@ export function ChatGPTInputTextArea({
   getValues: UseFormGetValues<Episode>;
 }) {
   const user = useSession().data?.user;
-  const textBlockBg = useColorModeValue("teal.500", "gray.800");
+  const textBlockBg = useColorModeValue("brand.700", "gray.800");
 
   const { mutate: chat, isLoading } =
     trpcClient.chatGPT.chatInEpisode.useMutation({
@@ -118,7 +118,7 @@ export function ChatGPTInputTextArea({
             <IconButton
               isDisabled={isLoading}
               aria-label="Clear message"
-              onClick={handleSubmitChat}
+              onClick={() => setInput("")}
             >
               <BiTrash />
             </IconButton>

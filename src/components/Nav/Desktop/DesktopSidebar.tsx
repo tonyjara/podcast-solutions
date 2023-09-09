@@ -66,24 +66,11 @@ const DesktopSidebar = ({ minimized, setMinimized }: SidebarProps) => {
           gap={2}
           justifyContent="space-between"
         >
-          {/* <Icon */}
-          {/*   display={{ base: "none", md: minimized ? "none" : "flex" }} */}
-          {/*   fontSize="lg" */}
-          {/*   color={ */}
-          {/*     selectedPodcast?.podcastStatus === "published" ? "green" : "red" */}
-          {/*   } */}
-          {/*   as={ */}
-          {/*     selectedPodcast?.active */}
-          {/*       ? AiOutlineCheckCircle */}
-          {/*       : MdOutlineUnpublished */}
-          {/*   } */}
-          {/* /> */}
           {!minimized && <PodcastSelect />}
           <IconButton
             aria-label="close drawer"
             display={{ base: "none", md: "flex" }}
             onClick={() => setMinimized(!minimized)}
-            colorScheme="teal"
             icon={
               minimized ? (
                 <TbLayoutSidebarRightCollapse style={{ fontSize: "25px" }} />

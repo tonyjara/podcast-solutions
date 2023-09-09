@@ -80,7 +80,6 @@ const PodcastNameForm = (props: props) => {
           <Button
             type="submit"
             isLoading={isSubmitting}
-            colorScheme="green"
             size="lg"
             alignSelf={"flex-end"}
           >

@@ -15,7 +15,7 @@ import FormControlledEditableText from "@/components/Forms/FormControlled/FormCo
 import FormControlledSwitch from "@/components/Forms/FormControlled/FormControlledSwitch";
 import slugify from "slugify";
 import { useSession } from "next-auth/react";
-import { Episode, Prisma } from "@prisma/client";
+import { Episode } from "@prisma/client";
 import {
     defaultEpisodeValues,
     validateEpisodeEdit,
@@ -33,11 +33,6 @@ import { AddIcon } from "@chakra-ui/icons";
 import FormControlledNumberInput from "@/components/Forms/FormControlled/FormControlledNumberInput";
 import FormControlledSelect from "@/components/Forms/FormControlled/FormControlledSelect";
 import useUnsavedChangesWarning from "@/lib/hooks/useUnsavedChangesWarning";
-import KeywordsEdit from "./KeywordsEdit";
-
-export type EpisodeWithAudioFiles = Prisma.EpisodeGetPayload<{
-    include: { audioFiles: true };
-}>;
 
 const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
     const user = useSession().data?.user;
@@ -90,7 +85,13 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
     const someError = Object.keys(errors).length > 0;
 
     return (
-        <Box w="100%" display={"flex"} justifyContent={"center"} pb={"100px"}>
+        <Box
+            p={{ base: 3, md: 10 }}
+            w="100%"
+            display={"flex"}
+            justifyContent={"center"}
+            pb={"100px"}
+        >
             <Flex maxW={"1000px"} flexDir={"column"} gap={13}>
                 <form
                     onKeyDown={(e) => {
@@ -131,7 +132,6 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             <Button
                                 onClick={() => handleSubmit(submitFunc)()}
                                 isDisabled={isSubmitting || isLoading || !isDirty}
-                                colorScheme="green"
                             >
                                 {fetchedEpisode?.status === "published"
                                     ? "Publish Changes"
@@ -145,15 +145,19 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             submitting.
                         </Text>
                     )}
-                    <VStack alignItems={"flex-start"}>
-                        <SimpleGrid columns={[1, 2, 3, 4]} spacing={10}>
+                    <VStack spacing={8} alignItems={"flex-start"}>
+                        <SimpleGrid
+                            mb={"20px"}
+                            columns={[1, 2, 3, 4]}
+                            spacing={{ base: 5, md: 10 }}
+                        >
                             <FormControlledDatePicker
                                 control={control}
                                 errors={errors}
                                 name="releaseDate"
                                 maxW={"200px"}
                                 label="Release date"
-                                helperText="Future dates schedule publishing."
+                                helperText="Future dates schedule release."
                             />
                             <FormControlledNumberInput
                                 control={control}
@@ -207,25 +211,29 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             control={control}
                             errors={errors}
                         />
-                        <KeywordsEdit episode={fetchedEpisode} control={control} errors={errors} />
 
-                        {user && (
-                            <FormControlledImageUpload
-                                control={control}
-                                imageName={
-                                    episodeTitle
-                                        ? `${(slugify(episodeTitle), { lower: true })}-image`
-                                        : ""
-                                }
-                                errors={errors}
-                                name="imageUrl"
-                                label="Episode Image"
-                                setValue={setValue}
-                                helperText="The image must be at least 1400 x 1400 pixels and at most 3000 x 3000 pixels, in JPEG or PNG format, and in the RGB color space with a minimum size of 500KB and a maximum size of 10MB."
-                                userId={user.id}
-                                minW={1400}
-                            />
-                        )}
+                        <CollapsableContainer
+                            title="Episode Image"
+                        /* tooltipText="The selected audio file will be used for the episode, it will be the one that appears in the podcast feed and the one used for transcription." */
+                        >
+                            {user && (
+                                <FormControlledImageUpload
+                                    control={control}
+                                    imageName={
+                                        episodeTitle
+                                            ? `${(slugify(episodeTitle), { lower: true })}-image`
+                                            : ""
+                                    }
+                                    errors={errors}
+                                    name="imageUrl"
+                                    /* label="Episode Image" */
+                                    setValue={setValue}
+                                    helperText="The image must be at least 1400 x 1400 pixels and at most 3000 x 3000 pixels, in JPEG or PNG format, and in the RGB color space with a minimum size of 500KB and a maximum size of 10MB."
+                                    userId={user.id}
+                                    minW={1400}
+                                />
+                            )}
+                        </CollapsableContainer>
                         <FormControlledSwitch
                             control={control}
                             errors={errors}

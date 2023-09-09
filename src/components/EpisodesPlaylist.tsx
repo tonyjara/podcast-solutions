@@ -8,11 +8,11 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import TablePagination from "./DynamicTables/TablePagination";
-import { EpisodeWithAudioFiles } from "@/pageContainers/Home/Episodes/Edit/EpisodesEditPage";
 import { FaPlayCircle } from "react-icons/fa";
 import { BsClock } from "react-icons/bs";
 import { useRouter } from "next/router";
 import HtmlParser from "./HtmlParser";
+import { EpisodeWithAudioFiles } from "@/pageContainers/Podcasts/PodcastsPage";
 
 function secondToMinutesAndSeconds(s: number) {
   return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
@@ -82,7 +82,7 @@ const EpisodesPlaylist = ({
                   <Image
                     maxW={"100px"}
                     rounded={"md"}
-                    alt={"feature image"}
+                    alt={"Episode image"}
                     src={episode.imageUrl}
                     objectFit={"contain"}
                   />

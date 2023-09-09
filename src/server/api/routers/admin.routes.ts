@@ -2,8 +2,83 @@ import { validateCoupons } from "@/components/Validations/couponCreate.validate"
 import { adminProcedure, createTRPCRouter } from "@/server/api/trpc";
 import { prisma } from "@/server/db";
 import { z } from "zod";
+import {
+  checkIfTrialHasEnoughChatCredits,
+  checkIfTrialHasEnoughTranscriptionMinutes,
+} from "./routeUtils/freeTrialUtils";
+import { postAudioTranscriptionUsageToStripe } from "./routeUtils/PostStripeUsageUtils";
+import { handleCreditUsageCalculation } from "./routeUtils/StripeUsageUtils";
+import Decimal from "decimal.js";
+import { postChatInputAndOutputToStripeAndDb } from "./chatGPT.routes";
 
 export const adminRouter = createTRPCRouter({
+  /** Simulate chat usage */
+  postChatUsage: adminProcedure
+    .input(z.object({ inputTokens: z.number(), outputTokens: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { inputTokens, outputTokens } = input;
+
+      const subscription = await prisma.subscription.findUniqueOrThrow({
+        where: { userId: ctx.session.user.id },
+        include: { subscriptionItems: true },
+      });
+
+      const lastChatActions = await checkIfTrialHasEnoughChatCredits({
+        tokenCountAverage: inputTokens,
+        subscription,
+        outputCutoff: 500,
+      });
+      const { lastChatInputAction, lastChatOuputAction } = lastChatActions;
+      await postChatInputAndOutputToStripeAndDb({
+        subscription,
+        inputTokens,
+        outputTokens,
+        lastChatInputAction,
+        lastChatOuputAction,
+      });
+    }),
+
+  postTranscriptionMinutesUsage: adminProcedure
+    .input(z.object({ durationInMinutes: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const { durationInMinutes } = input;
+
+      const subscription = await prisma.subscription.findUniqueOrThrow({
+        where: { userId: ctx.session.user.id },
+        include: { subscriptionItems: true },
+      });
+
+      const lastTranscriptionAction =
+        await checkIfTrialHasEnoughTranscriptionMinutes({
+          durationInMinutes,
+          subscription,
+        });
+
+      const postToDb = async (x: Decimal) =>
+        await prisma.subscriptionCreditsActions.create({
+          data: {
+            amount: x,
+            tag: "TRANSCRIPTION_MINUTE",
+            prevAmount: lastTranscriptionAction?.currentAmount,
+            currentAmount: lastTranscriptionAction?.currentAmount.sub(x),
+            subscriptionId: subscription.id,
+          },
+        });
+
+      const postToStripe = async (x: number) =>
+        await postAudioTranscriptionUsageToStripe({
+          durationInMinutes: x,
+          subscription,
+        });
+
+      //Hanlde the credits and usage posting
+      await handleCreditUsageCalculation({
+        usageAmount: durationInMinutes,
+        currentAmount: lastTranscriptionAction?.currentAmount,
+        reportUsageToStripeFunc: postToStripe,
+        discountFromCreditsFunc: postToDb,
+      });
+    }),
   createCoupon: adminProcedure
     .input(validateCoupons)
     .mutation(async ({ input }) => {

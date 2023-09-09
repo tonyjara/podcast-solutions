@@ -11,7 +11,7 @@ const MillisecondsCell = ({
 }) => {
   return (
     <Text fontSize="md" fontWeight="bold" pb=".5rem">
-      {format(date, hideHours ? "mmLss:SSSS" : "hh:mm:ss.SSSS")}
+      {format(date, hideHours ? "mmLss:SSSS" : "EEE hh:mm:ss.SSSS")}
     </Text>
   );
 };

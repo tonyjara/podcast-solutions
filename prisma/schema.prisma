@@ -31,12 +31,13 @@ model Account {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime?     @updatedAt
-  firstName    String
-  lastName     String
-  image        String
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  firstName String
+  lastName  String
+  image     String
+
   subscription Subscription?
   preferences  Preferences?
 
@@ -208,12 +209,14 @@ model AudioFile {
 
 //One row per user, if the user signed up after the 28th then move to the first of each month
 model Subscription {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  active    Boolean
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  active      Boolean
+  isFreeTrial Boolean  @default(false)
 
-  stripeCustomerId  String
+  stripeCustomerId  String?
+  stripeSubscriptionId  String?
   creditActions     SubscriptionCreditsActions[]
   subscriptionItems SubscriptionItem[]
 
@@ -228,8 +231,8 @@ model Subscription {
 
   user      User    @relation(fields: [userId], references: [id])
   userId    String  @unique
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
 }
 
 model Coupons {
@@ -294,6 +297,7 @@ model SubscriptionItem {
 
   subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
   subscriptionId String?
+  stripeSubscriptionId String?
   price          Price?        @relation(fields: [priceId], references: [id])
   priceId        String?
 }
@@ -394,6 +398,7 @@ enum StripeInterval {
 }
 
 enum PlanType {
+  TRIAL
   FREE
   HOBBY
   BASIC

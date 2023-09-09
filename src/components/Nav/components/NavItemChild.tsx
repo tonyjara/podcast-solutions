@@ -46,14 +46,22 @@ const NavItemChild = ({
           role="group"
           cursor="pointer"
           _hover={{
-            bg: "cyan.400",
+            bg: "brand.600",
             color: "white",
           }}
           justifyContent={minimized ? "center" : "left"}
+          _dark={{
+            _hover: {
+              bg: "brand.400",
+            },
+          }}
         >
           {icon && (
             <Icon
-              color={isCurrentLocation ? "teal.300" : undefined}
+              _dark={{
+                color: isCurrentLocation ? "brand.300" : undefined,
+              }}
+              color={isCurrentLocation ? "brand.500" : undefined}
               mr={minimized ? "4" : "4"}
               _groupHover={{
                 color: "white",
