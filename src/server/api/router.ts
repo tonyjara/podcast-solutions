@@ -14,6 +14,7 @@ import { stripeUsageRouter } from "./routers/stripe-usage.routes";
 import { seedRouter } from "./routers/seed.routes";
 import { logsRouter } from "./routers/logs.routes";
 import { couponsRouter } from "./routers/coupons.routes";
+import { telegramRouter } from "./routers/telegram.routes";
 
 /**
  * This is the primary router for your server.
@@ -36,6 +37,7 @@ export const appRouter = createTRPCRouter({
   rss: rssRouter,
   seed: seedRouter,
   logs: logsRouter,
+  telegram: telegramRouter,
 });
 
 // export type definition of API

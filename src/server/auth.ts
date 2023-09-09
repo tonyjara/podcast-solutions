@@ -7,6 +7,7 @@ import {
 import { prisma } from "@/server/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { postToTelegramAnalyticsGroup } from "@/utils/TelegramUtils";
 
 export type SessionUser = Omit<Account, "password"> & {
   id: string;
@@ -63,6 +64,7 @@ export const authOptions: NextAuthOptions = {
       },
       authorize: async (credentials) => {
         if (!credentials?.email || !credentials.password) return null;
+        //This runs when the user tries to login.
         // Purpose of this function is to check if the email and password exist and match the hashed password in the database.
         // If they match we strip the password and we return the user object we want to keep on the session.
 
@@ -96,6 +98,7 @@ export const authOptions: NextAuthOptions = {
           lastName: account.user.lastName,
           image: account.user.image ?? "",
         };
+        await postToTelegramAnalyticsGroup(sessionUser.email, "logged in");
 
         return sessionUser;
       },

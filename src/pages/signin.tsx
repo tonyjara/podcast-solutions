@@ -118,6 +118,7 @@ export default function SimpleCard() {
               type="submit"
               isDisabled={isSubmitting}
               color={"white"}
+              _dark={{ color: "gray.800" }}
               _hover={{
                 bg: "brand.600",
               }}

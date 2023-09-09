@@ -79,6 +79,7 @@
     "stripe": "^12.18.0",
     "stripe-event-types": "^2.4.0",
     "superjson": "1.13.1",
+    "telegraf": "^4.13.1",
     "uuid": "^9.0.0",
     "zod": "^3.21.4"
   },
