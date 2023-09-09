@@ -7,7 +7,6 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 import { useColorModeValue, Flex, CloseButton, Box } from "@chakra-ui/react";
-import PodcastSelect from "@/components/Selects/PodcastSelect";
 import Link from "next/link";
 import { podcastBlogUrl } from "@/lib/Constants";
 interface SidebarProps {

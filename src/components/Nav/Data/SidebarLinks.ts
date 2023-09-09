@@ -2,7 +2,7 @@ import type { IconType } from "react-icons";
 import { FiHome, FiSettings } from "react-icons/fi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { TbSeeding } from "react-icons/tb";
-import { FaCcStripe, FaShare, FaShareAlt } from "react-icons/fa";
+import { FaCcStripe } from "react-icons/fa";
 import { SessionUser } from "@/server/auth";
 import { BsShare, BsSpeedometer2 } from "react-icons/bs";
 import { AiOutlineFundView } from "react-icons/ai";
