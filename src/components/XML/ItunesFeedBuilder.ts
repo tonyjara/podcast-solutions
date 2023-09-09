@@ -53,7 +53,7 @@ export const generatePodcastRssFeed = async (podcast: PodcastTypeForFeed) => {
         url: `${webUrl}/podcasts/${podcast.slug}/${episode.id}`, // link to the item
 
         guid: audioFile.url, // optional - defaults to url
-        itunesKeywords: episode.keywords,
+        /* itunesKeywords: episode.keywords, */
         /* author: "Guest Author", // optional - defaults to feed author property */
         date: episode.releaseDate, // any format that js Date can parse.
         /* lat: 33.417974, //optional latitude field for GeoRSS */

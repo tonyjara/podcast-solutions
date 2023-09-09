@@ -67,7 +67,13 @@ const DistributionPage = () => {
   const someError = Object.keys(errors).length > 0;
 
   return (
-    <Box w="100%" display={"flex"} justifyContent={"center"} pb={"100px"}>
+    <Box
+      p={{ base: 3, md: 10 }}
+      w="100%"
+      display={"flex"}
+      justifyContent={"center"}
+      pb={"100px"}
+    >
       <Flex maxW={"1000px"} w="100%" flexDir={"column"}>
         <form
           onKeyDown={(e) => {

@@ -10,16 +10,25 @@ import {
   StatNumber,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { StripePriceTag } from "@prisma/client";
 import Decimal from "decimal.js";
 import React from "react";
+import Stripe from "stripe";
+
+export interface UsageStats {
+  tag: StripePriceTag;
+  credits: Decimal;
+  data: Stripe.UsageRecordSummary[];
+}
 
 const UsageStats = ({
   myUsage,
   loading,
 }: {
-  myUsage: any;
+  myUsage: UsageStats[] | undefined;
   loading: boolean;
 }) => {
+  const borderColor = useColorModeValue("gray.800", "gray.500");
   return (
     <Box w="full" maxW={"800px"}>
       <Heading mb={"20px"} maxW={"7xl"}>
@@ -35,11 +44,21 @@ const UsageStats = ({
             item.tag !== "PLAN_FEE" &&
             item.tag !== "STORAGE_PER_GB" && (
               <Skeleton key={item.tag} isLoaded={!loading}>
-                <StatsCard
-                  title={item.tag}
-                  credits={item.credits}
-                  value={value}
-                />
+                <Stat
+                  px={{ base: 4, md: 8 }}
+                  py={"5"}
+                  shadow={"xl"}
+                  border={"1px solid"}
+                  borderColor={borderColor}
+                  rounded={"lg"}
+                >
+                  <StatLabel>{prettyPriceTags(item.tag)}</StatLabel>
+                  <StatNumber>
+                    {" "}
+                    Credits left: {decimalFormat(item.credits)}
+                  </StatNumber>
+                  <StatNumber> Used: {value}</StatNumber>
+                </Stat>
               </Skeleton>
             )
           );
@@ -50,28 +69,3 @@ const UsageStats = ({
 };
 
 export default UsageStats;
-
-const StatsCard = ({
-  title,
-  value,
-  credits,
-}: {
-  title: string;
-  value: string;
-  credits?: Decimal;
-}) => {
-  return (
-    <Stat
-      px={{ base: 4, md: 8 }}
-      py={"5"}
-      shadow={"xl"}
-      border={"1px solid"}
-      borderColor={useColorModeValue("gray.800", "gray.500")}
-      rounded={"lg"}
-    >
-      <StatLabel>{prettyPriceTags(title)}</StatLabel>
-      <StatNumber> Credits: {decimalFormat(credits)}</StatNumber>
-      <StatNumber> Used: {value}</StatNumber>
-    </Stat>
-  );
-};

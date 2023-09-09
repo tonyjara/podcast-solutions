@@ -3,15 +3,25 @@ import { trpcClient } from "@/utils/api";
 import { Flex } from "@chakra-ui/react";
 import EpisodesPlaylist from "@/components/EpisodesPlaylist";
 import PodcastInfo from "@/components/PodcastInfo";
-import { PodcastWithDirectories } from "@/pages/podcasts/[slug]";
+import { PodcastWithDirectoriesAndSubscription } from "@/pages/podcasts/[slug]";
 import MetaTagsComponent from "@/components/Meta/MetaTagsComponent";
+import { Prisma } from "@prisma/client";
 
-const PodcastsPage = ({ podcast }: { podcast: PodcastWithDirectories }) => {
+export type EpisodeWithAudioFiles = Prisma.EpisodeGetPayload<{
+  include: {
+    audioFiles: true;
+  };
+}>;
+const PodcastsPage = ({
+  podcast,
+}: {
+  podcast: PodcastWithDirectoriesAndSubscription;
+}) => {
   const dynamicTableProps = useDynamicTable();
 
   const { pageIndex, pageSize } = dynamicTableProps;
 
-  const { data: episodes, isLoading: episodesAreLoading } =
+  const { data: episodes } =
     trpcClient.episode.getEpisodesWithPodcastId.useQuery({
       pageSize,
       pageIndex,
@@ -24,7 +34,12 @@ const PodcastsPage = ({ podcast }: { podcast: PodcastWithDirectories }) => {
     });
 
   return (
-    <Flex w="100%" flexDir={"column"} alignContent={"center"}>
+    <Flex
+      p={{ base: 3, md: 10 }}
+      w="100%"
+      flexDir={"column"}
+      alignContent={"center"}
+    >
       <MetaTagsComponent
         title={podcast.name}
         imageSrc={podcast.imageUrl}

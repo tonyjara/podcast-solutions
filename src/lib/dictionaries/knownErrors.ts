@@ -47,6 +47,13 @@ export const knownErrors = (error: string) => {
     return error;
   }
 
+  if (error.includes("Not enough transcription minutes")) {
+    return "Not enough transcription minutes, please subscribe to a plan.";
+  }
+
+  if (error.includes("Not enough chat credits")) {
+    return "Not enough chat credits, please subscribe to a plan.";
+  }
   console.error(error);
   return "Something went wrong, please try again.";
 };

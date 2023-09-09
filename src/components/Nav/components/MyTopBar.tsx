@@ -4,12 +4,14 @@ import {
   useColorModeValue,
   IconButton,
   useColorMode,
-  Link as ChakraLink,
+  HStack,
+  Button,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FiMenu } from "react-icons/fi";
 import NavbarProfileSection from "./NavbarProfileSection";
 import Link from "next/link";
+import { podcastBlogUrl } from "@/lib/Constants";
 
 interface MobileProps {
   onOpen: () => void;
@@ -28,7 +30,7 @@ const MyTopBar = ({ onOpen, authenticated }: MobileProps) => {
       id="top"
       position={"fixed"}
       width="100%"
-      zIndex={1}
+      zIndex={2}
       px={{ base: 4, md: 4 }}
       height="65px"
       alignItems="center"
@@ -43,11 +45,18 @@ const MyTopBar = ({ onOpen, authenticated }: MobileProps) => {
       <div
         style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
       >
+        <IconButton
+          display={{ base: "flex", md: "none" }}
+          onClick={onOpen}
+          variant="outline"
+          aria-label="open menu"
+          icon={<FiMenu />}
+        />
         {!authenticated && (
           <Image
             onClick={() => router.push("/")}
             ml={authenticated ? "80px" : "10px"}
-            display={{ base: authenticated ? "none" : "flex", md: "flex" }}
+            hideBelow={"md"}
             src={logo}
             alt="logo"
             width={"30px"}
@@ -56,23 +65,37 @@ const MyTopBar = ({ onOpen, authenticated }: MobileProps) => {
             mr="10px"
           />
         )}
-        {authenticated && (
-          <IconButton
-            display={{ base: "flex", md: "none" }}
-            onClick={onOpen}
-            variant="outline"
-            aria-label="open menu"
-            icon={<FiMenu />}
-          />
-        )}
+        {/* {authenticated && ( */}
+        {/* )} */}
       </div>
       <Flex alignItems={"center"}>
         {!authenticated && (
-          <>
-            <ChakraLink href={"/signin"} as={Link}>
-              Sign In
-            </ChakraLink>
-          </>
+          <HStack
+            spacing={1}
+            mr={1}
+            color="brand.500"
+            display={{
+              base: "none",
+              md: "inline-flex",
+            }}
+          >
+            {/* <Button variant="ghost">Features</Button> */}
+            <Button as={Link} href={"/pricing"} variant="ghost">
+              Pricing
+            </Button>
+            <Button
+              as={Link}
+              target="_blank"
+              href={podcastBlogUrl}
+              variant="ghost"
+            >
+              Blog
+            </Button>
+            {/* <Button variant="ghost">Company</Button> */}
+            <Button as={Link} href={"/signin"} variant="ghost">
+              Sign in
+            </Button>
+          </HStack>
         )}
         <NavbarProfileSection />
       </Flex>

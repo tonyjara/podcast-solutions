@@ -30,48 +30,61 @@ export const registerStripeUsage = async ({
   return registerUsage;
 };
 
-export interface ChatUsageHandler {
+export interface CreditUsageCalculation {
   usageAmount: number;
-  currentAmount: Decimal;
-  reportUsage: (usage: number) => Promise<any>;
-  discountFromCredits: (amountToSubstract: Decimal) => Promise<any>;
+  currentAmount: Decimal | undefined;
+  reportUsageToStripeFunc: (usage: number) => Promise<any>;
+  discountFromCreditsFunc: (amountToSubstract: Decimal) => Promise<any>;
 }
 
-export const handleChatUsage = async ({
+/** Calculates the amount of credits to substract or to report to stripe, takes the values and functions necessary to execute the logic */
+export const handleCreditUsageCalculation = async ({
   usageAmount,
   currentAmount,
-  reportUsage,
-  discountFromCredits,
-}: ChatUsageHandler) => {
-  const amountLeft = currentAmount.sub(usageAmount);
+  reportUsageToStripeFunc,
+  discountFromCreditsFunc,
+}: CreditUsageCalculation) => {
+  //Might be undefined
+
+  const hanldeCurrentAmount = () => {
+    // Prevent negative values from affecting the calculation
+    if (!currentAmount) return new Decimal(0);
+    return currentAmount?.lessThan(0) ? new Decimal(0) : currentAmount;
+  };
+  const currentCreditsAmount = hanldeCurrentAmount();
   const usageDecimal = new Decimal(usageAmount);
+  const creditsLeftAfterUsageSub = currentCreditsAmount.sub(usageDecimal);
 
   const response = {
     substractedFromCredits: new Decimal(0),
     reportedToStripe: new Decimal(0),
-    left: amountLeft.lessThan(0) ? new Decimal(0) : amountLeft,
+    left: creditsLeftAfterUsageSub.lessThan(0)
+      ? new Decimal(0)
+      : creditsLeftAfterUsageSub,
   };
 
   //credit handling
-  if (currentAmount.greaterThan(0)) {
-    if (amountLeft.greaterThanOrEqualTo(0)) {
-      await discountFromCredits(usageDecimal);
+  if (currentCreditsAmount.greaterThan(0)) {
+    if (creditsLeftAfterUsageSub.greaterThanOrEqualTo(0)) {
+      await discountFromCreditsFunc(usageDecimal);
       response.substractedFromCredits = usageDecimal;
     }
-    if (amountLeft.lessThan(0)) {
-      await discountFromCredits(currentAmount);
-      response.substractedFromCredits = currentAmount;
+    if (creditsLeftAfterUsageSub.lessThan(0)) {
+      await discountFromCreditsFunc(currentCreditsAmount);
+      response.substractedFromCredits = currentCreditsAmount;
     }
   }
 
   //stripe usage handling
-  if (currentAmount.lessThanOrEqualTo(0)) {
-    await reportUsage(usageAmount);
+  //If account doesn't have credits, report to stripe full usage
+  if (currentCreditsAmount.lessThanOrEqualTo(0)) {
+    await reportUsageToStripeFunc(usageAmount);
     response.reportedToStripe = usageDecimal;
   }
-  if (amountLeft.lessThan(0)) {
-    const usageLeft = usageDecimal.sub(currentAmount);
-    await reportUsage(usageLeft.toNumber());
+  //If current creadits minus usage is less than 0, report to stripe the difference
+  if (creditsLeftAfterUsageSub.lessThan(0)) {
+    const usageLeft = usageDecimal.sub(currentCreditsAmount);
+    await reportUsageToStripeFunc(usageLeft.toNumber());
     response.reportedToStripe = usageLeft;
   }
 
@@ -85,6 +98,13 @@ export const calculateAudioMinutes = (audioDuration: number) => {
 };
 
 export const creditsPerPlan = (planType: PlanType) => {
+  if (planType === "TRIAL") {
+    return {
+      chatInput: 50000,
+      chatOutput: 50000,
+      transcription: 180,
+    };
+  }
   if (planType === "HOBBY") {
     return {
       chatInput: 50000,

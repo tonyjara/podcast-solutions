@@ -47,6 +47,7 @@ export const handleCheckoutSessionCompleted = async ({
             return;
         }
 
+        //Update payment intent, this also gives us the user id
         const paymentIntent = await prisma.paymentIntent.update({
             where: { id: eventObject.id }, //session id
             data: {
@@ -64,17 +65,17 @@ export const handleCheckoutSessionCompleted = async ({
             );
             return;
         }
-
-        // Every time a user subscribes, create a subscription in the database and create add credits to the user according to the plan
-        const psSubscription = await prisma.subscription.create({
-            data: {
-                id: eventObject.subscription.toString(),
-                productId: product.id,
+        //User already has a subscription, update the subscription
+        const psSubscription = await prisma.subscription.update({
+            where: { userId: paymentIntent.userId }, data: {
                 active: true,
-                userId: paymentIntent.userId,
+                stripeSubscriptionId: eventObject.subscription.toString(),
                 stripeCustomerId: eventObject.customer.toString(),
-            },
-        });
+                productId: product.id,
+                isFreeTrial: false,
+                cancellAt: null,
+            }
+        })
 
         const prices = await stripe.prices.list({
             limit: 100,
@@ -89,6 +90,7 @@ export const handleCheckoutSessionCompleted = async ({
                     id: item.id,
                     active: true,
                     subscriptionId: psSubscription.id,
+                    stripeSubscriptionId: psSubscription.stripeSubscriptionId,
                     priceId: item.price.id,
                     priceTag:
                         (price?.metadata.tag as StripePriceTag | undefined) ?? "PLAN_FEE",
@@ -97,7 +99,7 @@ export const handleCheckoutSessionCompleted = async ({
         }
 
         await createServerLog(
-            "Checkout session completed, subscription created",
+            "Checkout session completed, subscription updated",
             "INFO",
             event.id,
         );
@@ -113,9 +115,10 @@ export const handleSubscriptionUpdated = async ({
         await createServerLog("customer.subscription.updated", "INFO", event.id);
         const subscriptionEvent = event.data.object;
 
-        const subscription = await prisma.subscription.findUnique({
-            where: { id: subscriptionEvent.id },
+        const subscription = await prisma.subscription.findFirst({
+            where: { stripeSubscriptionId: subscriptionEvent.id },
         });
+
         if (!subscription) {
             await createServerLog(
                 "Subscription updated triggered, but no subscription found",
@@ -188,8 +191,8 @@ export const handleInvoicePaid = async ({
             return;
         }
 
-        const psSubscription = await prisma.subscription.findUnique({
-            where: { id: event.subscription.toString() },
+        const psSubscription = await prisma.subscription.findFirst({
+            where: { stripeSubscriptionId: event.subscription.toString() },
             include: { product: true },
         });
         if (!psSubscription) {
@@ -200,12 +203,24 @@ export const handleInvoicePaid = async ({
             );
             return;
         }
+
+        if (!psSubscription.product) {
+            await createServerLog(
+                "Invoice paid, but no product was found on subscription",
+                "ERROR",
+                event.id,
+            );
+            return;
+        }
+
         if (psSubscription.product.planType === "FREE") {
             await createServerLog(
                 "Invoice paid, but subscription is free",
                 "INFO",
                 event.id,
             );
+            //If subscription is free, do nothing
+            return
         }
 
         const credits = creditsPerPlan(psSubscription.product.planType);

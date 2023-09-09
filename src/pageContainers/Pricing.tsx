@@ -1,13 +1,15 @@
-import { Box, Stack, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Stack, Heading, Text, VStack, Container } from "@chakra-ui/react";
 import { trpcClient } from "@/utils/api";
 import PricingCard from "@/components/Cards/PricingCard";
 import { useSession } from "next-auth/react";
-import { signIn } from "next-auth/react";
 import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
 import { type PricingPageProps } from "@/pages";
+import { freePricingCard } from "@/lib/Constants";
+import { useRouter } from "next/router";
 
 export default function Pricing({ prices, products }: PricingPageProps) {
   const session = useSession();
+  const router = useRouter();
 
   const authenticated = session?.status === "authenticated";
 
@@ -23,13 +25,13 @@ export default function Pricing({ prices, products }: PricingPageProps) {
     );
 
   const handleCheckout = async (productId?: any, defaultPriceId?: any) => {
-    if (!authenticated) return signIn();
+    if (!authenticated) return router.push("/signup");
     if (!productId || !defaultPriceId) return;
     mutate({ productId, defaultPriceId });
   };
 
   return (
-    <Box id="pricing" py={12}>
+    <Container id="pricing" py={12} maxW={"5xl"}>
       <VStack spacing={2} textAlign="center">
         <Heading maxW="800px" as="h1" fontSize="4xl">
           Choose the plan that better fits your needs{" "}
@@ -48,6 +50,15 @@ export default function Pricing({ prices, products }: PricingPageProps) {
         spacing={{ base: 4, lg: 10 }}
         py={10}
       >
+        <PricingCard
+          handleCheckout={() => router.push("/signup")}
+          description={freePricingCard.description}
+          autenticated={false}
+          defaultPriceId={""}
+          prices={[]}
+          title={freePricingCard.title}
+          features={freePricingCard.features}
+        />
         {products.data
           .sort(
             (a: any, b: any) =>
@@ -78,6 +89,6 @@ export default function Pricing({ prices, products }: PricingPageProps) {
             );
           })}
       </Stack>
-    </Box>
+    </Container>
   );
 }

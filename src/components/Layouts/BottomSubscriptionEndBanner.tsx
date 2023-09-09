@@ -17,6 +17,7 @@ const BottomSubscriptionEndBanner = () => {
   );
 
   const portalUrl = env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL;
+  const newSubscriprionRoute = "/home/plans";
 
   const shouldShowBanner =
     showBanner &&
@@ -45,20 +46,25 @@ const BottomSubscriptionEndBanner = () => {
         >
           {" "}
           <Text hideBelow={"md"} fontWeight={"bold"}>
-            Your subscription ends{" "}
+            Your {mySubscription.isFreeTrial ? "trial" : "subscription"} ends{" "}
             {format(mySubscription?.cancellAt ?? new Date(), "MM/dd/yy")}
           </Text>
           <Text hideFrom={"md"} fontWeight={"bold"}>
-            Plan about to expire
+            {mySubscription.isFreeTrial
+              ? `Trial ends: ${format(
+                  mySubscription?.cancellAt ?? new Date(),
+                  "MM/dd/yy",
+                )}`
+              : "Plan about to expire"}
           </Text>
           <Button
             as={Link}
-            href={portalUrl}
-            target="_blank"
+            href={mySubscription.isFreeTrial ? newSubscriprionRoute : portalUrl}
+            target={mySubscription.isFreeTrial ? undefined : "_blank"}
             size={"sm"}
             colorScheme="green"
           >
-            Renew
+            {mySubscription.isFreeTrial ? "Subscribe" : "Renew"}
           </Button>
           <Button onClick={() => setShowBanner(false)} size={"sm"}>
             Dismiss

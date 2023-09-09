@@ -13,7 +13,9 @@ export const validateEpisodeEdit: z.ZodType<Episode> = z.lazy(() =>
       .min(1, { message: "Show Notes are required" })
       .max(99999),
     transcription: z.string(),
-    imageUrl: z.string().min(1, { message: "Image URL is required" }),
+    imageUrl: z
+      .string()
+      .min(1, { message: "An Image is required for the episode" }),
     explicit: z.boolean(),
     status: z.nativeEnum(EpisodeStatus),
     subscriptionId: z.string().min(1),

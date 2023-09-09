@@ -1,6 +1,6 @@
-import Footer from "@/components/Footer";
-import HeroPage2 from "@/pageContainers/Hero2";
+import Pricing from "@/pageContainers/Pricing";
 import { getServerAuthSession } from "@/server/auth";
+import { TRPCError } from "@trpc/server";
 import { type GetServerSideProps } from "next";
 import React from "react";
 import Stripe from "stripe";
@@ -10,11 +10,11 @@ export interface PricingPageProps {
   prices: Stripe.ApiList<Stripe.Price>;
 }
 
-const Index = () => {
+const Index = (props: PricingPageProps) => {
+  //TODO add meta tags
   return (
     <>
-      <HeroPage2 />
-      <Footer />
+      <Pricing {...props} />
     </>
   );
 };
@@ -40,7 +40,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
+  const stripeKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeKey)
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Stripe key not found",
+    });
+  const stripe = new Stripe(stripeKey, {
+    apiVersion: "2022-11-15",
+  });
+  const products = await stripe.products.list({ active: true, limit: 100 });
+  const prices = await stripe.prices.list({ limit: 100, active: true });
+
   return {
-    props: {},
+    props: { products, prices },
   };
 };

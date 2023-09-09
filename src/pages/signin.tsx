@@ -4,7 +4,7 @@ import {
   Stack,
   Button,
   Heading,
-  Text,
+  Link as ChakraLink,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { z } from "zod";
@@ -58,84 +58,90 @@ export default function SimpleCard() {
     router.push("/home");
   };
   return (
-    <form onSubmit={handleSubmit(submitFunc)} noValidate>
-      <Flex
-        minH={"80vh"}
-        align={"center"}
-        justify={"center"}
-        bg={useColorModeValue("gray.50", "gray.800")}
+    <Flex
+      minH={"90vh"}
+      flexDir={"column"}
+      align={"center"}
+      justify={"start"}
+      bg={useColorModeValue("gray.50", "gray.800")}
+      w="full"
+      px="20px"
+    >
+      <form
+        /* style={{ width: "100%" }} */
+        onSubmit={handleSubmit(submitFunc)}
+        noValidate
       >
-        <Stack
-          minW={{ base: "100%", md: "500px" }}
-          spacing={8}
-          mx={"auto"}
-          maxW={"lg"}
-          py={12}
-          px={6}
-        >
-          <Stack align={"center"}>
-            <Heading fontSize={"4xl"}>Sign in</Heading>
-          </Stack>
-          <Box
-            rounded={"lg"}
-            bg={useColorModeValue("white", "gray.700")}
-            boxShadow={"lg"}
-            p={8}
-          >
-            <Stack spacing={4}>
-              <FormControlledText
-                isRequired
-                control={control}
-                name="email"
-                label="Email"
-                errors={errors}
-              />
-
-              <FormControlledText
-                isRequired
-                control={control}
-                name="password"
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                errors={errors}
-                inputRight={
-                  <Button
-                    variant={"ghost"}
-                    onClick={() =>
-                      setShowPassword((showPassword) => !showPassword)
-                    }
-                  >
-                    {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                  </Button>
-                }
-              />
-              <Stack spacing={10}>
-                <Stack
-                  direction={{ base: "column", sm: "row" }}
-                  align={"start"}
-                  justify={"space-between"}
-                >
-                  <Link href="/forgot-my-password">
-                    <Text color={"blue.400"}>Forgot password?</Text>
-                  </Link>
-                </Stack>
-                <Button
-                  bg={"blue.400"}
-                  color={"white"}
-                  type="submit"
-                  isDisabled={isSubmitting}
-                  _hover={{
-                    bg: "blue.500",
-                  }}
-                >
-                  Sign in
-                </Button>
-              </Stack>
-            </Stack>
-          </Box>
+        <Stack spacing={8} py={{ base: 6, md: 12 }}>
+          <Heading fontSize={"4xl"} textAlign={"center"}>
+            Sign in to Podcast Solutions
+          </Heading>
         </Stack>
-      </Flex>
-    </form>
+        <Box
+          rounded={"lg"}
+          bg={useColorModeValue("white", "gray.700")}
+          boxShadow={{ base: "none", md: "lg" }}
+          p={5}
+          minW={{ base: "full", md: "lg" }}
+          maxW="xl"
+        >
+          <Stack spacing={8}>
+            <FormControlledText
+              isRequired
+              control={control}
+              name="email"
+              label="Email"
+              errors={errors}
+            />
+
+            <FormControlledText
+              isRequired
+              control={control}
+              name="password"
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              errors={errors}
+              inputRight={
+                <Button
+                  variant={"ghost"}
+                  onClick={() =>
+                    setShowPassword((showPassword) => !showPassword)
+                  }
+                >
+                  {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                </Button>
+              }
+            />
+            <Button
+              bg={"blue.400"}
+              color={"white"}
+              type="submit"
+              isDisabled={isSubmitting}
+              _hover={{
+                bg: "blue.500",
+              }}
+            >
+              Sign in
+            </Button>
+          </Stack>
+
+          <Flex flexDir={"column"} pt="50px">
+            <ChakraLink
+              color="blue.400"
+              as={Link}
+              /* pb="10px" */
+              href="/forgot-my-password"
+            >
+              Forgot your password?
+            </ChakraLink>
+
+            <ChakraLink mt="10px" color="blue.400" as={Link} href="/signup">
+              Sign up for a free Podcast Solutions account
+            </ChakraLink>
+          </Flex>
+        </Box>
+      </form>
+    </Flex>
   );
 }
 

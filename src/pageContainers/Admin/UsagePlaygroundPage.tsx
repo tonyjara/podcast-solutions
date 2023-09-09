@@ -15,6 +15,9 @@ const UsagePlaygroundPage = () => {
     inputTokens: number;
     outputTokens: number;
   }>({ inputTokens: 0, outputTokens: 0 });
+
+  const [transcriptionMinutes, setTranscriptionMinutes] = useState(0);
+
   const { mutate: getSubscription } =
     trpcClient.stripeUsage.getMySubscription.useMutation(
       handleUseMutationAlerts({
@@ -26,8 +29,18 @@ const UsagePlaygroundPage = () => {
     );
   const { data: myUsage, isLoading } =
     trpcClient.stripeUsage.getMyUsage.useQuery();
-  const { mutate: postChatUsage } =
-    trpcClient.stripeUsage.postChatUsage.useMutation(
+
+  const { mutate: postChatUsage } = trpcClient.admin.postChatUsage.useMutation(
+    handleUseMutationAlerts({
+      successText: "Usage posted",
+      callback: () => {
+        trpcContext.invalidate();
+      },
+    }),
+  );
+
+  const { mutate: postTranscriptionMinutes } =
+    trpcClient.admin.postTranscriptionMinutesUsage.useMutation(
       handleUseMutationAlerts({
         successText: "Usage posted",
         callback: () => {
@@ -123,6 +136,28 @@ const UsagePlaygroundPage = () => {
             }
           >
             Add chat credits
+          </Button>
+        </Flex>
+
+        <Flex alignItems={"center"}>
+          <Flex flexDir={"column"}>
+            <FormLabel>Transcription Minutes</FormLabel>
+            <Input
+              onChange={(e) => {
+                setTranscriptionMinutes(parseInt(e.target.value));
+              }}
+              value={transcriptionMinutes}
+              type="number"
+            />
+          </Flex>
+          <Button
+            onClick={() =>
+              postTranscriptionMinutes({
+                durationInMinutes: transcriptionMinutes,
+              })
+            }
+          >
+            Post transcription minutes
           </Button>
         </Flex>
       </VStack>

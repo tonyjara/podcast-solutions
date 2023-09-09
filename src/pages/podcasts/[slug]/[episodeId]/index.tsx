@@ -1,15 +1,33 @@
 import { isScheduled } from "@/lib/utils/dateUtils";
-import { EpisodeWithAudioFiles } from "@/pageContainers/Home/Episodes/Edit/EpisodesEditPage";
 import EpisodePage from "@/pageContainers/Podcasts/Episodes/EpisodesPage";
 import { getServerAuthSession } from "@/server/auth";
 import { prisma } from "@/server/db";
-import { Podcast } from "@prisma/client";
+import { Podcast, Prisma } from "@prisma/client";
 import { GetServerSideProps } from "next";
 
+export type PodcastWithDirectories = Prisma.PodcastGetPayload<{
+  include: {
+    directories: true;
+  };
+}>;
+
+export type EpisodeWithAudioFilesAndSubscription = Prisma.EpisodeGetPayload<{
+  include: {
+    audioFiles: true;
+    subscription: {
+      select: {
+        active: true;
+        cancelledAt: true;
+        userId: true;
+        isFreeTrial: true;
+      };
+    };
+  };
+}>;
 export default EpisodePage;
 
 export const getServerSideProps: GetServerSideProps<{
-  episode: EpisodeWithAudioFiles;
+  episode: EpisodeWithAudioFilesAndSubscription;
   podcast: Podcast;
 }> = async (ctx) => {
   const q = ctx.query as { episodeId: string };
@@ -19,7 +37,12 @@ export const getServerSideProps: GetServerSideProps<{
     include: {
       audioFiles: true,
       subscription: {
-        select: { active: true, cancelledAt: true, userId: true },
+        select: {
+          active: true,
+          cancelledAt: true,
+          userId: true,
+          isFreeTrial: true,
+        },
       },
       podcast: { include: { directories: true } },
     },
@@ -36,6 +59,7 @@ export const getServerSideProps: GetServerSideProps<{
   if (
     !episode.podcast?.active ||
     !episode.subscription?.active ||
+    episode.subscription.isFreeTrial ||
     episode.podcast?.podcastStatus !== "published" ||
     (episode.podcast.publishedAt && isScheduled(episode.podcast.publishedAt)) ||
     episode.status !== "published" ||
