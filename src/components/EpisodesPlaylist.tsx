@@ -5,6 +5,7 @@ import {
   useColorModeValue,
   VStack,
   Icon,
+  Card,
 } from "@chakra-ui/react";
 import React from "react";
 import TablePagination from "./DynamicTables/TablePagination";
@@ -49,9 +50,10 @@ const EpisodesPlaylist = ({
     <VStack
       w="100%"
       backgroundColor={backgroundColor}
-      justifyContent={"center"}
+      justifyContent={"space-between"}
       alignItems={"center"}
       spacing={"10px"}
+      minH={"50vh"}
     >
       {!loading &&
         episodes.map((episode) => {
@@ -61,16 +63,18 @@ const EpisodesPlaylist = ({
           const showNotes = removeHtmlTags(episode.showNotes);
           return (
             <div key={episode.id}>
-              {/* MD and up */}
-              <Flex
+              {/* LG and up */}
+              <Card
                 onClick={() =>
                   router.push(`/podcasts/${podcastSlug}/${episode.id}`)
                 }
-                px={"10px"}
+                variant={"outline"}
+                display={"flex"}
+                flexDir={"row"}
                 gap={"20px"}
                 w="100%"
                 maxW="1000px"
-                hideBelow={"md"}
+                hideBelow={"lg"}
                 cursor={"pointer"}
                 borderRadius={"10px"}
                 p="10px"
@@ -106,18 +110,17 @@ const EpisodesPlaylist = ({
                     {secondToMinutesAndSeconds(selectedAudio?.duration ?? 0)}
                   </Text>
                 </Flex>
-              </Flex>
+              </Card>
 
-              {/* SM and down */}
+              {/* MD and down */}
               <Flex
                 onClick={() =>
                   router.push(`/podcasts/${podcastSlug}/${episode.id}`)
                 }
-                px={"10px"}
                 gap={"20px"}
                 w="100%"
                 maxW="1000px"
-                hideFrom={"md"}
+                hideFrom={"lg"}
                 cursor={"pointer"}
                 borderRadius={"10px"}
                 p="10px"
@@ -164,6 +167,7 @@ const EpisodesPlaylist = ({
           setPageSize={setPageSize}
           count={count}
           data={episodes}
+          noBg
         />
       )}
     </VStack>

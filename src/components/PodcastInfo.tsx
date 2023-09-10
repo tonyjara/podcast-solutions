@@ -63,7 +63,7 @@ export default function PodcastInfo({
             flexDir={"column"}
           >
             <Heading>{podcast.name}</Heading>
-            <Text color="gray.500">By {podcast.author}</Text>
+            <Text color="gray.400">By {podcast.author}</Text>
             <HtmlParser content={podcast.description} />
             <HStack>
               {podcast.categories.map((category) => (

@@ -29,8 +29,8 @@ const HtmlParser = ({ maxL, content, showMoreButton }: Props) => {
       <div
         className={
           colorMode === "light"
-            ? "prose prose-strong:font-extrabold prose-a:text-blue-600  max-w-none whitespace-normal"
-            : "prose prose-strong:text-blue-700 prose-strong:font-extrabold  prose-headings:text-slate-300 prose-a:text-blue-300 max-w-none text-slate-400"
+            ? "prose max-w-none whitespace-normal  prose-a:text-blue-600 prose-strong:font-extrabold"
+            : "prose max-w-none text-slate-300 prose-headings:text-slate-300  prose-p:text-slate-300 prose-a:text-blue-300 prose-strong:font-extrabold prose-strong:text-blue-700"
         }
         dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
