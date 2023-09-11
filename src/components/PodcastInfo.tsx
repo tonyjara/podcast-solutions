@@ -13,12 +13,12 @@ import {
 
 import { BiRss } from "react-icons/bi";
 import HtmlParser from "./HtmlParser";
-import { FaShareAlt } from "react-icons/fa";
 import ListenOnModal from "./ListenOnModal";
 import { PodcastWithDirectoriesAndSubscription } from "@/pages/podcasts/[slug]";
 import SubscriptionRequiredFloat from "./SubscriptionRequiredFloat";
 import MetaTagsComponent from "./Meta/MetaTagsComponent";
 import ShareButtons from "./ShareButtons";
+import { BsShare } from "react-icons/bs";
 
 export default function PodcastInfo({
   podcast,
@@ -87,7 +87,7 @@ export default function PodcastInfo({
           {podcast.directories && (
             <Button
               onClick={() => onOpen()}
-              leftIcon={<FaShareAlt />}
+              leftIcon={<BsShare />}
               maxW={"200px"}
               size={"sm"}
             >

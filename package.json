@@ -115,5 +115,12 @@
     "prisma": "^5.1.1",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.1.6"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": false,
+    "emptyLines": false
   }
 }
