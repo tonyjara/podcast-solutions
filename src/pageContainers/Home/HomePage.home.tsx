@@ -56,13 +56,14 @@ export default function HomePage() {
         trpcClient.episode.countEpisodesFromSelectedPodcast.useQuery({
             whereFilterList,
         });
+    const isLoading = selectedPodcastIsLoading || episodesAreLoading;
 
     const handleRowClick = (row: Episode) => {
         return router.push(`home/episodes/edit/${row.id}`);
     };
     const handleSubtitleText = () => {
-        if (!selectedPodcast) return "You have no podcast selected!";
-        if (!episodes?.length) {
+        if (!selectedPodcast && !isLoading) return "You have no podcast selected!";
+        if (!episodes?.length && !isLoading) {
             return (
                 <Text hideBelow={"sm"} as="em" py="10px" px="5px">
                     You have no episodes! Click the shiny button!"
@@ -91,7 +92,7 @@ export default function HomePage() {
         >
             <DynamicTable
                 rowActions={handleRowClick}
-                loading={episodesAreLoading || selectedPodcastIsLoading}
+                loading={isLoading}
                 enableColumnFilters={true}
                 whereFilterList={whereFilterList}
                 setWhereFilterList={setWhereFilterList}
