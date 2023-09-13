@@ -4,7 +4,6 @@ import { Flex } from "@chakra-ui/react";
 import EpisodesPlaylist from "@/components/EpisodesPlaylist";
 import PodcastInfo from "@/components/PodcastInfo";
 import { PodcastWithDirectoriesAndSubscription } from "@/pages/podcasts/[slug]";
-import MetaTagsComponent from "@/components/Meta/MetaTagsComponent";
 import { Prisma } from "@prisma/client";
 
 export type EpisodeWithAudioFiles = Prisma.EpisodeGetPayload<{
@@ -40,11 +39,6 @@ const PodcastsPage = ({
       flexDir={"column"}
       alignContent={"center"}
     >
-      <MetaTagsComponent
-        title={podcast.name}
-        imageSrc={podcast.imageUrl}
-        description={podcast.description}
-      />
       <PodcastInfo podcast={podcast} />
       <EpisodesPlaylist
         episodes={episodes ?? []}

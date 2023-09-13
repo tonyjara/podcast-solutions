@@ -25,10 +25,11 @@ const TablePagination = <T extends object>({
   setPageSize,
   count,
   data,
+  noBg,
 }: {
   data?: T[];
   pageIndex: number;
-
+  noBg?: boolean;
   setPageIndex: React.Dispatch<React.SetStateAction<number>>;
   pageSize: number;
   setPageSize: React.Dispatch<React.SetStateAction<number>>;
@@ -47,7 +48,8 @@ const TablePagination = <T extends object>({
       justifyContent="center"
       p={"10px"}
       alignItems="center"
-      bg={bgColor}
+      bg={noBg ? undefined : bgColor}
+      overflowX={"auto"}
     >
       <Flex gap={"10px"} maxW="750px" w={"100%"}>
         <Flex>

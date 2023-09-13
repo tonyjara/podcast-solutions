@@ -65,10 +65,12 @@
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
     "react-easy-crop": "^5.0.0",
+    "react-fast-marquee": "^1.6.0",
     "react-google-recaptcha": "^3.1.0",
     "react-hook-form": "^7.45.4",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.10.1",
+    "react-json-view": "^1.21.3",
     "react-number-format": "^5.3.0",
     "react-player": "^2.12.0",
     "react-quill": "^2.0.0",
@@ -115,5 +117,12 @@
     "prisma": "^5.1.1",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.1.6"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": false,
+    "emptyLines": false
   }
 }
