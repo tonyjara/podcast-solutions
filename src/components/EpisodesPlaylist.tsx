@@ -3,7 +3,6 @@ import {
     Image,
     Flex,
     useColorModeValue,
-    VStack,
     Icon,
     Card,
     Box,
@@ -43,7 +42,6 @@ const EpisodesPlaylist = ({
     const hoverColor = useColorModeValue("gray.100", "gray.700")
     const removeHtmlTags = (x: string) => x.replace(/(<([^>]+)>)/gi, "")
     const router = useRouter()
-
     return (
         <Flex
             w="100%"
@@ -60,10 +58,10 @@ const EpisodesPlaylist = ({
                         const selectedAudio = episode.audioFiles.find(
                             (audio) => audio.isSelected
                         )
-                        const showNotes = removeHtmlTags(episode.showNotes)
+                        /* const showNotes = removeHtmlTags(episode.showNotes) */
                         return (
                             <Box key={episode.id}>
-                                {/* LG and up */}
+                                {/* INFO: LG and up */}
                                 <Card
                                     onClick={() =>
                                         router.push(
@@ -137,8 +135,9 @@ const EpisodesPlaylist = ({
                                     </Flex>
                                 </Card>
 
-                                {/* MD and down */}
-                                <Flex
+                                {/*INFO: MD and down */}
+                                <Card
+                                    variant={"outline"}
                                     onClick={() =>
                                         router.push(
                                             `/podcasts/${podcastSlug}/${episode.id}`
@@ -180,7 +179,6 @@ const EpisodesPlaylist = ({
                                             content={episode.showNotes}
                                             allPTags
                                         />
-
                                     </Flex>
                                     <Flex alignItems={"center"} gap={"5px"}>
                                         {" "}
@@ -191,7 +189,7 @@ const EpisodesPlaylist = ({
                                             )}
                                         </Text>
                                     </Flex>
-                                </Flex>
+                                </Card>
                             </Box>
                         )
                     })}

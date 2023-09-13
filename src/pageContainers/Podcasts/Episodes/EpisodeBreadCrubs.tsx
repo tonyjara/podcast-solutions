@@ -28,7 +28,8 @@ const EpisodeBreadCrumbs = ({
             borderRadius={"5px"}
         >
             <Breadcrumb
-                color={"gray.500"}
+                color={"gray.800"}
+                _dark={{ color: "gray.400" }}
                 spacing="8px"
                 separator={<ChevronRightIcon fontSize={"2xl"} color="orange" />}
             >

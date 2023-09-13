@@ -6,30 +6,27 @@ import {
     Button,
     useClipboard,
     useDisclosure,
-    Divider,
+    Box,
 } from "@chakra-ui/react"
-
-import { BiRss } from "react-icons/bi"
+import format from "date-fns/format"
+import { BiCalendar, BiRss } from "react-icons/bi"
 import EpisodeBreadCrumbs from "./EpisodeBreadCrubs"
 import HtmlParser from "@/components/HtmlParser"
-import { FaShareAlt } from "react-icons/fa"
 import ListenOnModal from "@/components/ListenOnModal"
 import MetaTagsComponent from "@/components/Meta/MetaTagsComponent"
 import SubscriptionRequiredFloat from "@/components/SubscriptionRequiredFloat"
-import {
-    EpisodeWithAudioFilesAndSubscription,
-    PodcastWithDirectories,
-} from "@/pages/podcasts/[slug]/[episodeId]"
+import { EpisodePageProps } from "@/pages/podcasts/[slug]/[episodeId]"
 import ShareButtons from "@/components/ShareButtons"
 import BottomAudioPlayer from "@/components/AudioPlayer/BottomAudioPlayer"
+import { BsClock, BsShare } from "react-icons/bs"
+import { formatDurationSeconds } from "@/lib/utils/durationUtils"
 
 export default function EpisodePage({
     episode,
     podcast,
-}: {
-    podcast: PodcastWithDirectories
-    episode: EpisodeWithAudioFilesAndSubscription
-}) {
+    nextEpisode,
+    prevEpisode,
+}: EpisodePageProps) {
     const { onCopy, hasCopied } = useClipboard("")
     const { onOpen, onClose, isOpen } = useDisclosure()
     const handleCopyFeed = () => {
@@ -84,6 +81,7 @@ export default function EpisodePage({
                                 objectFit={"contain"}
                             />
                         </Flex>
+                        {/* Title and desc */}
                         <Flex
                             alignSelf={"start"}
                             gap={"10px"}
@@ -105,6 +103,28 @@ export default function EpisodePage({
                                         {podcast.name} by {podcast.author}
                                     </Text>
                                 </Flex>
+                                <Text color="gray.500" whiteSpace={"nowrap"}>
+                                    E{episode.episodeNumber} |{" "}
+                                    <BiCalendar
+                                        style={{
+                                            display: "inline",
+                                            marginBottom: "2px",
+                                        }}
+                                    />{" "}
+                                    {episode.releaseDate
+                                        ? format(episode.releaseDate, "MMM dd")
+                                        : ""}{" "}
+                                    |{" "}
+                                    <BsClock
+                                        style={{
+                                            display: "inline",
+                                            marginBottom: "2px",
+                                        }}
+                                    />{" "}
+                                    {formatDurationSeconds(
+                                        selectedAudioFile?.duration ?? 0
+                                    )}
+                                </Text>
                             </Flex>
 
                             <Flex gap={"20px"}>
@@ -120,21 +140,30 @@ export default function EpisodePage({
                                 {podcast.directories && (
                                     <Button
                                         onClick={() => onOpen()}
-                                        leftIcon={<FaShareAlt />}
+                                        leftIcon={<BsShare />}
                                         maxW={"200px"}
                                         size={"sm"}
                                     >
                                         Listen on
                                     </Button>
                                 )}
-                                <ShareButtons title={episode.title} />
+
+                                <Box hideBelow={"lg"}>
+                                    <ShareButtons title={episode.title} />
+                                </Box>
                             </Flex>
                         </Flex>
                     </Flex>
+                    <Box mb={"10px"} hideFrom={"lg"}>
+                        <ShareButtons title={episode.title} />
+                    </Box>
                     <HtmlParser content={episode.showNotes} />
 
                     {selectedAudioFile && (
                         <BottomAudioPlayer
+                            podcastSlug={podcast.slug}
+                            nextEpisodeId={nextEpisode?.id}
+                            prevEpisodeId={prevEpisode?.id}
                             track={{
                                 title: episode.title,
                                 src: selectedAudioFile.url,

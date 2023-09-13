@@ -10,6 +10,7 @@ import { EpisodeStatus } from "@prisma/client"
 import { handleSortEpisodes } from "./routeUtils/Sorting.routeUtils"
 import { TRPCError } from "@trpc/server"
 import { EpisodesForHomePageArgs } from "@/components/DynamicTables/Columns/EpisodesColumns.home"
+import { episodeForEditArgs } from "@/pageContainers/Home/Episodes/Edit/EpisodeEdit.types"
 
 export const episodesRouter = createTRPCRouter({
     createEpisodeWithTitle: protectedProcedure
@@ -84,13 +85,35 @@ export const episodesRouter = createTRPCRouter({
             })
         }),
 
-    getEpisodeWithAudioFiles: protectedProcedure
+    getEpisodeForEditPage: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input }) => {
-            return await prisma.episode.findUnique({
+            const episode = await prisma.episode.findFirstOrThrow({
                 where: { id: input.id },
-                include: { audioFiles: { orderBy: { isSelected: "asc" } } },
+                ...episodeForEditArgs,
             })
+            const nextEpisode = await prisma.episode.findFirst({
+                where: {
+                    podcastId: episode.podcastId,
+                    status: "published",
+                    episodeNumber: { gt: episode.episodeNumber },
+                    releaseDate: { lt: new Date() },
+                },
+                orderBy: { episodeNumber: "asc" },
+                select: { id: true },
+            })
+
+            const prevEpisode = await prisma.episode.findFirst({
+                where: {
+                    podcastId: episode.podcastId,
+                    status: "published",
+                    episodeNumber: { lt: episode.episodeNumber },
+                    releaseDate: { lt: new Date() },
+                },
+                orderBy: { episodeNumber: "desc" },
+                select: { id: true },
+            })
+            return { fetchedEpisode: episode, nextEpisode, prevEpisode }
         }),
     countEpisodesFromSelectedPodcast: protectedProcedure
         .input(

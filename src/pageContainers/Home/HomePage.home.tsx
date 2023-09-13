@@ -97,7 +97,7 @@ export default function HomePage() {
                 setWhereFilterList={setWhereFilterList}
                 title={"Episodes"}
                 customHeader={
-                    <Flex mb={{ base: "20px", md: "0px" }} flexDir={"column"}>
+                    <Flex pb={{ base: "20px", md: "0px" }} flexDir={"column"}>
                         <Card
                             p={{ base: "10px", md: "10px" }}
                             bg={"gray.100"}
@@ -181,8 +181,7 @@ export default function HomePage() {
                                 </Button>
                             </Flex>
                         </Card>
-                        {/* <Text hideBelow={"sm"} as="em" py="10px" px="5px"> */}
-                        {handleSubtitleText()} {/* </Text> */}
+                        {handleSubtitleText()}
                     </Flex>
                 }
                 data={episodes ?? []}

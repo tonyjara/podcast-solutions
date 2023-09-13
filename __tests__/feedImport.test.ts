@@ -45,7 +45,11 @@ describe("test podcast feed parsing", () => {
             //Temporary fix for syntax.fm
             expect(episodes.length).toEqual(feed.items.length - 1)
             expect(audioFiles.length).toEqual(feed.items.length - 1)
-            console.log(audioFiles[0])
+
+            console.log(episodes?.at(-1)?.episodeNumber)
+            console.log(episodes?.at(-1)?.title)
+            //Check for correct episode number parsing
+            expect(episodes?.at(-1)?.episodeNumber).toBe(feed.items.length)
         }
     })
 })

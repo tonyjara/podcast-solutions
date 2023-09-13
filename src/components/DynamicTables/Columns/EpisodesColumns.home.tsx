@@ -22,7 +22,7 @@ export const homeEpisodesColumns = () => [
     columnHelper.accessor("episodeNumber", {
         cell: (x) => `# ${x.getValue()}` ?? "-",
         header: "№",
-        sortingFn: "datetime",
+        sortingFn: "alphanumeric",
     }),
     columnHelper.accessor("releaseDate", {
         cell: (x) =>

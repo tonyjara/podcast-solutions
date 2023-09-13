@@ -6,6 +6,7 @@ import { AudioFile, Episode, Podcast } from "@prisma/client"
 import Parser from "rss-parser"
 import slugify from "slugify"
 import { validateAudioFile } from "@/components/Validations/Validate.AudioFile"
+import { parseDurationToSeconds } from "@/lib/utils/durationUtils"
 
 export type PodcastParserFeed = {
     [key: string]: any
@@ -66,7 +67,13 @@ export const parseEpisodesAndAudioFilesFromFeed = ({
 
     let audioFiles: AudioFile[] = []
 
-    feed.items?.forEach((item, index) => {
+    const sortedFeedItems = feed.items?.sort((a, b) => {
+        const dateA = a.pubDate ? new Date(a.pubDate) : new Date()
+        const dateB = b.pubDate ? new Date(b.pubDate) : new Date()
+        return dateA.getTime() - dateB.getTime()
+    })
+
+    sortedFeedItems?.forEach((item, index) => {
         const episodeId = createId()
         const audioFileId = createId()
         const podcastEpisode: Episode = {
@@ -103,35 +110,6 @@ export const parseEpisodesAndAudioFilesFromFeed = ({
             return 0
         }
 
-        const handleDuration = (x: unknown) => {
-            // Some podcasts have their duration in hours minutes and seconds, others in hours and minutes
-            //If it's a string with semi-colons, parse it, else return as is
-            if (typeof x === "string") {
-                if (x.includes(":")) {
-                    if (x.split(":").length === 3) {
-                        const [hours, minutes, seconds] = x.split(":")
-                        return (
-                            parseInt(hours ?? "0") * 60 * 60 +
-                            parseInt(minutes ?? "0") * 60 +
-                            parseInt(seconds ?? "0")
-                        )
-                    }
-                    if (x.split(":").length === 2) {
-                        const [minutes, seconds] = x.split(":")
-                        return (
-                            parseInt(minutes ?? "0") * 60 +
-                            parseInt(seconds ?? "0")
-                        )
-                    }
-                }
-                return parseInt(x)
-            }
-            if (typeof x === "number") {
-                return x
-            }
-            return 0
-        }
-
         const episodeAudioFile: AudioFile = {
             id: audioFileId,
             createdAt: new Date(),
@@ -139,7 +117,7 @@ export const parseEpisodesAndAudioFilesFromFeed = ({
             subscriptionId: subscriptionId,
             name: item.name ?? `audio-file-episode-${index + 1}`,
             length: handleParseInt(item.enclosure?.length),
-            duration: handleDuration(item.itunes?.duration),
+            duration: parseDurationToSeconds(item.itunes?.duration),
             url: item.enclosure?.url ?? "",
             podcastId: podcastId,
             episodeId: episodeId,
