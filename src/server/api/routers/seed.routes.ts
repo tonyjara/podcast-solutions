@@ -51,6 +51,10 @@ export const seedRouter = createTRPCRouter({
                 },
             },
         })
+        await prisma.preferences.deleteMany({
+            where: { userId: user.id },
+        })
+
         await prisma.audioFile.deleteMany({
             where: { subscriptionId: subscription.id },
         })

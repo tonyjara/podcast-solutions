@@ -16,11 +16,13 @@ const BottomSubscriptionEndBanner = () => {
 
     const portalUrl = env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL
     const newSubscriprionRoute = "/home/plans"
+    const hasSeenOnboaring = mySubscription?.user.preferences?.hasSeenOnboarding
 
     const shouldShowBanner =
         showBanner &&
         !!user &&
         mySubscription?.cancellAt &&
+        hasSeenOnboaring &&
         isBefore(new Date(), mySubscription.cancellAt)
 
     return (

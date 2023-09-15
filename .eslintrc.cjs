@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require("path");
+const path = require("path")
 
 /** @type {import("eslint").Linter.Config} */
 const config = {
@@ -23,6 +23,7 @@ const config = {
     rules: {
         "@typescript-eslint/no-empty-function": "off",
         "prefer-const": "off",
+        "react/no-children-prop": "off",
         "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-var-requires": "off",
@@ -33,9 +34,12 @@ const config = {
                 fixStyle: "inline-type-imports",
             },
         ],
-        "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+        "@typescript-eslint/no-unused-vars": [
+            "warn",
+            { argsIgnorePattern: "^_" },
+        ],
         "react/no-unescaped-entities": "off",
     },
-};
+}
 
-module.exports = config;
+module.exports = config

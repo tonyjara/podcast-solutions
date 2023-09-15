@@ -17,10 +17,10 @@ import { useRouter } from "next/router"
 import { Episode, Prisma } from "@prisma/client"
 import NewEpisodeModal from "./NewEpisodeModal"
 import { homeEpisodesColumns } from "@/components/DynamicTables/Columns/EpisodesColumns.home"
-import NoPodcastAndPodcastEditModal from "./NoPodcastAndPodcastEditModal"
 import { BiRss } from "react-icons/bi"
 import { useState } from "react"
 import PodcastStatusMenu from "./PodcastStatusMenu"
+import PodcastEditModal from "./NoPodcastAndPodcastEditModal"
 
 export default function HomePage() {
     const dynamicTableProps = useDynamicTable()
@@ -37,9 +37,12 @@ export default function HomePage() {
         onOpen: onNewEpisodeOpen,
         onClose: onNewEpisodeClose,
     } = useDisclosure()
-    const NoPodcastAndEditToggles = useDisclosure()
-    const { onOpen: onOpenNoPodcastAndPodcastEditModal } =
-        NoPodcastAndEditToggles
+
+    const {
+        isOpen: isEditPodOpen,
+        onOpen: onOpenPodEdit,
+        onClose: onClosePodEdit,
+    } = useDisclosure()
 
     const { data: selectedPodcast, isLoading: selectedPodcastIsLoading } =
         trpcClient.podcast.getMySelectedPodcast.useQuery()
@@ -130,9 +133,7 @@ export default function HomePage() {
                                     <Image
                                         src={selectedPodcast?.imageUrl}
                                         width={"50px"}
-                                        onClick={
-                                            onOpenNoPodcastAndPodcastEditModal
-                                        }
+                                        onClick={onOpenPodEdit}
                                         objectFit={"contain"}
                                         borderRadius={"md"}
                                         alt="Podcast logo/image"
@@ -144,7 +145,7 @@ export default function HomePage() {
                                     gap={"10px"}
                                     alignItems={"center"}
                                     maxW={"500px"}
-                                    onClick={onOpenNoPodcastAndPodcastEditModal}
+                                    onClick={onOpenPodEdit}
                                     cursor={"pointer"}
                                     _hover={{ opacity: 0.8 }}
                                     fontSize={"2xl"}
@@ -158,9 +159,7 @@ export default function HomePage() {
                                         hideFrom={"sm"}
                                         src={selectedPodcast?.imageUrl}
                                         width={"50px"}
-                                        onClick={
-                                            onOpenNoPodcastAndPodcastEditModal
-                                        }
+                                        onClick={onOpenPodEdit}
                                         objectFit={"contain"}
                                         alt="Podcast logo/image"
                                         cursor={"pointer"}
@@ -208,7 +207,13 @@ export default function HomePage() {
                 count={count ?? 0}
                 {...dynamicTableProps}
             />
-            <NoPodcastAndPodcastEditModal {...NoPodcastAndEditToggles} />
+            {selectedPodcast && (
+                <PodcastEditModal
+                    isOpen={isEditPodOpen}
+                    onClose={onClosePodEdit}
+                    selectedPodcast={selectedPodcast}
+                />
+            )}
             <NewEpisodeModal
                 isOpen={isNewEpisodeOpen}
                 onClose={onNewEpisodeClose}

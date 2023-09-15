@@ -200,6 +200,12 @@ dependencies:
   uuid:
     specifier: ^9.0.0
     version: 9.0.0
+  wavesurfer-react:
+    specifier: ^2.2.3
+    version: 2.2.3(wavesurfer.js@7.3.2)
+  wavesurfer.js:
+    specifier: ^7.3.2
+    version: 7.3.2
   zod:
     specifier: ^3.21.4
     version: 3.22.2
@@ -247,6 +253,9 @@ devDependencies:
   '@types/uuid':
     specifier: ^9.0.2
     version: 9.0.2
+  '@types/wavesurfer.js':
+    specifier: ^6.0.6
+    version: 6.0.6
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.3.0
     version: 6.5.0(@typescript-eslint/parser@6.5.0)(eslint@8.48.0)(typescript@5.2.2)
@@ -2708,6 +2717,10 @@ packages:
     resolution: {integrity: sha512-LiMQ6EOPob/4yUL66SZzu6Yh77cbzJFYll+ZfaPiPPFswtIlA/Fs1MzdKYA7JApHU49zQTbJGX3PDmCpIdDBRQ==}
     dev: true
 
+  /@types/debounce@1.2.1:
+    resolution: {integrity: sha512-epMsEE85fi4lfmJUH/89/iV/LI+F5CvNIvmgs5g5jYFPfhO2S/ae8WSsLOKWdwtoaZw9Q2IhJ4tQ5tFCcS/4HA==}
+    dev: true
+
   /@types/eslint@8.44.2:
     resolution: {integrity: sha512-sdPRb9K6iL5XZOmBubg8yiFp5yS/JdUDQsq5e6h95km91MCYMuvp7mh1fjPEYUhvHepKpZOjnEaMBR4PxjWDzg==}
     dependencies:
@@ -2878,6 +2891,12 @@ packages:
 
   /@types/uuid@9.0.2:
     resolution: {integrity: sha512-kNnC1GFBLuhImSnV7w4njQkUiJi0ZXUycu1rUaouPqiKlXkh77JKgdRnTAp1x5eBwcIwbtI+3otwzuIDEuDoxQ==}
+    dev: true
+
+  /@types/wavesurfer.js@6.0.6:
+    resolution: {integrity: sha512-fD54o0RXZXxkOb+69Rt6rGViaHpIc1Mmde2aOX9qPhlQhrCPepybGnsekiG407+7scPlaK+hmuPez5AnnmlzGg==}
+    dependencies:
+      '@types/debounce': 1.2.1
     dev: true
 
   /@types/yargs-parser@21.0.0:
@@ -8065,6 +8084,18 @@ packages:
     dependencies:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
+    dev: false
+
+  /wavesurfer-react@2.2.3(wavesurfer.js@7.3.2):
+    resolution: {integrity: sha512-GnG2baWB/zWJHA8UiNVEBIq4RAPowMFxz/DPGXa5QfS0v3vIvENXYnnzMu3V+NfPRTZLkfpWCi5tUH9qpFFrNw==}
+    peerDependencies:
+      wavesurfer.js: ^4.0.0 || ^5.0.0 || ^6.0.0
+    dependencies:
+      wavesurfer.js: 7.3.2
+    dev: false
+
+  /wavesurfer.js@7.3.2:
+    resolution: {integrity: sha512-CPi7qC0OcTE6HoQYIzwyWiJSl+Q+pcUa7jZOzlFcGt8kyOEdmPM2uo8IyGRQbJN/jzMdOgJKOwHxQ9akZhdOuw==}
     dev: false
 
   /webidl-conversions@3.0.1:

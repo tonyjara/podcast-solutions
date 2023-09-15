@@ -78,7 +78,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
         if (!data?.fetchedEpisode) return
         reset(data.fetchedEpisode)
 
-        return () => { }
+        return () => {}
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data?.fetchedEpisode])
 
@@ -187,7 +187,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             >
                                 {isLargerThan800 &&
                                     (data?.fetchedEpisode?.status ===
-                                        "published"
+                                    "published"
                                         ? "Publish Changes"
                                         : "Save")}
                             </Button>
@@ -206,14 +206,14 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                         </Flex>
                     </Flex>
 
-                    <Box mt={"40px"} w="full" gap={"20px"}>
-                        <FormControlledEditableText
-                            control={control}
-                            errors={errors}
-                            name="title"
-                        />
-                    </Box>
                     <VStack mt={"10px"} spacing={8} alignItems={"flex-start"}>
+                        <Box mt={"40px"} w="full" gap={"20px"}>
+                            <FormControlledEditableText
+                                control={control}
+                                errors={errors}
+                                name="title"
+                            />
+                        </Box>
                         {/* Action Buttons */}
                         {someError && (
                             <Text py={"10px"} color="red.300">
@@ -295,9 +295,10 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                                     control={control}
                                     imageName={
                                         episodeTitle
-                                            ? `${(slugify(episodeTitle),
-                                                { lower: true })
-                                            }-image`
+                                            ? `${
+                                                  (slugify(episodeTitle),
+                                                  { lower: true })
+                                              }-image`
                                             : ""
                                     }
                                     errors={errors}
