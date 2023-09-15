@@ -20,8 +20,7 @@ import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast"
 import axios from "axios"
 import { FieldErrors } from "react-hook-form"
 import { Episode } from "@prisma/client"
-import TimestampAudioPlayer from "@/components/AudioPlayer/TimestampAudioPlayer"
-import AudioSelectorAudioPlayer from "@/components/AudioPlayer/AudioSelectorAudioPlayer"
+/* import AudioSelectorAudioPlayer from "@/components/AudioPlayer/AudioSelectorAudioPlayer" */
 
 const AudioFileSelector = ({
     episodeId,
@@ -116,20 +115,20 @@ const AudioFileSelector = ({
                                             size={"lg"}
                                             isChecked={audioFile.isSelected}
                                         />
-                                        {/* <ReactPlayer */}
-                                        {/*     ref={playerRef} */}
-                                        {/*     url={audioFile.url} */}
-                                        {/*     controls={true} */}
-                                        {/*     height={"30px"} */}
-                                        {/*     width={"100%"} */}
-                                        {/* /> */}
-
-                                        <AudioSelectorAudioPlayer
-                                            track={{
-                                                duration: audioFile.duration,
-                                                src: audioFile.url,
-                                            }}
+                                        <ReactPlayer
+                                            ref={playerRef}
+                                            url={audioFile.url}
+                                            controls={true}
+                                            height={"30px"}
+                                            width={"100%"}
                                         />
+
+                                        {/* <AudioSelectorAudioPlayer */}
+                                        {/*     track={{ */}
+                                        {/*         duration: audioFile.duration, */}
+                                        {/*         src: audioFile.url, */}
+                                        {/*     }} */}
+                                        {/* /> */}
                                         <AreYouSureButton
                                             title={"Delete audio file"}
                                             modalContent={

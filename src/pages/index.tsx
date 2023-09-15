@@ -1,46 +1,46 @@
-import Footer from "@/components/Footer";
-import HeroPage2 from "@/pageContainers/Hero2";
-import { getServerAuthSession } from "@/server/auth";
-import { type GetServerSideProps } from "next";
-import React from "react";
-import Stripe from "stripe";
+import Footer from "@/components/Footer"
+import HeroPage2 from "@/pageContainers/Hero2"
+import { getServerAuthSession } from "@/server/auth"
+import { type GetServerSideProps } from "next"
+import React from "react"
+import Stripe from "stripe"
 
 export interface PricingPageProps {
-  products: Stripe.ApiList<Stripe.Product>;
-  prices: Stripe.ApiList<Stripe.Price>;
+    products: Stripe.ApiList<Stripe.Product>
+    prices: Stripe.ApiList<Stripe.Price>
 }
 
 const Index = () => {
-  return (
-    <>
-      <HeroPage2 />
-      <Footer />
-    </>
-  );
-};
+    return (
+        <>
+            <HeroPage2 />
+            <Footer />
+        </>
+    )
+}
 
-export default Index;
+export default Index
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { p = "/" } = ctx.query;
+    const { p = "/" } = ctx.query
 
-  const session = await getServerAuthSession(ctx);
+    const session = await getServerAuthSession(ctx)
 
-  const destination = () => {
-    if (p.toString().length === 1) return "/home";
-    return p.toString();
-  };
+    const destination = () => {
+        if (p.toString().length === 1) return "/home"
+        return p.toString()
+    }
 
-  if (session) {
+    if (session) {
+        return {
+            redirect: {
+                destination: destination(),
+                permanent: false,
+            },
+            props: {},
+        }
+    }
+
     return {
-      redirect: {
-        destination: destination(),
-        permanent: false,
-      },
-      props: {},
-    };
-  }
-
-  return {
-    props: {},
-  };
-};
+        props: {},
+    }
+}
