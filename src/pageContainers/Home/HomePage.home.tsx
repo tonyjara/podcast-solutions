@@ -37,12 +37,17 @@ export default function HomePage() {
         onOpen: onNewEpisodeOpen,
         onClose: onNewEpisodeClose,
     } = useDisclosure()
-    const NoPodcastAndEditToggles = useDisclosure()
-    const { onOpen: onOpenNoPodcastAndPodcastEditModal } =
-        NoPodcastAndEditToggles
+
+    const [isNoPodcastOpen, setIsNoPodcastOpen] = useState(false)
 
     const { data: selectedPodcast, isLoading: selectedPodcastIsLoading } =
-        trpcClient.podcast.getMySelectedPodcast.useQuery()
+        trpcClient.podcast.getMySelectedPodcast.useQuery(undefined, {
+            onSuccess: (data) => {
+                if (!data && !isNoPodcastOpen) {
+                    setIsNoPodcastOpen(true)
+                }
+            },
+        })
 
     const { data: episodes, isLoading: episodesAreLoading } =
         trpcClient.episode.getMySelectedPodcastEpisodes.useQuery({
@@ -130,9 +135,7 @@ export default function HomePage() {
                                     <Image
                                         src={selectedPodcast?.imageUrl}
                                         width={"50px"}
-                                        onClick={
-                                            onOpenNoPodcastAndPodcastEditModal
-                                        }
+                                        onClick={() => setIsNoPodcastOpen(true)}
                                         objectFit={"contain"}
                                         borderRadius={"md"}
                                         alt="Podcast logo/image"
@@ -144,7 +147,7 @@ export default function HomePage() {
                                     gap={"10px"}
                                     alignItems={"center"}
                                     maxW={"500px"}
-                                    onClick={onOpenNoPodcastAndPodcastEditModal}
+                                    onClick={() => setIsNoPodcastOpen(true)}
                                     cursor={"pointer"}
                                     _hover={{ opacity: 0.8 }}
                                     fontSize={"2xl"}
@@ -158,9 +161,7 @@ export default function HomePage() {
                                         hideFrom={"sm"}
                                         src={selectedPodcast?.imageUrl}
                                         width={"50px"}
-                                        onClick={
-                                            onOpenNoPodcastAndPodcastEditModal
-                                        }
+                                        onClick={() => setIsNoPodcastOpen(true)}
                                         objectFit={"contain"}
                                         alt="Podcast logo/image"
                                         cursor={"pointer"}
@@ -208,7 +209,11 @@ export default function HomePage() {
                 count={count ?? 0}
                 {...dynamicTableProps}
             />
-            <NoPodcastAndPodcastEditModal {...NoPodcastAndEditToggles} />
+            <NoPodcastAndPodcastEditModal
+                isOpen={isNoPodcastOpen}
+                onClose={() => setIsNoPodcastOpen(false)}
+                selectedPodcast={selectedPodcast}
+            />
             <NewEpisodeModal
                 isOpen={isNewEpisodeOpen}
                 onClose={onNewEpisodeClose}
