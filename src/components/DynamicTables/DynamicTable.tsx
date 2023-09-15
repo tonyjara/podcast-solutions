@@ -21,11 +21,7 @@ import {
 } from "@chakra-ui/react"
 import React, { useRef, useState } from "react"
 import SkeletonRows from "./Utils/SkeletonRows"
-import {
-    CloseIcon,
-    TriangleDownIcon,
-    TriangleUpIcon,
-} from "@chakra-ui/icons"
+import { CloseIcon, TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons"
 import type { ColumnDef, Header, SortingState } from "@tanstack/react-table"
 import {
     useReactTable,
@@ -168,7 +164,8 @@ const DynamicTable = <T extends object>({
                 backgroundColor={backgroundColor}
                 maxH="calc(75vh - 80px)"
                 minH="75vh"
-                justifyContent="space-between"
+                display="flex"
+                flexDirection="column"
             >
                 {!noHeader && !customHeader && (
                     <CardHeader display="flex" w="100%" flexDirection="column">
@@ -243,7 +240,7 @@ const DynamicTable = <T extends object>({
                                                 isNumeric={meta?.isNumeric}
                                                 color={
                                                     globalFilter &&
-                                                        header.id ===
+                                                    header.id ===
                                                         "no-global-sort"
                                                         ? "red.300"
                                                         : undefined
@@ -258,17 +255,17 @@ const DynamicTable = <T extends object>({
 
                                                     <chakra.span pl="4">
                                                         {!globalFilter &&
-                                                            header.column.getIsSorted() ? (
+                                                        header.column.getIsSorted() ? (
                                                             header.column.getIsSorted() ===
-                                                                "desc" ? (
+                                                            "desc" ? (
                                                                 <TriangleDownIcon aria-label="sorted descending" />
                                                             ) : (
                                                                 <TriangleUpIcon aria-label="sorted ascending" />
                                                             )
                                                         ) : null}
                                                         {globalFilter &&
-                                                            sorting[0] &&
-                                                            sorting[0].id ===
+                                                        sorting[0] &&
+                                                        sorting[0].id ===
                                                             header.column.id ? (
                                                             sorting[0]?.desc ? (
                                                                 <TriangleDownIcon aria-label="sorted descending" />
@@ -337,11 +334,11 @@ const DynamicTable = <T extends object>({
                                     color={
                                         //Colors rows, used for cancelled rows
                                         colorRedKey &&
+                                        //@ts-ignore
+                                        colorRedKey.some(
                                             //@ts-ignore
-                                            colorRedKey.some(
-                                                //@ts-ignore
-                                                (key) => !!row.original[key]
-                                            )
+                                            (key) => !!row.original[key]
+                                        )
                                             ? redRowColor
                                             : undefined
                                     }
@@ -349,10 +346,10 @@ const DynamicTable = <T extends object>({
                                     _hover={
                                         rowOptions || rowActions
                                             ? {
-                                                backgroundColor:
-                                                    rowHoverColor,
-                                                cursor: "pointer",
-                                            }
+                                                  backgroundColor:
+                                                      rowHoverColor,
+                                                  cursor: "pointer",
+                                              }
                                             : undefined
                                     }
                                     //Opens a menu at the clicked row.
@@ -409,10 +406,10 @@ const DynamicTable = <T extends object>({
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                    header.column.columnDef
-                                                        .footer,
-                                                    header.getContext()
-                                                )}
+                                                      header.column.columnDef
+                                                          .footer,
+                                                      header.getContext()
+                                                  )}
                                         </Th>
                                     ))}
                                 </Tr>
@@ -462,9 +459,9 @@ const DynamicTable = <T extends object>({
                             <MenuGroup>
                                 {menuData.rowData
                                     ? rowOptions({
-                                        x: menuData.rowData,
-                                        setMenuData,
-                                    })
+                                          x: menuData.rowData,
+                                          setMenuData,
+                                      })
                                     : []}
                             </MenuGroup>
                         </MenuList>

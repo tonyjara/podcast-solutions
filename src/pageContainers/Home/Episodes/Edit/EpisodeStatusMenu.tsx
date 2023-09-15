@@ -47,6 +47,7 @@ const EpisodeStatusMenu = ({
         <Menu>
             <MenuButton
                 maxW={"150px"}
+                outline={"solid 3px"}
                 width={"100%"}
                 as={Button}
                 rightIcon={<ChevronDownIcon />}

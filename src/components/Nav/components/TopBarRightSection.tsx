@@ -10,6 +10,8 @@ import {
     MenuDivider,
     useColorMode,
     Portal,
+    Button,
+    useDisclosure,
 } from "@chakra-ui/react"
 import { RxAvatar } from "react-icons/rx"
 import { useSession } from "next-auth/react"
@@ -17,55 +19,72 @@ import { useRouter } from "next/router"
 import React from "react"
 import { signOut } from "next-auth/react"
 import { BiLogOutCircle } from "react-icons/bi"
+import { MdOutlineFeedback } from "react-icons/md"
+import SupportTicketModal from "@/components/SupportTicketModal"
 
-const NavbarProfileSection = () => {
+const TopBarRightSection = () => {
     const router = useRouter()
+    const user = useSession().data?.user
     const { colorMode, toggleColorMode } = useColorMode()
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
-    const { data } = useSession()
     const handleSignout = () => {
         router.push("/")
         signOut()
     }
 
     return (
-        <Flex gap={{ base: "0", md: "1" }}>
-            <IconButton
-                size="lg"
-                variant="ghost"
-                onClick={toggleColorMode}
-                aria-label="change color theme"
-                icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-            />
+        <>
+            <SupportTicketModal isOpen={isOpen} onClose={onClose} />
+            <Flex gap={{ base: "15px", md: "10px" }} alignItems={"center"}>
+                {user && (
+                    <Button
+                        hideBelow={"md"}
+                        rightIcon={<MdOutlineFeedback />}
+                        variant="ghost"
+                        onClick={onOpen}
+                    >
+                        Feedback
+                    </Button>
+                )}
+                <IconButton
+                    hideFrom={"md"}
+                    variant="ghost"
+                    onClick={toggleColorMode}
+                    aria-label="change color theme"
+                    icon={<MdOutlineFeedback />}
+                />
+                <IconButton
+                    mr="10px"
+                    variant="ghost"
+                    onClick={toggleColorMode}
+                    aria-label="change color theme"
+                    icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                />
 
-            {/* <NotificationIcon /> */}
-            {data && (
-                <Flex pl={"10px"} alignItems={"center"}>
+                {user && (
                     <Menu>
                         <MenuButton
                             py={2}
                             transition="all 0.3s"
                             _focus={{ boxShadow: "none" }}
                         >
-                            <Avatar
-                                size={"sm"}
-                                src={data?.user.image ?? undefined}
-                            />
+                            <Avatar size={"sm"} src={user.image ?? undefined} />
                         </MenuButton>
                         <Portal>
-                            <MenuList>
+                            <MenuList zIndex={"11"}>
                                 <MenuItem
                                     pointerEvents={"none"}
                                     icon={<RxAvatar />}
                                 >
-                                    {data?.user.firstName} {data?.user.lastName}{" "}
+                                    {user.firstName} {user.lastName}{" "}
                                 </MenuItem>
 
                                 <MenuItem
                                     pointerEvents={"none"}
                                     icon={<EmailIcon />}
                                 >
-                                    {data?.user.email}
+                                    {user.email}
                                 </MenuItem>
                                 <MenuDivider />
                                 <MenuItem
@@ -87,10 +106,10 @@ const NavbarProfileSection = () => {
                             </MenuList>
                         </Portal>
                     </Menu>
-                </Flex>
-            )}
-        </Flex>
+                )}
+            </Flex>
+        </>
     )
 }
 
-export default NavbarProfileSection
+export default TopBarRightSection

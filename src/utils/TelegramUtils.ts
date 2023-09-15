@@ -4,10 +4,7 @@ import { Telegraf } from "telegraf"
 const bot = new Telegraf(env.TELEGRAM_BOT_TOKEN)
 const isDevEnv = env.NODE_ENV === "development"
 
-export const postToTelegramAnalyticsGroup = async (
-    email: string,
-    message: string
-) => {
+export const postToTelegramGroup = async (email: string, message: string) => {
     try {
         if (isDevEnv) return
         await bot.telegram.sendMessage(

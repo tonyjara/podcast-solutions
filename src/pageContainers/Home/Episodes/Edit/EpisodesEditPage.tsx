@@ -36,9 +36,7 @@ import FormControlledNumberInput from "@/components/Forms/FormControlled/FormCon
 import FormControlledSelect from "@/components/Forms/FormControlled/FormControlledSelect"
 import { MdPublish } from "react-icons/md"
 import { AiOutlineFundView } from "react-icons/ai"
-import Link from "next/link"
 import { useRouter } from "next/router"
-import { BsForward } from "react-icons/bs"
 import { TbPlayerSkipBack, TbPlayerSkipForward } from "react-icons/tb"
 /* import useUnsavedChangesWarning from "@/lib/hooks/useUnsavedChangesWarning"; */
 
@@ -93,7 +91,6 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
     const someError = Object.keys(errors).length > 0
     const [isLargerThan800] = useMediaQuery("(min-width: 800px)")
 
-
     return (
         <Box
             p={{ base: 3, md: 10 }}
@@ -116,14 +113,16 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                         borderRadius={"md"}
                         position={"sticky"}
                         zIndex={10}
-                        top={{ base: "80px", md: "10px" }}
+                        top={{ base: "80px", md: "80px" }}
                         gap={"10px"}
+                        outlineColor={"gray.700"}
                         alignSelf={"flex-start"}
                         justifyContent={"space-between"}
                         height={"auto"}
                     >
                         <Flex gap={"10px"}>
                             <IconButton
+                                outline={"solid 3px"}
                                 hideBelow={"md"}
                                 isDisabled={!data?.prevEpisode}
                                 onClick={() =>
@@ -144,6 +143,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                         <Flex gap={"10px"}>
                             <Button
                                 as={!isLargerThan800 ? IconButton : undefined}
+                                outline={"solid 3px"}
                                 icon={<AiOutlineFundView fontSize={"sm"} />}
                                 size={{ base: "sm", md: "md" }}
                                 onClick={() =>
@@ -159,6 +159,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             </Button>
                             <Button
                                 as={!isLargerThan800 ? IconButton : undefined}
+                                outline={"solid 3px"}
                                 icon={<DeleteIcon fontSize={"sm"} />}
                                 size={{ base: "sm", md: "md" }}
                                 rightIcon={<DeleteIcon fontSize={"sm"} />}
@@ -175,6 +176,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             </Button>
                             <Button
                                 as={!isLargerThan800 ? IconButton : undefined}
+                                outline={"solid 3px"}
                                 icon={<MdPublish fontSize={"sm"} />}
                                 size={{ base: "sm", md: "md" }}
                                 rightIcon={<MdPublish fontSize={"sm"} />}
@@ -190,6 +192,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                                         : "Save")}
                             </Button>
                             <IconButton
+                                outline={"solid 3px"}
                                 hideBelow={"md"}
                                 isDisabled={!data?.nextEpisode}
                                 onClick={() =>
