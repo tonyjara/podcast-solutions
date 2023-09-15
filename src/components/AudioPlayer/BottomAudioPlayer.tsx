@@ -54,7 +54,6 @@ export default function BottomAudioPlayer({
 }) {
     const router = useRouter()
 
-
     // states
     const [timeProgress, setTimeProgress] = useState(0)
 
@@ -75,7 +74,7 @@ export default function BottomAudioPlayer({
         setTimeProgress(parseDurationToSeconds(time))
         audioRef.current.currentTime = time
 
-        return () => { }
+        return () => {}
     }, [router.query])
 
     const onPlaybackEnded = () => {
@@ -177,9 +176,6 @@ export default function BottomAudioPlayer({
                 onTimeUpdate={(e) => {
                     setTimeProgress(e.currentTarget.currentTime)
                 }}
-            /* onDurationChange={(e) => { */
-            /*     setDuration(e.currentTarget.duration) */
-            /* }} */
             />
             {/* Fixed container  */}
             <Box

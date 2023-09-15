@@ -6,9 +6,9 @@ import { Box, useDisclosure } from "@chakra-ui/react"
 import { useSession } from "next-auth/react"
 import DesktopSidebar from "./Desktop/DesktopSidebar"
 import MobileSidebar from "./Mobile/MobileSidebar"
-import MyTopBar from "./components/MyTopBar"
 import useDidMountEffect from "@/lib/hooks/useDidMountEffect"
 import UnauthenticatedMobileSideBar from "./Mobile/UnathenticatedMobileSideBar"
+import TopBar from "./components/TopBar"
 
 export default function DrawerWithTopBar({
     children,
@@ -54,7 +54,7 @@ export default function DrawerWithTopBar({
                     />
                 </div>
             )}
-            <MyTopBar authenticated={authenticated} onOpen={onOpen} />
+            <TopBar authenticated={authenticated} onOpen={onOpen} />
 
             <Box
                 //MOBILE
