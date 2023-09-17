@@ -1,5 +1,5 @@
-import type { ContainerClient } from "@azure/storage-blob";
-import { BlobServiceClient } from "@azure/storage-blob";
+import type { ContainerClient } from "@azure/storage-blob"
+import { BlobServiceClient } from "@azure/storage-blob"
 
 // AllowedOrigins: ['*'],
 // AllowedMethods: ['GET'],
@@ -8,54 +8,57 @@ import { BlobServiceClient } from "@azure/storage-blob";
 // MaxAgeInSeconds: 60
 
 const uploadFileToBlob = async ({
-  file,
-  containerName,
-  fileName,
-  connectionString,
-  onProgress,
+    file,
+    containerName,
+    fileName,
+    connectionString,
+    onProgress,
 }: {
-  file: File | null;
-  containerName: string;
-  fileName: string;
-  connectionString: string;
-  onProgress?: (progress: number) => void;
+    file: File | null
+    containerName: string
+    fileName: string
+    connectionString: string
+    onProgress?: (progress: number) => void
 }): Promise<string | null> => {
-  if (!file) return null;
+    if (!file) return null
 
-  const blobService = new BlobServiceClient(connectionString);
-  blobService.setProperties({
-    cors: [
-      {
-        allowedOrigins: "*",
-        allowedMethods: "PUT",
-        allowedHeaders: "*",
-        exposedHeaders: "*",
-        maxAgeInSeconds: 60,
-      },
-    ],
-  });
+    const blobService = new BlobServiceClient(connectionString)
+    blobService.setProperties({
+        cors: [
+            {
+                allowedOrigins: "*",
+                allowedMethods: "PUT",
+                allowedHeaders: "*",
+                exposedHeaders: "*",
+                maxAgeInSeconds: 60,
+            },
+        ],
+    })
 
-  // get Container - full public read access
-  const containerClient: ContainerClient =
-    blobService.getContainerClient(containerName);
+    // get Container - full public read access
+    const containerClient: ContainerClient =
+        blobService.getContainerClient(containerName)
 
-  await containerClient.createIfNotExists({
-    access: "container",
-  });
+    await containerClient.createIfNotExists({
+        access: "container",
+    })
 
-  const blobClient = containerClient.getBlockBlobClient(fileName);
+    const blobClient = containerClient.getBlockBlobClient(fileName)
 
-  // upload file
-  await blobClient.uploadData(file, {
-    blobHTTPHeaders: { blobContentType: file.type },
-    onProgress: (progress) => {
-      onProgress && onProgress(progress.loadedBytes);
-    },
-  });
+    // upload file
+    await blobClient.uploadData(file, {
+        blobHTTPHeaders: { blobContentType: file.type },
+        onProgress: (progress) => {
+            onProgress && onProgress(progress.loadedBytes)
+        },
+    })
+    const client = containerClient.getBlobClient(fileName)
+    //build a url
+    const cleanUrl = `https://${client.accountName}.blob.core.windows.net/${client.containerName}/${client.name}`
 
-  const client = containerClient.getBlobClient(fileName);
+    console.log(cleanUrl)
 
-  return client.url;
-};
+    return cleanUrl
+}
 
-export default uploadFileToBlob;
+export default uploadFileToBlob

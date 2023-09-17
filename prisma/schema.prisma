@@ -204,6 +204,7 @@ model AudioFile {
     podcastId      String
     subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
     subscriptionId String?
+    peaks          Float[]
 
     @@unique([blobName, subscriptionId])
 }

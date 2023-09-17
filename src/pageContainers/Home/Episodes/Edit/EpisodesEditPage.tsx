@@ -38,9 +38,11 @@ import { MdPublish } from "react-icons/md"
 import { AiOutlineFundView } from "react-icons/ai"
 import { useRouter } from "next/router"
 import { TbPlayerSkipBack, TbPlayerSkipForward } from "react-icons/tb"
+import { BiCollapse } from "react-icons/bi"
 /* import useUnsavedChangesWarning from "@/lib/hooks/useUnsavedChangesWarning"; */
 
 const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
+    const [collapseAll, setCollapseAll] = React.useState(false)
     const user = useSession().data?.user
     const router = useRouter()
     const audioModalDisclosure = useDisclosure()
@@ -87,7 +89,6 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
     }
 
     const episodeTitle = useWatch({ control, name: "title" })
-
     const someError = Object.keys(errors).length > 0
     const [isLargerThan800] = useMediaQuery("(min-width: 800px)")
 
@@ -100,7 +101,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
             justifyContent={"center"}
             pb={"100px"}
         >
-            <Flex maxW={"1000px"} flexDir={"column"} gap={13}>
+            <Flex maxW={"1000px"} w="full" flexDir={"column"} gap={13}>
                 <form
                     onKeyDown={(e) => {
                         e.key === "Enter" && e.preventDefault()
@@ -108,7 +109,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                     onSubmit={handleSubmit(submitFunc)}
                     noValidate
                 >
-                    {/* Actions bar */}
+                    {/*INFO: Sticky actions bar */}
                     <Flex
                         borderRadius={"md"}
                         position={"sticky"}
@@ -124,6 +125,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             <IconButton
                                 outline={"solid 3px"}
                                 hideBelow={"md"}
+                                size={"sm"}
                                 isDisabled={!data?.prevEpisode}
                                 onClick={() =>
                                     router.push(
@@ -144,24 +146,8 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             <Button
                                 as={!isLargerThan800 ? IconButton : undefined}
                                 outline={"solid 3px"}
-                                icon={<AiOutlineFundView fontSize={"sm"} />}
-                                size={{ base: "sm", md: "md" }}
-                                onClick={() =>
-                                    router.push(
-                                        `/podcasts/${data?.fetchedEpisode?.podcast.slug}/${episode.id}`
-                                    )
-                                }
-                                rightIcon={
-                                    <AiOutlineFundView fontSize={"sm"} />
-                                }
-                            >
-                                {isLargerThan800 && "Preview"}
-                            </Button>
-                            <Button
-                                as={!isLargerThan800 ? IconButton : undefined}
-                                outline={"solid 3px"}
                                 icon={<DeleteIcon fontSize={"sm"} />}
-                                size={{ base: "sm", md: "md" }}
+                                size={"sm"}
                                 rightIcon={<DeleteIcon fontSize={"sm"} />}
                                 onClick={(e) => {
                                     e.preventDefault()
@@ -178,7 +164,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                                 as={!isLargerThan800 ? IconButton : undefined}
                                 outline={"solid 3px"}
                                 icon={<MdPublish fontSize={"sm"} />}
-                                size={{ base: "sm", md: "md" }}
+                                size={"sm"}
                                 rightIcon={<MdPublish fontSize={"sm"} />}
                                 onClick={() => handleSubmit(submitFunc)()}
                                 isDisabled={
@@ -194,6 +180,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             <IconButton
                                 outline={"solid 3px"}
                                 hideBelow={"md"}
+                                size={"sm"}
                                 isDisabled={!data?.nextEpisode}
                                 onClick={() =>
                                     router.push(
@@ -206,65 +193,114 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                         </Flex>
                     </Flex>
 
-                    <VStack mt={"10px"} spacing={8} alignItems={"flex-start"}>
-                        <Box mt={"40px"} w="full" gap={"20px"}>
-                            <FormControlledEditableText
-                                control={control}
-                                errors={errors}
-                                name="title"
-                            />
-                        </Box>
-                        {/* Action Buttons */}
+                    {/* INFO: Secondary actions */}
+                    <Flex
+                        justifyContent={"space-between"}
+                        mt={"20px"}
+                        gap={"10px"}
+                    >
+                        <Button
+                            as={!isLargerThan800 ? IconButton : undefined}
+                            icon={<BiCollapse />}
+                            size={"sm"}
+                            leftIcon={<BiCollapse />}
+                            onClick={() => setCollapseAll(true)}
+                        >
+                            {isLargerThan800 && "Collapse all"}
+                        </Button>
+                        <Button
+                            as={!isLargerThan800 ? IconButton : undefined}
+                            icon={<AiOutlineFundView />}
+                            size={"sm"}
+                            onClick={() =>
+                                router.push(
+                                    `/podcasts/${data?.fetchedEpisode?.podcast.slug}/${episode.id}`
+                                )
+                            }
+                            rightIcon={<AiOutlineFundView fontSize={"sm"} />}
+                        >
+                            {isLargerThan800 && "Preview"}
+                        </Button>
+                    </Flex>
+                    <VStack mt={"20px"} spacing={8} alignItems={"flex-start"}>
                         {someError && (
                             <Text py={"10px"} color="red.300">
                                 There's some issues in the form, please resolve
                                 them before submitting.
                             </Text>
                         )}
-                        <SimpleGrid
-                            columns={[1, 2, 3, 4]}
-                            spacing={{ base: 5, md: 10 }}
-                        >
-                            <FormControlledDatePicker
-                                control={control}
-                                errors={errors}
-                                name="releaseDate"
-                                maxW={"200px"}
-                                label="Release date"
-                                helperText="Future dates schedule release."
-                            />
-                            <FormControlledNumberInput
-                                control={control}
-                                errors={errors}
-                                name="seasonNumber"
-                                label="Season Number"
-                            />
-
-                            <FormControlledNumberInput
-                                control={control}
-                                errors={errors}
-                                name="episodeNumber"
-                                label="Episode Number"
-                            />
-
-                            <FormControlledSelect
-                                options={[
-                                    { label: "Full", value: "full" },
-                                    { label: "Trailer", value: "trailer" },
-                                    { label: "Bonus", value: "bonus" },
-                                ]}
-                                control={control}
-                                errors={errors}
-                                name="episodeType"
-                                label="Episode Type"
-                            />
-                        </SimpleGrid>
-
+                        {/* INFO: Episode details */}
                         <CollapsableContainer
+                            collapseAll={collapseAll}
+                            setCollapseAll={setCollapseAll}
+                            title="Episode Details"
+                        >
+                            <Flex flexDir={"column"} gap={"20px"}>
+                                <FormControlledEditableText
+                                    control={control}
+                                    errors={errors}
+                                    name="title"
+                                />
+                                <SimpleGrid
+                                    columns={[1, 2, 3, 4]}
+                                    spacing={{ base: 5, md: 10 }}
+                                >
+                                    <FormControlledDatePicker
+                                        control={control}
+                                        errors={errors}
+                                        name="releaseDate"
+                                        maxW={"200px"}
+                                        label="Release date"
+                                        helperText="Future dates schedule release."
+                                    />
+                                    <FormControlledNumberInput
+                                        control={control}
+                                        errors={errors}
+                                        name="seasonNumber"
+                                        label="Season"
+                                    />
+
+                                    <FormControlledNumberInput
+                                        control={control}
+                                        errors={errors}
+                                        name="episodeNumber"
+                                        label="Number"
+                                    />
+
+                                    <FormControlledSelect
+                                        options={[
+                                            { label: "Full", value: "full" },
+                                            {
+                                                label: "Trailer",
+                                                value: "trailer",
+                                            },
+                                            { label: "Bonus", value: "bonus" },
+                                        ]}
+                                        control={control}
+                                        errors={errors}
+                                        name="episodeType"
+                                        label="Type"
+                                    />
+                                </SimpleGrid>
+
+                                <FormControlledSwitch
+                                    control={control}
+                                    errors={errors}
+                                    name="explicit"
+                                    label="Does this episode have explicit content?"
+                                />
+                            </Flex>
+                        </CollapsableContainer>
+
+                        {/* INFO: Audio selector */}
+                        <CollapsableContainer
+                            collapseAll={collapseAll}
+                            setCollapseAll={setCollapseAll}
                             title="Audio Files"
                             tooltipText="The selected audio file will be used for the episode, it will be the one that appears in the podcast feed and the one used for transcription."
                             titleComponents={
                                 <Button
+                                    size={"sm"}
                                     rightIcon={<AddIcon fontSize="sm" />}
                                     onClick={onOpen}
                                 >
@@ -279,17 +315,26 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             />
                         </CollapsableContainer>
                         <TranscriptionEdit
+                            collapseAll={collapseAll}
+                            setCollapseAll={setCollapseAll}
                             episode={data?.fetchedEpisode}
                             control={control}
                             errors={errors}
                         />
                         <ShowNotesEdit
+                            collapseAll={collapseAll}
+                            setCollapseAll={setCollapseAll}
                             episode={data?.fetchedEpisode}
                             control={control}
                             errors={errors}
                         />
 
-                        <CollapsableContainer title="Episode Image">
+                        {/* INFO: Episode Image */}
+                        <CollapsableContainer
+                            collapseAll={collapseAll}
+                            setCollapseAll={setCollapseAll}
+                            title="Episode Image"
+                        >
                             {user && (
                                 <FormControlledImageUpload
                                     control={control}
@@ -310,12 +355,6 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                                 />
                             )}
                         </CollapsableContainer>
-                        <FormControlledSwitch
-                            control={control}
-                            errors={errors}
-                            name="explicit"
-                            label="Does this episode have explicit content?"
-                        />
                     </VStack>
                 </form>
             </Flex>

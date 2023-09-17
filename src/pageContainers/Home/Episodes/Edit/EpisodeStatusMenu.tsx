@@ -51,7 +51,7 @@ const EpisodeStatusMenu = ({
                 width={"100%"}
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
-                size={{ base: "sm", md: "md" }}
+                size={"sm"}
             >
                 {episodeStatus === "published" &&
                     episodeIsScheduled &&

@@ -15,10 +15,14 @@ const ShowNotesEdit = ({
     control,
     errors,
     episode,
+    collapseAll,
+    setCollapseAll,
 }: {
     control: Control<any>
     errors: any
     episode: Episode | null | undefined
+    collapseAll: boolean
+    setCollapseAll: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
     const context = trpcClient.useContext()
 
@@ -38,6 +42,8 @@ const ShowNotesEdit = ({
         <>
             <CollapsableContainer
                 title="Show Notes"
+                collapseAll={collapseAll}
+                setCollapseAll={setCollapseAll}
                 titleComponents={
                     <AreYouSureButton
                         rightIcon={<SiOpenai fontSize={"sm"} />}

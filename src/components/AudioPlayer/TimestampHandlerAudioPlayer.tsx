@@ -10,8 +10,10 @@ import {
     SliderThumb,
     SliderTrack,
     Text,
+    keyframes,
 } from "@chakra-ui/react"
 import WaveSurfer from "wavesurfer.js"
+import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline"
 import { trpcClient } from "@/utils/api"
 import { TbPlayerPause, TbPlayerPlay } from "react-icons/tb"
 import AreYouSureButton from "../Buttons/AreYouSureButton"
@@ -19,27 +21,27 @@ import { handleUseMutationAlerts } from "../Toasts & Alerts/MyToast"
 import { AudioFile } from "@prisma/client"
 import axios from "axios"
 import { DeleteIcon } from "@chakra-ui/icons"
+import { TiZoom } from "react-icons/ti"
 import {
     IoMdVolumeHigh,
     IoMdVolumeLow,
     IoMdVolumeMute,
     IoMdVolumeOff,
 } from "react-icons/io"
-import { MdGraphicEq } from "react-icons/md"
-import { BsZoomIn, BsZoomOut } from "react-icons/bs"
+import { customScrollbar } from "@/styles/CssUtils"
 
-// NOTE: Chrome blocked autoplay before user interacts with the page and there's a running issue on wavesurfer
-export default function TimestampAudioPlayer({
+// NOTE: Chrome blocked autoplay before user interacts with the page
+export default function TimestampHandlerAudioPlayer({
     audioFile,
 }: {
     audioFile: AudioFile
 }) {
     //states
-    const [timeProgress, setTimeProgress] = useState(0)
     const context = trpcClient.useContext()
     const [volume, setVolume] = useState(100)
     const [muteVolume, setMuteVolume] = useState(false)
     const [isPlaying, setIsPlaying] = useState(false)
+    const [zoom, setZoom] = useState(1)
 
     //refs
     const wsContainerRef = useRef<HTMLDivElement>(null)
@@ -73,23 +75,30 @@ export default function TimestampAudioPlayer({
                 },
             })
         )
-
     useEffect(() => {
         if (!wsContainerRef.current) return
+
         ws.current = WaveSurfer.create({
             container: wsContainerRef.current,
-            dragToSeek: true,
+            /* waveColor: "rgb(200, 0, 200)", */
+            /* progressColor: "rgb(100, 0, 100)", */
+            /* cursorColor: "transparent", */
+            /* dragToSeek: true, */
             url: audioFile.url,
             barWidth: 3,
             autoplay: false,
             cursorWidth: 2,
-            /* mediaControls: isAdmin, */
-            height: 50,
-            hideScrollbar: true,
+            height: audioFile.isSelected ? 200 : 50,
+            /* minPxPerSec: 100, */
             peaks: audioFile.peaks.length
                 ? (audioFile.peaks as any)
                 : undefined,
+            /* plugins: audioFile.isSelected ? [TimelinePlugin.create()] : [], */
         })
+
+        /* wavesurferRef.current.on("loading", (percent) => { */
+        /*     console.log("Loading", percent + "%") */
+        /* }) */
 
         ws.current.on("ready", function () {
             try {
@@ -97,7 +106,7 @@ export default function TimestampAudioPlayer({
 
                 const peaks = ws.current.exportPeaks({
                     channels: 1,
-                    maxLength: audioFile.duration,
+                    /* maxLength: track.duration, */
                 })
 
                 if (!peaks[0]) return
@@ -106,23 +115,16 @@ export default function TimestampAudioPlayer({
                 console.error(e)
             }
         })
-        ws.current.on("audioprocess", function (time: number) {
-            setTimeProgress(time)
-        })
 
-        ws.current.on("timeupdate", function (time: number) {
-            setTimeProgress(time)
-        })
-
-        ws.current.on("finish", function () {
-            if (!ws.current) return
-            ws.current.seekTo(0)
-            setTimeProgress(0)
-            setIsPlaying(false)
-        })
         return () => ws.current?.destroy()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [audioFile.isSelected])
+
+    const handleZoom = (e: number) => {
+        if (!ws.current) return
+        ws.current.zoom(e)
+        setZoom(e)
+    }
 
     //controls
     const togglePlayPause = () => {
@@ -136,12 +138,6 @@ export default function TimestampAudioPlayer({
     }
 
     // Volume slider
-    useEffect(() => {
-        if (!ws.current) return
-        if (muteVolume) return ws.current.setVolume(0)
-        ws.current.setVolume(volume / 100)
-    }, [volume, muteVolume])
-
     const handleVolumeSliderIcon = () => {
         if (muteVolume) return IoMdVolumeOff
         if (volume > 50) return IoMdVolumeHigh
@@ -168,40 +164,6 @@ export default function TimestampAudioPlayer({
             audioFileId: audioFile.id,
         })
     }
-
-    const handleProgressBarChange = (e: number) => {
-        setTimeProgress(e)
-        if (!ws.current) return
-        const newTime = isFinite(e) ? e : 0
-        const percentagePlayed = (newTime * 100) / audioFile.duration
-        ws.current.seekTo(percentagePlayed / 100)
-    }
-
-    const formatTime = (time: number) => {
-        if (time && !isNaN(time)) {
-            const minutes = Math.floor(time / 60)
-            const formatMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`
-            const seconds = Math.floor(time % 60)
-            const formatSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`
-            return `${formatMinutes}:${formatSeconds}`
-        }
-        return "00:00"
-    }
-
-    const handleZoomIn = () => {
-        if (!ws.current) return
-        const newZoom = ws.current.options.minPxPerSec + 10
-        ws.current.zoom(newZoom)
-    }
-
-    const handleZoomOut = () => {
-        if (!ws.current) return
-        const currentZoom = ws.current.options.minPxPerSec
-        if (currentZoom <= 10) return ws.current.zoom(0)
-        const newZoom = currentZoom - 10
-        ws.current.zoom(newZoom)
-    }
-
     return (
         <Flex width="100%" flexDir={"column"} key={audioFile.id}>
             <Box
@@ -228,32 +190,6 @@ export default function TimestampAudioPlayer({
             </Box>
             {/* INFO: WAVE SURFER */}
             <div ref={wsContainerRef}></div>
-
-            {/* INFO: PROGRESS BAR */}
-            <Flex alignItems={"center"} w="full" gap={"10px"}>
-                <Text>{formatTime(timeProgress)}</Text>
-                <Slider
-                    /* ref={progressBarRef} */
-                    max={Math.floor(audioFile.duration)}
-                    onChange={handleProgressBarChange}
-                    aria-label="Progress bar"
-                    value={timeProgress}
-                    defaultValue={0}
-                    role="group"
-                >
-                    <SliderTrack bg="red.100">
-                        <SliderFilledTrack bg="brand.600" />
-                    </SliderTrack>
-                    <SliderThumb
-                        _focus={{ boxShadow: "none" }}
-                        bg={"white"}
-                        boxSize={7}
-                    >
-                        <Box color="brand.600" as={MdGraphicEq} boxSize={7} />
-                    </SliderThumb>
-                </Slider>
-                <Text>{formatTime(audioFile.duration)}</Text>
-            </Flex>
             <Flex
                 justifyContent={"space-between"}
                 alignItems={"center"}
@@ -280,35 +216,56 @@ export default function TimestampAudioPlayer({
                     cursor={"pointer"}
                     onClick={togglePlayPause}
                 />
+                {/*INFO: ZOOM BAR */}
+                <Flex
+                    alignItems={"center"}
+                    w="full"
+                    maxW={{ base: "100px", md: "300px" }}
+                    gap={"10px"}
+                >
+                    <Slider
+                        /* ref={progressBarRef} */
+                        /* max={Math.floor(track.duration)} */
+                        max={200}
+                        onChange={handleZoom}
+                        aria-label="Zoom bar"
+                        value={zoom}
+                        defaultValue={0}
+                    >
+                        <SliderTrack bg="red.100">
+                            <SliderFilledTrack bg="brand.600" />
+                        </SliderTrack>
+                        <SliderThumb
+                            _focus={{ boxShadow: "none" }}
+                            bg={{ base: "white", md: "transparent" }}
+                            _hover={{
+                                bg: "white",
+                                opacity: 1,
+                                outlineColor: "transparent",
+                                animation: `${keyframes`
+                                    from { opacity: 0.1 }
+                                    to { opacity: 1 }`} ease-in-out 0.1s`,
+                                transformOrigin: "center",
+                            }}
+                            boxSize={7}
+                        >
+                            <Box
+                                color="transparent"
+                                _hover={{ color: "brand.600" }}
+                                as={TiZoom}
+                                boxSize={7}
+                            />
+                        </SliderThumb>
+                    </Slider>
+                </Flex>
 
-                {/* INFO: ZOOM BUTTONS */}
-                <IconButton
-                    aria-label="Zoom out"
-                    _hover={{ color: "brand.500" }}
-                    variant={"outline"}
-                    size={"sm"}
-                    icon={<BsZoomOut style={{ fontSize: "16px" }} />}
-                    cursor={"pointer"}
-                    onClick={handleZoomOut}
-                />
-
-                <IconButton
-                    aria-label="Zoom in"
-                    _hover={{ color: "brand.500" }}
-                    variant={"outline"}
-                    size={"sm"}
-                    icon={<BsZoomIn style={{ fontSize: "16px" }} />}
-                    cursor={"pointer"}
-                    onClick={handleZoomIn}
-                />
-
-                {/*INFO: VOLUME */}
                 <Flex
                     w="full"
                     justifyContent={"end"}
+                    role="group"
                     height={"auto"}
-                    gap={"15px"}
                     hideBelow={"lg"}
+                    gap={"15px"}
                 >
                     <Slider
                         maxW="150px"
