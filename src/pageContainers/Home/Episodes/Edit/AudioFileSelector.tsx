@@ -28,7 +28,7 @@ const AudioFileSelector = ({
             {
                 episodeId: episodeId,
             },
-            { enabled: !!episodeId }
+            { refetchOnWindowFocus: false, enabled: !!episodeId }
         )
 
     return (

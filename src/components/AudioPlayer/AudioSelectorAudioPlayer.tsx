@@ -9,6 +9,7 @@ import {
     SliderFilledTrack,
     SliderThumb,
     SliderTrack,
+    Spinner,
     Text,
 } from "@chakra-ui/react"
 import WaveSurfer from "wavesurfer.js"
@@ -87,8 +88,7 @@ export default function AudioSelectorAudioPlayer({
                 ? (audioFile.peaks as any)
                 : undefined,
         })
-
-        ws.current.on("ready", function () {
+        ws.current.on("redraw", function () {
             try {
                 if (!ws.current || audioFile.peaks.length > 0) return
 
@@ -109,7 +109,10 @@ export default function AudioSelectorAudioPlayer({
             ws.current.seekTo(0)
             setIsPlaying(false)
         })
-        return () => ws.current?.destroy()
+
+        return () => {
+            ws.current?.destroy()
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [audioFile.isSelected])
 
@@ -171,18 +174,19 @@ export default function AudioSelectorAudioPlayer({
                 borderRadius={"md"}
                 zIndex={5}
             >
-                <Text
-                    whiteSpace={"nowrap"}
-                    px={"10px"}
-                    fontWeight={"bold"}
-                    /* color={"white"} */
-                >
+                <Text whiteSpace={"nowrap"} px={"10px"} fontWeight={"bold"}>
                     {audioFile.name.length > 24
                         ? audioFile.name.slice(0, 24) + "..."
                         : audioFile.name}
                 </Text>
             </Box>
             {/* INFO: WAVE SURFER */}
+            {!audioFile.peaks.length && (
+                <Flex mt={"20px"} alignItems={"center"} gap={"20px"}>
+                    <Spinner />
+                    <Text>Generating waveform...</Text>
+                </Flex>
+            )}
             <div ref={wsContainerRef}></div>
 
             <Flex

@@ -17,12 +17,14 @@ const TranscriptionEdit = ({
     episode,
     collapseAll,
     setCollapseAll,
+    hasAudioFiles,
 }: {
     control: Control<any>
     errors: any
     episode: Episode | null | undefined
     collapseAll: boolean
     setCollapseAll: React.Dispatch<React.SetStateAction<boolean>>
+    hasAudioFiles: boolean
 }) => {
     const context = trpcClient.useContext()
     const { mutate: transcribe } =
@@ -35,10 +37,10 @@ const TranscriptionEdit = ({
             })
         )
 
-    const { data: selecteAudioFile } =
-        trpcClient.audioFile.getSelectedAudioFileForEpisode.useQuery({
-            episodeId: episode?.id,
-        })
+    /* const { data: selecteAudioFile } = */
+    /*     trpcClient.audioFile.getSelectedAudioFileForEpisode.useQuery({ */
+    /*         episodeId: episode?.id, */
+    /*     }) */
 
     return (
         <CollapsableContainer
@@ -46,22 +48,21 @@ const TranscriptionEdit = ({
             collapseAll={collapseAll}
             setCollapseAll={setCollapseAll}
             subTitle={
-                !!selecteAudioFile
+                hasAudioFiles
                     ? undefined
                     : "Upload an audio file to generate a transcription"
             }
             titleComponents={
                 <AreYouSureButton
                     rightIcon={<SiOpenai fontSize={"sm"} />}
-                    isDisabled={!episode || !selecteAudioFile}
+                    isDisabled={!episode || !hasAudioFiles}
                     buttonText="Generate"
                     confirmAction={() => {
-                        if (!episode || !selecteAudioFile?.id) {
+                        if (!episode || !hasAudioFiles) {
                             return myToast.error("No audio file selected")
                         }
                         transcribe({
                             episodeId: episode.id,
-                            audioFileId: selecteAudioFile.id,
                         })
                     }}
                     title="Generate Transcription"

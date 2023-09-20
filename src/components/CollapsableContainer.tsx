@@ -49,10 +49,11 @@ const CollapsableContainer = ({
     return (
         <Box style={style} w={"100%"}>
             <Flex
-                my={"10px"}
+                py={"10px"}
                 justifyContent={"space-between"}
                 alignItems={"center"}
                 gap={5}
+                w={"100%"}
             >
                 <Flex gap={"10px"} alignItems={"center"}>
                     <IconButton
@@ -62,7 +63,9 @@ const CollapsableContainer = ({
                         icon={<BiCollapseVertical />}
                         onClick={handleToggle}
                     />
-                    <Heading fontSize={"xl"}>{title}</Heading>
+                    <Heading whiteSpace="nowrap" fontSize={"xl"}>
+                        {title}
+                    </Heading>
                     {tooltipText && (
                         <Tooltip label={tooltipText}>
                             <IconButton
@@ -78,7 +81,7 @@ const CollapsableContainer = ({
                 {titleComponents}
             </Flex>
             {subTitle && (
-                <Text mb="10px" mt="-10px" color={"gray.500"}>
+                <Text pb="10px" mt="-10px" color={"gray.500"}>
                     {subTitle}
                 </Text>
             )}

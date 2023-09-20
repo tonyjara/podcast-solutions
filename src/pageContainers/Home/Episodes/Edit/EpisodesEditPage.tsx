@@ -39,6 +39,7 @@ import { AiOutlineFundView } from "react-icons/ai"
 import { useRouter } from "next/router"
 import { TbPlayerSkipBack, TbPlayerSkipForward } from "react-icons/tb"
 import { BiCollapse } from "react-icons/bi"
+import TimestampHandler from "@/components/AudioPlayer/TimestampHandler"
 /* import useUnsavedChangesWarning from "@/lib/hooks/useUnsavedChangesWarning"; */
 
 const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
@@ -89,6 +90,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
     }
 
     const episodeTitle = useWatch({ control, name: "title" })
+    const showNotes = useWatch({ control, name: "showNotes" })
     const someError = Object.keys(errors).length > 0
     const [isLargerThan800] = useMediaQuery("(min-width: 800px)")
 
@@ -320,7 +322,22 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             episode={data?.fetchedEpisode}
                             control={control}
                             errors={errors}
+                            hasAudioFiles={
+                                !!data?.fetchedEpisode.audioFiles.length
+                            }
                         />
+                        {/* INFO: Timestamp tool */}
+                        <CollapsableContainer
+                            collapseAll={collapseAll}
+                            setCollapseAll={setCollapseAll}
+                            title="Timestamp tool"
+                        >
+                            {/* NOTE: Making sure there are peaks avoids double processing and crashing the server. */}
+                            <TimestampHandler
+                                showNotes={showNotes}
+                                episodeId={episode.id}
+                            />
+                        </CollapsableContainer>
                         <ShowNotesEdit
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}

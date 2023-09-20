@@ -157,6 +157,7 @@ export default function EpisodePage({
                     <Box mb={"10px"} hideFrom={"lg"}>
                         <ShareButtons title={episode.title} />
                     </Box>
+                    {/* INFO: Html parse */}
                     <HtmlParser content={episode.showNotes} />
 
                     {selectedAudioFile && (
