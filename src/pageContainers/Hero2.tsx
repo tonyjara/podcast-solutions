@@ -5,15 +5,18 @@ import {
     useColorModeValue,
     Icon,
     chakra,
-} from "@chakra-ui/react";
-import Link from "next/link";
+} from "@chakra-ui/react"
+import Link from "next/link"
 
 const HeroPage2 = () => {
-    const bg = useColorModeValue("white", "gray.800");
-    const mobilePic = "/assets/hero/hero-mobile2.jpeg";
-    const desktopPic = "/assets/hero/hero-desktop2.jpeg";
+    const bg = useColorModeValue("white", "gray.800")
+    const mobilePic = "/assets/hero/hero-mobile2.jpeg"
+    const desktopPic = "/assets/hero/hero-desktop2.jpeg"
     return (
-        <Box minH={"81vh"}>
+        <Box
+            /* minH={"81vh"} */
+            /* height="100%" */
+        >
             <Box
                 pos="relative"
                 overflow="hidden"
@@ -142,10 +145,11 @@ const HeroPage2 = () => {
                                         lg: 0,
                                     }}
                                     fontWeight="medium"
-                                /* color="gray.500" */
+                                    /* color="gray.500" */
                                 >
-                                    Host your podcast, manage your episodes, schedule uploads,
-                                    transcribe your audio, generate AI content and more.{" "}
+                                    Host your podcast, manage your episodes,
+                                    schedule uploads, transcribe your audio,
+                                    generate AI content and more.{" "}
                                 </chakra.p>
                                 <Box
                                     mt={{
@@ -160,7 +164,7 @@ const HeroPage2 = () => {
                                         lg: "start",
                                     }}
                                     fontWeight="extrabold"
-                                /* fontFamily="fantasy" */
+                                    /* fontFamily="fantasy" */
                                 >
                                     <Box rounded="full" shadow="md">
                                         <chakra.a
@@ -253,6 +257,6 @@ const HeroPage2 = () => {
                 </Box>
             </Box>
         </Box>
-    );
-};
-export default HeroPage2;
+    )
+}
+export default HeroPage2

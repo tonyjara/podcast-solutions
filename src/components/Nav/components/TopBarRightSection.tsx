@@ -29,8 +29,8 @@ const TopBarRightSection = () => {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     const handleSignout = () => {
-        router.push("/")
         signOut()
+        /* router.push("/") */
     }
 
     return (
