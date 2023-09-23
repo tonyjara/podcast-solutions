@@ -6,21 +6,12 @@ import {
     ModalCloseButton,
     ModalHeader,
     Button,
-    Heading,
-    Icon,
     Text,
-    Box,
     Stack,
     useColorModeValue,
-    HStack,
     Flex,
-    VStack,
 } from "@chakra-ui/react"
-import { SupportTicket } from "@prisma/client"
-import Link from "next/link"
 import React from "react"
-import { FaPodcast, FaSpotify } from "react-icons/fa"
-import { SiGooglepodcasts, SiStitcher, SiTunein } from "react-icons/si"
 import {
     FormSupportTicket,
     defaultSupportTicketValues,
@@ -30,7 +21,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import FormControlledText from "./Forms/FormControlled/FormControlledText"
 import { useSession } from "next-auth/react"
-import FormControlledAvatarUpload from "./Forms/FormControlled/FormControlledAvatarUpload"
 import FormControlledFeedbackUpload from "./Forms/FormControlled/FormControlledFeedbackUpload"
 import { trpcClient } from "@/utils/api"
 import { handleUseMutationAlerts } from "./Toasts & Alerts/MyToast"

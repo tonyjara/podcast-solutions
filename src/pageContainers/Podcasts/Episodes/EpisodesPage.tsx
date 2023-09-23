@@ -19,7 +19,7 @@ import { EpisodePageProps } from "@/pages/podcasts/[slug]/[episodeId]"
 import ShareButtons from "@/components/ShareButtons"
 import BottomAudioPlayer from "@/components/AudioPlayer/BottomAudioPlayer"
 import { BsClock, BsShare } from "react-icons/bs"
-import { formatDurationSeconds } from "@/lib/utils/durationUtils"
+import { formatSecondsToDuration } from "@/lib/utils/durationUtils"
 
 export default function EpisodePage({
     episode,
@@ -121,7 +121,7 @@ export default function EpisodePage({
                                             marginBottom: "2px",
                                         }}
                                     />{" "}
-                                    {formatDurationSeconds(
+                                    {formatSecondsToDuration(
                                         selectedAudioFile?.duration ?? 0
                                     )}
                                 </Text>

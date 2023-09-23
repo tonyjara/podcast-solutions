@@ -32,7 +32,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     </RootLayout>
                 </ChakraProvider>
             </SessionProvider>
-
             {/* Google Analytics, block on dev because of weird errors */}
             {!isDev && (
                 <>

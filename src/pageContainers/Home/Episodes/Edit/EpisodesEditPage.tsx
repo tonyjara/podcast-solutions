@@ -9,7 +9,7 @@ import {
     useMediaQuery,
     IconButton,
 } from "@chakra-ui/react"
-import React, { useEffect } from "react"
+import React from "react"
 import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast"
 import { trpcClient } from "@/utils/api"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,10 +18,7 @@ import FormControlledSwitch from "@/components/Forms/FormControlled/FormControll
 import slugify from "slugify"
 import { useSession } from "next-auth/react"
 import { Episode } from "@prisma/client"
-import {
-    defaultEpisodeValues,
-    validateEpisodeEdit,
-} from "@/components/Validations/EpisodeEdit.validate"
+import { validateEpisodeEdit } from "@/components/Validations/EpisodeEdit.validate"
 import { useForm, useWatch } from "react-hook-form"
 import FormControlledImageUpload from "@/components/Forms/FormControlled/FormControlledImageUpload"
 import AudioFileSelector from "./AudioFileSelector"
@@ -34,15 +31,28 @@ import EpisodeStatusMenu from "./EpisodeStatusMenu"
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons"
 import FormControlledNumberInput from "@/components/Forms/FormControlled/FormControlledNumberInput"
 import FormControlledSelect from "@/components/Forms/FormControlled/FormControlledSelect"
-import { MdPublish } from "react-icons/md"
-import { AiOutlineFundView } from "react-icons/ai"
+import { AiOutlineFundView, AiTwotoneSave } from "react-icons/ai"
 import { useRouter } from "next/router"
 import { TbPlayerSkipBack, TbPlayerSkipForward } from "react-icons/tb"
 import { BiCollapse } from "react-icons/bi"
 import TimestampHandler from "@/components/AudioPlayer/TimestampHandler"
+import { useLazyEffect } from "@/lib/hooks/useLazyEffect"
+import { EpisodeForEditType } from "./EpisodeEdit.types"
 /* import useUnsavedChangesWarning from "@/lib/hooks/useUnsavedChangesWarning"; */
 
-const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
+const EpisodesEditPage = ({
+    episode,
+    nextEpisode,
+    prevEpisode,
+}: {
+    episode: EpisodeForEditType
+    nextEpisode: {
+        id: string
+    } | null
+    prevEpisode: {
+        id: string
+    } | null
+}) => {
     const [collapseAll, setCollapseAll] = React.useState(false)
     const user = useSession().data?.user
     const router = useRouter()
@@ -58,10 +68,9 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
         reset,
         formState: { errors, isSubmitting, isDirty },
     } = useForm<Episode>({
-        defaultValues: defaultEpisodeValues,
+        defaultValues: episode,
         resolver: zodResolver(validateEpisodeEdit),
     })
-    /* useUnsavedChangesWarning(isDirty && !isSubmitting); */
 
     const { mutate, isLoading } = trpcClient.episode.editEpisode.useMutation(
         handleUseMutationAlerts({
@@ -72,18 +81,24 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
         })
     )
 
-    const { data } = trpcClient.episode.getEpisodeForEditPage.useQuery(
-        { id: episode.id },
-        { refetchOnWindowFocus: false }
-    )
+    const { data: fetchedEpisode, isFetchedAfterMount } =
+        trpcClient.episode.getEpisodeForEditPage.useQuery(
+            { id: episode.id },
+            {
+                refetchOnWindowFocus: false,
+                refetchOnMount: false,
+                initialData: episode,
+            }
+        )
 
-    useEffect(() => {
-        if (!data?.fetchedEpisode) return
-        reset(data.fetchedEpisode)
+    useLazyEffect(() => {
+        //Guarantees that the default data is from the getServerside props comp
+        if (!isFetchedAfterMount) return
+        reset(fetchedEpisode)
 
         return () => {}
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data?.fetchedEpisode])
+    }, [fetchedEpisode, isFetchedAfterMount])
 
     const submitFunc = (data: Episode) => {
         mutate(data)
@@ -111,7 +126,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                     onSubmit={handleSubmit(submitFunc)}
                     noValidate
                 >
-                    {/*INFO: Sticky actions bar */}
+                    {/* INFO: Sticky actions bar  */}
                     <Flex
                         borderRadius={"md"}
                         position={"sticky"}
@@ -128,18 +143,18 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                                 outline={"solid 3px"}
                                 hideBelow={"md"}
                                 size={"sm"}
-                                isDisabled={!data?.prevEpisode}
+                                isDisabled={!prevEpisode}
                                 onClick={() =>
                                     router.push(
-                                        `/home/episodes/edit/${data?.prevEpisode?.id}`
+                                        `/home/episodes/edit/${prevEpisode?.id}`
                                     )
                                 }
                                 aria-label="Next Episode"
                                 icon={<TbPlayerSkipBack fontSize={"sm"} />}
                             />
-                            {data?.fetchedEpisode && (
+                            {fetchedEpisode && (
                                 <EpisodeStatusMenu
-                                    episode={data?.fetchedEpisode}
+                                    episode={fetchedEpisode}
                                     isDirty={isDirty}
                                 />
                             )}
@@ -153,8 +168,8 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                                 rightIcon={<DeleteIcon fontSize={"sm"} />}
                                 onClick={(e) => {
                                     e.preventDefault()
-                                    if (!data?.fetchedEpisode) return
-                                    reset(data?.fetchedEpisode)
+                                    if (!fetchedEpisode) return
+                                    reset(fetchedEpisode)
                                 }}
                                 isDisabled={
                                     isSubmitting || isLoading || !isDirty
@@ -165,17 +180,16 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             <Button
                                 as={!isLargerThan800 ? IconButton : undefined}
                                 outline={"solid 3px"}
-                                icon={<MdPublish fontSize={"sm"} />}
+                                icon={<AiTwotoneSave fontSize={"sm"} />}
                                 size={"sm"}
-                                rightIcon={<MdPublish fontSize={"sm"} />}
+                                rightIcon={<AiTwotoneSave fontSize={"sm"} />}
                                 onClick={() => handleSubmit(submitFunc)()}
                                 isDisabled={
                                     isSubmitting || isLoading || !isDirty
                                 }
                             >
                                 {isLargerThan800 &&
-                                    (data?.fetchedEpisode?.status ===
-                                    "published"
+                                    (fetchedEpisode?.status === "published"
                                         ? "Publish Changes"
                                         : "Save")}
                             </Button>
@@ -183,10 +197,10 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                                 outline={"solid 3px"}
                                 hideBelow={"md"}
                                 size={"sm"}
-                                isDisabled={!data?.nextEpisode}
+                                isDisabled={!nextEpisode}
                                 onClick={() =>
                                     router.push(
-                                        `/home/episodes/edit/${data?.nextEpisode?.id}`
+                                        `/home/episodes/edit/${nextEpisode?.id}`
                                     )
                                 }
                                 aria-label="Next Episode"
@@ -194,7 +208,6 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             />
                         </Flex>
                     </Flex>
-
                     {/* INFO: Secondary actions */}
                     <Flex
                         justifyContent={"space-between"}
@@ -216,7 +229,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                             size={"sm"}
                             onClick={() =>
                                 router.push(
-                                    `/podcasts/${data?.fetchedEpisode?.podcast.slug}/${episode.id}`
+                                    `/podcasts/${fetchedEpisode?.podcast.slug}/${episode.id}`
                                 )
                             }
                             rightIcon={<AiOutlineFundView fontSize={"sm"} />}
@@ -293,7 +306,6 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                                 />
                             </Flex>
                         </CollapsableContainer>
-
                         {/* INFO: Audio selector */}
                         <CollapsableContainer
                             collapseAll={collapseAll}
@@ -319,21 +331,24 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                         <TranscriptionEdit
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}
-                            episode={data?.fetchedEpisode}
+                            episode={fetchedEpisode}
                             control={control}
                             errors={errors}
-                            hasAudioFiles={
-                                !!data?.fetchedEpisode.audioFiles.length
-                            }
+                            hasAudioFiles={!!fetchedEpisode.audioFiles.length}
                         />
-                        {/* INFO: Timestamp tool */}
+                        {/* INFO: Timestamp tool  */}
                         <CollapsableContainer
                             collapseAll={collapseAll}
+                            tooltipText={
+                                "Add timestamps using the flag icon at the cursos position. Adjust the time by dragging the timestamp text or arrow. Double clck a timestamp to delete it. Add manually by making a list in the show notes, writing your time in the following format hh:mm and creating a link. Then edit the link with this format #t=YOUR_TIME ex: #t=30:01"
+                            }
                             setCollapseAll={setCollapseAll}
                             title="Timestamp tool"
                         >
                             {/* NOTE: Making sure there are peaks avoids double processing and crashing the server. */}
                             <TimestampHandler
+                                getValues={getValues}
+                                setValue={setValue}
                                 showNotes={showNotes}
                                 episodeId={episode.id}
                             />
@@ -341,12 +356,11 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
                         <ShowNotesEdit
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}
-                            episode={data?.fetchedEpisode}
+                            episode={fetchedEpisode}
                             control={control}
                             errors={errors}
                         />
-
-                        {/* INFO: Episode Image */}
+                        {/* INFO:Episode Image */}
                         <CollapsableContainer
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}
@@ -378,7 +392,7 @@ const EpisodesEditPage = ({ episode }: { episode: Episode }) => {
             <ChatDrawer
                 setValue={setValue}
                 getValues={getValues}
-                episode={data?.fetchedEpisode}
+                episode={fetchedEpisode}
             />
         </Box>
     )

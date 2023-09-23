@@ -88,33 +88,12 @@ export const episodesRouter = createTRPCRouter({
     getEpisodeForEditPage: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input }) => {
-            const episode = await prisma.episode.findFirstOrThrow({
+            return await prisma.episode.findFirstOrThrow({
                 where: { id: input.id },
                 ...episodeForEditArgs,
             })
-            const nextEpisode = await prisma.episode.findFirst({
-                where: {
-                    podcastId: episode.podcastId,
-                    status: "published",
-                    episodeNumber: { gt: episode.episodeNumber },
-                    releaseDate: { lt: new Date() },
-                },
-                orderBy: { episodeNumber: "asc" },
-                select: { id: true },
-            })
-
-            const prevEpisode = await prisma.episode.findFirst({
-                where: {
-                    podcastId: episode.podcastId,
-                    status: "published",
-                    episodeNumber: { lt: episode.episodeNumber },
-                    releaseDate: { lt: new Date() },
-                },
-                orderBy: { episodeNumber: "desc" },
-                select: { id: true },
-            })
-            return { fetchedEpisode: episode, nextEpisode, prevEpisode }
         }),
+
     countEpisodesFromSelectedPodcast: protectedProcedure
         .input(
             z.object({

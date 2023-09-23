@@ -2,7 +2,7 @@ import { validateEpisodeEdit } from "@/components/Validations/EpisodeEdit.valida
 import { validatePodcastEdit } from "@/components/Validations/PodcastEdit.validate"
 import "fast-text-encoding"
 import { createId } from "@paralleldrive/cuid2"
-import { AudioFile, Episode, Podcast, Prisma } from "@prisma/client"
+import { AudioFile, Episode, Podcast } from "@prisma/client"
 import Parser from "rss-parser"
 import slugify from "slugify"
 import { validateAudioFile } from "@/components/Validations/Validate.AudioFile"

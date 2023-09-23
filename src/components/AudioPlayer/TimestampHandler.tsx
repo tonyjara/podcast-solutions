@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {
     Box,
     Flex,
@@ -11,10 +11,7 @@ import {
     Text,
 } from "@chakra-ui/react"
 import WaveSurfer from "wavesurfer.js"
-import WsRegions, {
-    Region,
-    RegionParams,
-} from "wavesurfer.js/dist/plugins/regions"
+import WsRegions, { Region } from "wavesurfer.js/dist/plugins/regions"
 import { trpcClient } from "@/utils/api"
 import { TbPlayerPause, TbPlayerPlay } from "react-icons/tb"
 import {
@@ -26,32 +23,45 @@ import {
 import {
     MdGraphicEq,
     MdOutlineNavigateNext,
-    MdNavigateBefore,
     MdOutlineNavigateBefore,
 } from "react-icons/md"
 import { BsZoomIn, BsZoomOut } from "react-icons/bs"
-import { TimestampNamePopover } from "./TimestampNamePopover"
-import { extractTimestampsFromShowNotes } from "@/lib/utils/timestampUtils"
+import {
+    deleteTimestamp,
+    extractTimestampsFromShowNotes,
+    updateTextTimestamp,
+} from "@/lib/utils/timestampUtils"
 import { useRouter } from "next/router"
-import { parseDurationToSeconds } from "@/lib/utils/durationUtils"
+import {
+    formatSecondsToDuration,
+    parseDurationToSeconds,
+} from "@/lib/utils/durationUtils"
+import { Episode } from "@prisma/client"
+import { UseFormGetValues, UseFormSetValue } from "react-hook-form"
+import { throttle } from "lodash"
+import TimestampNamePopover from "./TimestampNamePopover"
 
 // NOTE: Chrome blocked autoplay before user interacts with the page and there's a running issue on wavesurfer
 export default function TimestampHandler({
     episodeId,
     showNotes,
+    setValue,
+    getValues,
 }: {
     episodeId: string | undefined
     showNotes: string
+    setValue: UseFormSetValue<Episode>
+    getValues: UseFormGetValues<Episode>
 }) {
     //states
     const router = useRouter()
-    const [regions, setRegions] = useState<RegionParams[]>([])
-    const [timeProgress, setTimeProgress] = useState(0)
+    const [progressInSeconds, setProgressInSeconds] = useState(0)
     const [volume, setVolume] = useState(100)
     const [muteVolume, setMuteVolume] = useState(false)
     const [isPlaying, setIsPlaying] = useState(false)
 
     //refs
+    const regionsAreLoaded = useRef(false)
     const wsContainerRef = useRef<HTMLDivElement>(null)
     const regionsRef = useRef<WsRegions | null>(null)
     const ws = useRef<WaveSurfer | null>(null)
@@ -71,23 +81,26 @@ export default function TimestampHandler({
         if (!wsContainerRef.current || !selectedAudio?.peaks.length) return
 
         regionsRef.current = WsRegions.create()
+
         regionsRef.current.on("region-updated", (region: Region) => {
-            const refRegions = regionsRef.current?.getRegions()
-            const updatedRegions = refRegions?.map((r) => {
-                //should update showNotes
-                /* return { */
-                /*     id: r.id, */
-                /*     start: r.start, */
-                /*     content: r.content?.outerText, */
-                /*     color: "#0fa824", */
-                /* } */
+            const notes = getValues("showNotes")
+
+            const updatedNotes = updateTextTimestamp({
+                id: region.id,
+                text: notes,
+                newStart: region.start,
             })
+            setValue("showNotes", updatedNotes)
         })
 
         //remove timestamp when double clicked
-        regionsRef.current.on("region-double-clicked", (region: any) => {
-            region.remove()
-            setRegions((prev) => prev.filter((r) => r.id !== region.id))
+        regionsRef.current.on("region-double-clicked", (region) => {
+            const notes = getValues("showNotes")
+            const notesWithoutTimestamp = deleteTimestamp({
+                timestampStartInSeconds: region.start,
+                showNotes: notes,
+            })
+            setValue("showNotes", notesWithoutTimestamp)
         })
 
         ws.current = WaveSurfer.create({
@@ -108,9 +121,13 @@ export default function TimestampHandler({
         })
 
         //Add timestamps whenever the waveform is first loaded
+        // After that prevent re render with ref
         ws.current.on("redraw", function () {
+            if (regionsAreLoaded.current) return
+            regionsAreLoaded.current = true
             const regionsRefCurrent = regionsRef.current
             if (!regionsRefCurrent) return
+
             const regionsFromShowNotes =
                 extractTimestampsFromShowNotes(showNotes)
             regionsFromShowNotes.forEach((region: any) => {
@@ -118,24 +135,30 @@ export default function TimestampHandler({
             })
         })
 
-        ws.current.on("timeupdate", function (time: number) {
-            setTimeProgress(time)
+        //Set progress bar state
+        ws.current.on("timeupdate", function (curretTimeInSeconds: number) {
+            const updateOncePerSec = throttle(
+                () => setProgressInSeconds(curretTimeInSeconds),
+                1000
+            )
+            /* setProgressInSeconds(curretTimeInSeconds) */
+            updateOncePerSec()
         })
 
+        //Playback ends
         ws.current.on("finish", function () {
             if (!ws.current) return
             ws.current.seekTo(0)
-            setTimeProgress(0)
+            setProgressInSeconds(0)
             setIsPlaying(false)
         })
         return () => {
             ws.current?.destroy()
-            regionsRef.current?.destroy()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedAudio])
+    }, [selectedAudio?.isSelected])
 
-    //Set regions from show notes
+    //Set regions from show notes changes
     useEffect(() => {
         const regionsRefCurrent = regionsRef.current
         if (!regionsRefCurrent) return
@@ -143,22 +166,31 @@ export default function TimestampHandler({
         regionsFromShowNotes.forEach((region: any) => {
             regionsRefCurrent.addRegion(region)
         })
+
         return () => {
             regionsRefCurrent?.clearRegions()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [regionsRef.current, showNotes])
+    }, [showNotes])
 
     //Set time progress from url
     useEffect(() => {
         if (!router.query.t || !ws.current || !selectedAudio) return
-        const time = parseDurationToSeconds(router.query.t)
-        setTimeProgress(parseDurationToSeconds(time))
-        const percentagePlayed = (time * 100) / selectedAudio.duration
+        const timeStampInSeconds = parseDurationToSeconds(router.query.t)
+        setProgressInSeconds(timeStampInSeconds)
+        const percentagePlayed =
+            (timeStampInSeconds * 100) / selectedAudio.duration
         ws.current.seekTo(percentagePlayed / 100)
         return () => {}
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [router.query])
+
+    // Volume slider
+    useEffect(() => {
+        if (!ws.current) return
+        if (muteVolume) return ws.current.setVolume(0)
+        ws.current.setVolume(volume / 100)
+    }, [volume, muteVolume])
 
     //controls
     const togglePlayPause = () => {
@@ -169,14 +201,6 @@ export default function TimestampHandler({
         ws.current?.play()
         return setIsPlaying(true)
     }
-    /* useKeyDownCallback(" ", togglePlayPause) */
-
-    // Volume slider
-    useEffect(() => {
-        if (!ws.current) return
-        if (muteVolume) return ws.current.setVolume(0)
-        ws.current.setVolume(volume / 100)
-    }, [volume, muteVolume])
 
     const handleVolumeSliderIcon = () => {
         if (muteVolume) return IoMdVolumeOff
@@ -187,22 +211,11 @@ export default function TimestampHandler({
 
     // Progress bar
     const handleProgressBarChange = (e: number) => {
-        setTimeProgress(e)
+        setProgressInSeconds(e)
         if (!ws.current || !selectedAudio) return
         const newTime = isFinite(e) ? e : 0
         const percentagePlayed = (newTime * 100) / selectedAudio.duration
         ws.current.seekTo(percentagePlayed / 100)
-    }
-
-    const formatTime = (time: number) => {
-        if (time && !isNaN(time)) {
-            const minutes = Math.floor(time / 60)
-            const formatMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`
-            const seconds = Math.floor(time % 60)
-            const formatSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`
-            return `${formatMinutes}:${formatSeconds}`
-        }
-        return "00:00"
     }
 
     // Zoom buttons
@@ -212,7 +225,7 @@ export default function TimestampHandler({
         ws.current.zoom(newZoom)
         //Center the cursor when zooming
         const percentagePlayed =
-            (timeProgress * 100) / (selectedAudio?.duration ?? 1)
+            (progressInSeconds * 100) / (selectedAudio?.duration ?? 1)
 
         ws.current.seekTo(percentagePlayed / 100)
     }
@@ -225,7 +238,7 @@ export default function TimestampHandler({
         ws.current.zoom(newZoom)
         //Center the cursor when zooming
         const percentagePlayed =
-            (timeProgress * 100) / (selectedAudio?.duration ?? 1)
+            (progressInSeconds * 100) / (selectedAudio?.duration ?? 1)
 
         ws.current.seekTo(percentagePlayed / 100)
     }
@@ -237,10 +250,10 @@ export default function TimestampHandler({
         //Get the next region, offset by 1 second to avoid going to the same region
         const previousRegion = regions
             .toReversed()
-            .find((r) => r.start < timeProgress - 1)
+            .find((r) => r.start < progressInSeconds - 1)
         if (!previousRegion) return
 
-        setTimeProgress(previousRegion.start)
+        setProgressInSeconds(previousRegion.start)
         const percentagePlayed =
             (previousRegion.start * 100) / selectedAudio.duration
         ws.current.seekTo(percentagePlayed / 100)
@@ -251,10 +264,10 @@ export default function TimestampHandler({
         const regions = regionsRef.current?.getRegions()
         if (!regions) return
         //Get the next region, offset by 1 second to avoid going to the same region
-        const nextRegion = regions.find((r) => r.start > timeProgress + 1)
+        const nextRegion = regions.find((r) => r.start > progressInSeconds + 1)
         if (!nextRegion) return
 
-        setTimeProgress(nextRegion.start)
+        setProgressInSeconds(nextRegion.start)
         const percentagePlayed =
             (nextRegion.start * 100) / selectedAudio.duration
         ws.current.seekTo(percentagePlayed / 100)
@@ -268,14 +281,13 @@ export default function TimestampHandler({
 
                 {/* INFO: PROGRESS BAR */}
                 <Flex alignItems={"center"} w="full" gap={"10px"}>
-                    <Text>{formatTime(timeProgress)}</Text>
+                    <Text>{formatSecondsToDuration(progressInSeconds)}</Text>
                     <Slider
-                        /* ref={progressBarRef} */
                         max={Math.floor(selectedAudio.duration)}
                         onChange={handleProgressBarChange}
                         aria-label="Progress bar"
-                        value={timeProgress}
-                        defaultValue={0}
+                        value={progressInSeconds}
+                        /* defaultValue={0} */
                         role="group"
                     >
                         <SliderTrack bg="red.100">
@@ -293,7 +305,9 @@ export default function TimestampHandler({
                             />
                         </SliderThumb>
                     </Slider>
-                    <Text>{formatTime(selectedAudio.duration)}</Text>
+                    <Text>
+                        {formatSecondsToDuration(selectedAudio.duration)}
+                    </Text>
                 </Flex>
                 {/* INFO: CONTROLS */}
                 <Flex
@@ -341,10 +355,9 @@ export default function TimestampHandler({
                     />
 
                     <TimestampNamePopover
-                        regions={regions}
-                        setRegions={setRegions}
-                        regionsRef={regionsRef}
-                        timeProgress={timeProgress}
+                        setValue={setValue}
+                        progressInSeconds={progressInSeconds}
+                        showNotes={showNotes}
                     />
                     {/* INFO: TIMESTAMPS */}
                     <IconButton
@@ -380,9 +393,9 @@ export default function TimestampHandler({
                         justifyContent={"end"}
                         height={"auto"}
                         gap={"15px"}
-                        hideBelow={"lg"}
                     >
                         <Slider
+                            hideBelow={"lg"}
                             maxW="150px"
                             opacity="0"
                             value={volume}

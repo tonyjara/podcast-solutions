@@ -222,10 +222,10 @@ export default function AudioSelectorAudioPlayer({
                     justifyContent={"end"}
                     height={"auto"}
                     gap={"15px"}
-                    hideBelow={"lg"}
                 >
                     <Slider
                         maxW="150px"
+                        hideBelow={"lg"}
                         opacity="0"
                         value={volume}
                         onChange={(e) => setVolume(e)}

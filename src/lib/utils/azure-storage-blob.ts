@@ -54,11 +54,10 @@ const uploadFileToBlob = async ({
     })
     const client = containerClient.getBlobClient(fileName)
     //build a url
-    const cleanUrl = `https://${client.accountName}.blob.core.windows.net/${client.containerName}/${client.name}`
-
-    console.log(cleanUrl)
-
-    return cleanUrl
+    return client.url
+    /* const cleanUrl = `https://${client.accountName}.blob.core.windows.net/${client.containerName}/${client.name}` */
+    /**/
+    /* return cleanUrl */
 }
 
 export default uploadFileToBlob

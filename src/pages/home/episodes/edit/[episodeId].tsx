@@ -1,4 +1,5 @@
 import { manageSubscription } from "@/lib/utils/SubscriptionManagementUtils"
+import { episodeForEditArgs } from "@/pageContainers/Home/Episodes/Edit/EpisodeEdit.types"
 import EpisodesEditPage from "@/pageContainers/Home/Episodes/Edit/EpisodesEditPage"
 import { getServerAuthSession } from "@/server/auth"
 import { prisma } from "@/server/db"
@@ -30,6 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             id: query.episodeId,
             subscriptionId: subscription.id,
         },
+        ...episodeForEditArgs,
     })
 
     if (!episode) {
@@ -37,10 +39,31 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             notFound: true,
         }
     }
+    const nextEpisode = await prisma.episode.findFirst({
+        where: {
+            podcastId: episode.podcastId,
+            status: "published",
+            episodeNumber: { gt: episode.episodeNumber },
+            releaseDate: { lt: new Date() },
+        },
+        orderBy: { episodeNumber: "asc" },
+        select: { id: true },
+    })
+
+    const prevEpisode = await prisma.episode.findFirst({
+        where: {
+            podcastId: episode.podcastId,
+            status: "published",
+            episodeNumber: { lt: episode.episodeNumber },
+            releaseDate: { lt: new Date() },
+        },
+        orderBy: { episodeNumber: "desc" },
+        select: { id: true },
+    })
 
     return (
         subManager ?? {
-            props: { episode },
+            props: { episode, nextEpisode, prevEpisode },
         }
     )
 }

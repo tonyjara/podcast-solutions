@@ -6,9 +6,9 @@ import { Box, useDisclosure } from "@chakra-ui/react"
 import { useSession } from "next-auth/react"
 import DesktopSidebar from "./Desktop/DesktopSidebar"
 import MobileSidebar from "./Mobile/MobileSidebar"
-import useDidMountEffect from "@/lib/hooks/useDidMountEffect"
 import UnauthenticatedMobileSideBar from "./Mobile/UnathenticatedMobileSideBar"
 import TopBar from "./components/TopBar"
+import { useLazyEffect } from "@/lib/hooks/useLazyEffect"
 
 export default function DrawerWithTopBar({
     children,
@@ -29,7 +29,7 @@ export default function DrawerWithTopBar({
         return () => {}
     }, [])
 
-    useDidMountEffect(() => {
+    useLazyEffect(() => {
         localStorage.setItem("sidebarToggle", JSON.stringify(minimized))
         return () => {}
     }, [minimized])
@@ -57,18 +57,6 @@ export default function DrawerWithTopBar({
             <TopBar authenticated={authenticated} onOpen={onOpen} />
 
             <Box
-                //MOBILE
-                display={{ base: "block", md: "none" }}
-                transition="0.2s ease"
-                pt={"65px"}
-            >
-                {children}
-            </Box>
-
-            <Box
-                //DESKTOP
-                display={{ base: "none", md: "block" }}
-                transition="0.2s ease"
                 pt={"65px"}
                 ml={
                     !authenticated
