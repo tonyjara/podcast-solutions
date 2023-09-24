@@ -12,6 +12,7 @@ import toast from "react-hot-toast"
 import { z } from "zod"
 import PodcastImportCard from "../Cards/PodcastImporCard"
 import { Podcast } from "@prisma/client"
+import axios from "axios"
 
 const validateFeedUrl = z.object({
     rssFeedUrl: z.string().url().min(1),
@@ -64,6 +65,14 @@ const RssImportForm = (props: props) => {
         mutate(data)
     }
 
+    const handleTest = async () => {
+        const feedUrl = getValues("rssFeedUrl")
+        const res = await axios.post("/api/parse-rss-feed", {
+            rssFeedUrl: feedUrl,
+        })
+        console.log(res)
+    }
+
     return (
         <>
             {importedFeed && (
@@ -106,6 +115,7 @@ const RssImportForm = (props: props) => {
                         />
 
                         <Flex justifyContent={"space-between"}>
+                            <Button onClick={handleTest}>test in prod</Button>
                             <Button
                                 onClick={props.goBack}
                                 isLoading={isSubmitting || isLoadingFeed}
