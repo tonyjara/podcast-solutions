@@ -65,14 +65,6 @@ const RssImportForm = (props: props) => {
         mutate(data)
     }
 
-    const handleTest = async () => {
-        const feedUrl = getValues("rssFeedUrl")
-        const res = await axios.post("/api/parse-rss-feed", {
-            rssFeedUrl: feedUrl,
-        })
-        console.log(res)
-    }
-
     return (
         <>
             {importedFeed && (
@@ -115,7 +107,6 @@ const RssImportForm = (props: props) => {
                         />
 
                         <Flex justifyContent={"space-between"}>
-                            <Button onClick={handleTest}>test in prod</Button>
                             <Button
                                 onClick={props.goBack}
                                 isLoading={isSubmitting || isLoadingFeed}
