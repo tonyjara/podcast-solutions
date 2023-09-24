@@ -43,7 +43,7 @@ export const seedRouter = createTRPCRouter({
     restartAccount: adminProcedure
         .input(z.object({ connectionString: z.string() }))
         .mutation(async ({ input, ctx }) => {
-            if (!isDevEnv) return
+            /* if (!isDevEnv) return */
             const user = ctx.session.user
 
             const blobService = new BlobServiceClient(input.connectionString)
