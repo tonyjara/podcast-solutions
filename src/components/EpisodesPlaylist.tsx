@@ -14,7 +14,7 @@ import { BsClock } from "react-icons/bs"
 import { useRouter } from "next/router"
 import HtmlParser from "./HtmlParser"
 import { EpisodeWithAudioFiles } from "@/pageContainers/Podcasts/PodcastsPage"
-import { formatDurationSeconds } from "@/lib/utils/durationUtils"
+import { formatSecondsToDuration } from "@/lib/utils/durationUtils"
 
 export interface EpisodesPlaylist {
     loading?: boolean
@@ -40,7 +40,6 @@ const EpisodesPlaylist = ({
 }: EpisodesPlaylist) => {
     const backgroundColor = useColorModeValue("white", "gray.800")
     const hoverColor = useColorModeValue("gray.100", "gray.700")
-    const removeHtmlTags = (x: string) => x.replace(/(<([^>]+)>)/gi, "")
     const router = useRouter()
     return (
         <Flex
@@ -127,7 +126,7 @@ const EpisodesPlaylist = ({
                                             {" "}
                                             <BsClock />{" "}
                                             <Text>
-                                                {formatDurationSeconds(
+                                                {formatSecondsToDuration(
                                                     selectedAudio?.duration ?? 0
                                                 )}
                                             </Text>
@@ -184,7 +183,7 @@ const EpisodesPlaylist = ({
                                         {" "}
                                         <BsClock />{" "}
                                         <Text>
-                                            {formatDurationSeconds(
+                                            {formatSecondsToDuration(
                                                 selectedAudio?.duration ?? 0
                                             )}
                                         </Text>

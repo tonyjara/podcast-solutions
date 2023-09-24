@@ -5,6 +5,8 @@ import {
     addSubscriptionCredits,
     creditsPerPlan,
 } from "./routeUtils/StripeUsageUtils"
+import { BlobServiceClient, ContainerClient } from "@azure/storage-blob"
+import { z } from "zod"
 
 const isDevEnv = process.env.NODE_ENV === "development"
 
@@ -38,90 +40,106 @@ export const seedRouter = createTRPCRouter({
             })
         }
     ),
-    restartAccount: adminProcedure.mutation(async ({ ctx }) => {
-        if (!isDevEnv) return
-        const user = ctx.session.user
-        const subscription = await prisma.subscription.findUniqueOrThrow({
-            where: { userId: user.id },
-            include: {
-                user: {
-                    select: {
-                        preferences: { select: { selectedPodcastId: true } },
+    restartAccount: adminProcedure
+        .input(z.object({ connectionString: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+            /* if (!isDevEnv) return */
+            const user = ctx.session.user
+
+            const blobService = new BlobServiceClient(input.connectionString)
+            const containerClient: ContainerClient =
+                blobService.getContainerClient(user.id)
+            containerClient.deleteIfExists()
+
+            const subscription = await prisma.subscription.findUniqueOrThrow({
+                where: { userId: user.id },
+                include: {
+                    user: {
+                        select: {
+                            preferences: {
+                                select: { selectedPodcastId: true },
+                            },
+                        },
                     },
                 },
-            },
-        })
-        await prisma.preferences.deleteMany({
-            where: { userId: user.id },
-        })
-
-        await prisma.audioFile.deleteMany({
-            where: { subscriptionId: subscription.id },
-        })
-
-        await prisma.directories.deleteMany({
-            where: {
-                podcastId: subscription.user.preferences?.selectedPodcastId,
-            },
-        })
-        await prisma.episode.deleteMany({
-            where: { subscriptionId: subscription.id },
-        })
-        await prisma.podcast.deleteMany({
-            where: { subscriptionId: subscription.id },
-        })
-        await prisma.subscriptionCreditsActions.deleteMany({
-            where: { subscriptionId: subscription.id },
-        })
-        await prisma.subscription.update({
-            where: { userId: user.id },
-            data: {
-                isFreeTrial: true,
-                cancellAt: addMonths(new Date(), 1),
-            },
-        })
-
-        const credits = creditsPerPlan("TRIAL")
-        //INPUT
-        const lastInputAction =
-            await prisma.subscriptionCreditsActions.findFirst({
-                where: { subscriptionId: subscription.id, tag: "CHAT_INPUT" },
-                orderBy: { id: "desc" },
             })
-        await addSubscriptionCredits({
-            tag: "CHAT_INPUT",
-            lastAction: lastInputAction,
-            amount: credits.chatInput,
-            subscriptionId: subscription.id,
-        })
-
-        //OUTPUT
-        const lastOutputAction =
-            await prisma.subscriptionCreditsActions.findFirst({
-                where: { subscriptionId: subscription.id, tag: "CHAT_OUTPUT" },
-                orderBy: { id: "desc" },
+            await prisma.preferences.deleteMany({
+                where: { userId: user.id },
             })
-        await addSubscriptionCredits({
-            tag: "CHAT_OUTPUT",
-            lastAction: lastOutputAction,
-            amount: credits.chatOutput,
-            subscriptionId: subscription.id,
-        })
 
-        //TRANSCRIPTION
-        const lastTranscriptionAction =
-            await prisma.subscriptionCreditsActions.findFirst({
+            await prisma.audioFile.deleteMany({
+                where: { subscriptionId: subscription.id },
+            })
+
+            await prisma.directories.deleteMany({
                 where: {
-                    subscriptionId: subscription.id,
-                    tag: "TRANSCRIPTION_MINUTE",
+                    podcastId: subscription.user.preferences?.selectedPodcastId,
                 },
-                orderBy: { id: "desc" },
             })
-        await addSubscriptionCredits({
-            tag: "TRANSCRIPTION_MINUTE",
-            lastAction: lastTranscriptionAction,
-            amount: credits.transcription,
-            subscriptionId: subscription.id,
-        })
-    }),
+            await prisma.episode.deleteMany({
+                where: { subscriptionId: subscription.id },
+            })
+            await prisma.podcast.deleteMany({
+                where: { subscriptionId: subscription.id },
+            })
+            await prisma.subscriptionCreditsActions.deleteMany({
+                where: { subscriptionId: subscription.id },
+            })
+            await prisma.subscription.update({
+                where: { userId: user.id },
+                data: {
+                    isFreeTrial: true,
+                    cancellAt: addMonths(new Date(), 1),
+                },
+            })
+
+            const credits = creditsPerPlan("TRIAL")
+            //INPUT
+            const lastInputAction =
+                await prisma.subscriptionCreditsActions.findFirst({
+                    where: {
+                        subscriptionId: subscription.id,
+                        tag: "CHAT_INPUT",
+                    },
+                    orderBy: { id: "desc" },
+                })
+            await addSubscriptionCredits({
+                tag: "CHAT_INPUT",
+                lastAction: lastInputAction,
+                amount: credits.chatInput,
+                subscriptionId: subscription.id,
+            })
+
+            //OUTPUT
+            const lastOutputAction =
+                await prisma.subscriptionCreditsActions.findFirst({
+                    where: {
+                        subscriptionId: subscription.id,
+                        tag: "CHAT_OUTPUT",
+                    },
+                    orderBy: { id: "desc" },
+                })
+            await addSubscriptionCredits({
+                tag: "CHAT_OUTPUT",
+                lastAction: lastOutputAction,
+                amount: credits.chatOutput,
+                subscriptionId: subscription.id,
+            })
+
+            //TRANSCRIPTION
+            const lastTranscriptionAction =
+                await prisma.subscriptionCreditsActions.findFirst({
+                    where: {
+                        subscriptionId: subscription.id,
+                        tag: "TRANSCRIPTION_MINUTE",
+                    },
+                    orderBy: { id: "desc" },
+                })
+            await addSubscriptionCredits({
+                tag: "TRANSCRIPTION_MINUTE",
+                lastAction: lastTranscriptionAction,
+                amount: credits.transcription,
+                subscriptionId: subscription.id,
+            })
+        }),
 })

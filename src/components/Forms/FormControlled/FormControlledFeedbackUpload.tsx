@@ -14,9 +14,9 @@ import { useDropzone } from "react-dropzone"
 import type { Control, FieldValues, Path, SetFieldValue } from "react-hook-form"
 import { useWatch } from "react-hook-form"
 import axios from "axios"
-import uploadFileToBlob from "@/lib/utils/azure-storage-blob"
 import { myToast } from "@/components/Toasts & Alerts/MyToast"
 import { compressFeedbackImage } from "@/lib/utils/ImageCompressor"
+import { uploadFileToBlobStorage } from "@/lib/utils/azure-storage-blob"
 interface InputProps<T extends FieldValues> {
     control: Control<T>
     errors: any
@@ -70,7 +70,7 @@ const FormControlledFeedbackUpload = <T extends FieldValues>(
             const req = await axios("/api/get-connection-string")
             const { connectionString } = req.data
 
-            const url = await uploadFileToBlob({
+            const url = await uploadFileToBlobStorage({
                 fileName,
                 file: compressed,
                 containerName: userId,

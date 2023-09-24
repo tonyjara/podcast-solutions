@@ -227,3 +227,21 @@ button svg {
         background-position: 0 0;
     }
 }
+
+/* Wavesurfer */
+
+.ws-timestamp-tool ::part(marker) {
+    white-space: nowrap;
+}
+
+.ws-timestamp-tool ::part(marker)::before {
+    /* make a triangle shape */
+    border-top: 7px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 7px solid #f50;
+    content: "";
+    display: inline-block;
+    height: 0;
+    width: 0;
+    margin-right: 0.5rem;
+}

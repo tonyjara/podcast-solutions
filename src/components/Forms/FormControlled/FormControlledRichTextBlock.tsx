@@ -10,7 +10,7 @@ import type { Control, FieldValues, Path } from "react-hook-form"
 import { Controller } from "react-hook-form"
 const QuillNoSSRWrapper = dynamic(import("react-quill"), {
     ssr: false,
-    /* loading: () => <p>Loading ...</p>, */
+    loading: () => <p>Loading ...</p>,
 })
 
 interface InputProps<T extends FieldValues> {

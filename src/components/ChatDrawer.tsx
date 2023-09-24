@@ -76,6 +76,7 @@ const ChatDrawer = ({
                 borderRightRadius={"none"}
                 position={"fixed"}
                 right={"0"}
+                zIndex={"10"}
                 bottom={"100"}
                 onClick={onToggle}
                 backgroundColor={"orange.400"}

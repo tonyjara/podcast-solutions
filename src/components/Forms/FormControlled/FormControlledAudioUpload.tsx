@@ -11,27 +11,29 @@ import {
     Flex,
     Progress,
     Spinner,
-} from "@chakra-ui/react";
-import React, { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
-import type { Path, UseFormGetValues, UseFormSetValue } from "react-hook-form";
-import { AiOutlineCloudUpload } from "react-icons/ai";
-import uploadFileToBlob from "@/lib/utils/azure-storage-blob";
-import axios from "axios";
-import { myToast } from "@/components/Toasts & Alerts/MyToast";
-import slugify from "slugify";
-import { AudioFile } from "@prisma/client";
+} from "@chakra-ui/react"
+import React, { useCallback, useState } from "react"
+import { useDropzone } from "react-dropzone"
+import type { Path, UseFormGetValues, UseFormSetValue } from "react-hook-form"
+import { AiOutlineCloudUpload } from "react-icons/ai"
+import axios from "axios"
+import { myToast } from "@/components/Toasts & Alerts/MyToast"
+import slugify from "slugify"
+import { AudioFile } from "@prisma/client"
+import extractPeaks from "webaudio-peaks"
+import { uploadFileToBlobStorage } from "@/lib/utils/azure-storage-blob"
+
 interface InputProps {
-    errors: any;
-    fieldName: Path<AudioFile>;
-    label: string;
-    hidden?: boolean;
-    setValue: UseFormSetValue<AudioFile>;
-    getValues: UseFormGetValues<any>;
-    helperText?: string;
-    userId: string;
-    episodeId: string;
-    uploadCallback: () => void;
+    errors: any
+    fieldName: Path<AudioFile>
+    label: string
+    hidden?: boolean
+    setValue: UseFormSetValue<AudioFile>
+    getValues: UseFormGetValues<any>
+    helperText?: string
+    userId: string
+    episodeId: string
+    uploadCallback: () => void
 }
 
 const FormControlledAudioUpload = (props: InputProps) => {
@@ -46,83 +48,83 @@ const FormControlledAudioUpload = (props: InputProps) => {
         getValues,
         uploadCallback,
         episodeId,
-    } = props;
-    const [uploading, setUploading] = useState(false);
-    const [progress, setProgress] = useState(0);
+    } = props
+    const [uploading, setUploading] = useState(false)
+    const [progress, setProgress] = useState(0)
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
-        handleAudioUpload(acceptedFiles);
+        handleAudioUpload(acceptedFiles)
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [])
 
     const handleAudioUpload = async (files: File[]) => {
         try {
-            if (!files[0]) return;
-            setUploading(true);
+            if (!files[0]) return
+            setUploading(true)
 
-            const audioName = getValues("name");
-            const fileExtension = files[0].name.split(".").pop();
-            const audioNameSlug = `${slugify(`${episodeId}-${audioName}-audio-file`, {
-                lower: true,
-            })}.${fileExtension}`;
-            setValue("blobName", audioNameSlug);
+            const audioName = getValues("name")
+            const fileExtension = files[0].name.split(".").pop()
+            const audioNameSlug = `${slugify(
+                `${episodeId}-${audioName}-audio-file`,
+                {
+                    lower: true,
+                }
+            )}.${fileExtension}`
+            setValue("blobName", audioNameSlug)
 
-            const getFile: File = files[0];
+            const getFile: File = files[0]
             const file = new File([getFile], audioNameSlug, {
                 type: getFile.type,
                 lastModified: getFile.lastModified,
-            });
+            })
 
-            const reader = new FileReader();
-            // When the file has been succesfully read
-            reader.onload = function(event) {
-                if (!event.target) return;
-                // Create an instance of AudioContext
-                let audioContext = new window.AudioContext();
+            try {
+                let audioContext = new window.AudioContext()
+                const arrayBuffer = await file.arrayBuffer()
+                const audioBuffer =
+                    await audioContext.decodeAudioData(arrayBuffer)
+                const peakData = extractPeaks(audioBuffer, 10000, true)
+                const peaks = Object.values(peakData.data[0] ?? []).map(
+                    (x) => x
+                )
+                let duration = audioBuffer.duration
+                setValue("duration", Math.floor(duration))
+                setValue("peaks", peaks)
+            } catch (e: any) {
+                console.error(e)
+            }
 
-                // Asynchronously decode audio file data contained in an ArrayBuffer.
-                audioContext.decodeAudioData(
-                    event.target.result as ArrayBuffer,
-                    function(buffer) {
-                        let duration = buffer.duration;
-                        setValue("duration", Math.floor(duration));
-                    },
-                );
-            };
-            reader.readAsArrayBuffer(file);
-
-            const req = await axios("/api/get-connection-string");
-            const { connectionString } = req.data;
+            const req = await axios("/api/get-connection-string")
+            const { connectionString } = req.data
             const handleProgress = (progress: number) => {
-                setProgress((progress / file.size) * 100);
-            };
-
-            const url = await uploadFileToBlob({
+                setProgress((progress / file.size) * 100)
+            }
+            const url = await uploadFileToBlobStorage({
                 file,
                 containerName: userId,
                 fileName: file.name,
                 connectionString,
                 onProgress: handleProgress,
-            });
+            })
             if (!url) {
                 throw new Error(
-                    "Something went wrong uploading your file, please try again.",
-                );
+                    "Something went wrong uploading your file, please try again."
+                )
             }
 
-            setValue("url", url);
-            setValue("length", file.size);
-            setValue("type", file.type);
-            setUploading(false);
-            setProgress(0);
-            uploadCallback();
+            setValue("url", url)
+            setValue("length", file.size)
+            setValue("type", file.type)
+            setUploading(false)
+            setProgress(0)
+            uploadCallback()
         } catch (err) {
-            myToast.error();
-            console.error(err);
-            setUploading(false);
+            myToast.error()
+            console.error(err)
+            setUploading(false)
         }
-    };
+    }
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -131,17 +133,17 @@ const FormControlledAudioUpload = (props: InputProps) => {
         accept: {
             "audio/mpeg": [".mp3"],
         },
-    });
-    const activeBg = useColorModeValue("gray.100", "gray.600");
+    })
+    const activeBg = useColorModeValue("gray.100", "gray.600")
 
-    const splitName = fieldName.split(".");
+    const splitName = fieldName.split(".")
     const reduceErrors = splitName.reduce((acc: any, curr: any) => {
-        if (!acc[curr]) return acc;
+        if (!acc[curr]) return acc
         if (isNaN(curr)) {
-            return acc[curr];
+            return acc[curr]
         }
-        return acc[parseInt(curr)];
-    }, errors);
+        return acc[parseInt(curr)]
+    }, errors)
 
     return (
         <FormControl hidden={hidden} isInvalid={!!errors[fieldName]}>
@@ -168,7 +170,9 @@ const FormControlledAudioUpload = (props: InputProps) => {
                 >
                     <Flex color={"gray.400"}>
                         {!uploading && "Drag and drop or click to upload"}
-                        {uploading && <span>Uploading, one moment please.</span>}
+                        {uploading && (
+                            <span>Uploading, one moment please.</span>
+                        )}
                         {uploading && <Spinner ml={"10px"} />}
                     </Flex>
                     {!uploading && (
@@ -182,7 +186,12 @@ const FormControlledAudioUpload = (props: InputProps) => {
                 </VStack>
             </HStack>
             {uploading && (
-                <Progress value={progress} width={"100%"} size={"lg"} mt={"10px"} />
+                <Progress
+                    value={progress}
+                    width={"100%"}
+                    size={"lg"}
+                    mt={"10px"}
+                />
             )}
 
             {!reduceErrors.message ? (
@@ -191,7 +200,7 @@ const FormControlledAudioUpload = (props: InputProps) => {
                 <FormErrorMessage>{reduceErrors.message}</FormErrorMessage>
             )}
         </FormControl>
-    );
-};
+    )
+}
 
-export default FormControlledAudioUpload;
+export default FormControlledAudioUpload

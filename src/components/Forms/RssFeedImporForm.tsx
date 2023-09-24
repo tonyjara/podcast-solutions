@@ -12,6 +12,7 @@ import toast from "react-hot-toast"
 import { z } from "zod"
 import PodcastImportCard from "../Cards/PodcastImporCard"
 import { Podcast } from "@prisma/client"
+import axios from "axios"
 
 const validateFeedUrl = z.object({
     rssFeedUrl: z.string().url().min(1),
@@ -74,7 +75,7 @@ const RssImportForm = (props: props) => {
                         <Button
                             onClick={() => setImportedFeed(null)}
                             isLoading={isSubmitting || isImportingFeed}
-                            size="lg"
+                            size="sm"
                             alignSelf={"flex-end"}
                         >
                             Prev
@@ -85,7 +86,7 @@ const RssImportForm = (props: props) => {
                                 importFeed({ rssFeedUrl })
                             }}
                             isLoading={isSubmitting || isImportingFeed}
-                            size="lg"
+                            size="sm"
                             alignSelf={"flex-end"}
                         >
                             Yes, import it
@@ -109,7 +110,7 @@ const RssImportForm = (props: props) => {
                             <Button
                                 onClick={props.goBack}
                                 isLoading={isSubmitting || isLoadingFeed}
-                                size="lg"
+                                size="sm"
                                 alignSelf={"flex-end"}
                             >
                                 Prev
@@ -117,7 +118,7 @@ const RssImportForm = (props: props) => {
                             <Button
                                 type="submit"
                                 isLoading={isSubmitting || isLoadingFeed}
-                                size="lg"
+                                size="sm"
                                 alignSelf={"flex-end"}
                             >
                                 Next

@@ -9,8 +9,9 @@ import {
     ModalOverlay,
 } from "@chakra-ui/react"
 import React from "react"
-import dynamic from "next/dynamic"
-const JsonView = dynamic(() => import("react-json-view"), { ssr: false })
+import JsonView from "react18-json-view"
+import "react18-json-view/src/style.css"
+import "react18-json-view/src/dark.css"
 
 interface props {
     x: any
@@ -28,8 +29,8 @@ export function RowOptionsJsonView({ x }: props) {
                 <ModalContent>
                     <ModalHeader>{x?.id ?? ""}</ModalHeader>
                     <ModalCloseButton />
-                    <ModalBody minW={"xl"}>
-                        <JsonView src={x} theme="monokai" />
+                    <ModalBody background={"gray.50"} minW={"xl"}>
+                        <JsonView src={x} />
                     </ModalBody>
                 </ModalContent>
             </Modal>

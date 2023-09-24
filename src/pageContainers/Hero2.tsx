@@ -5,15 +5,18 @@ import {
     useColorModeValue,
     Icon,
     chakra,
-} from "@chakra-ui/react";
-import Link from "next/link";
+} from "@chakra-ui/react"
+import Link from "next/link"
 
 const HeroPage2 = () => {
-    const bg = useColorModeValue("white", "gray.800");
-    const mobilePic = "/assets/hero/hero-mobile2.jpeg";
-    const desktopPic = "/assets/hero/hero-desktop2.jpeg";
+    const bg = useColorModeValue("white", "gray.800")
+    const mobilePic = "/assets/hero/hero-mobile2.jpeg"
+    const desktopPic = "/assets/hero/hero-desktop2.jpeg"
     return (
-        <Box minH={"81vh"}>
+        <Box
+        /* minH={"81vh"} */
+        /* height="100%" */
+        >
             <Box
                 pos="relative"
                 overflow="hidden"
@@ -90,7 +93,7 @@ const HeroPage2 = () => {
                             >
                                 <chakra.h1
                                     fontSize={{
-                                        base: "4xl",
+                                        base: "5xl",
                                         sm: "5xl",
                                         md: "6xl",
                                         xl: "7xl",
@@ -121,12 +124,12 @@ const HeroPage2 = () => {
                                             color: "brand.400",
                                         }}
                                     >
-                                        made easy
+                                        simplified{" "}
                                     </chakra.span>
                                 </chakra.h1>
                                 <chakra.p
                                     mt={{
-                                        base: 3,
+                                        base: 8,
                                         sm: 5,
                                         md: 5,
                                     }}
@@ -142,14 +145,15 @@ const HeroPage2 = () => {
                                         lg: 0,
                                     }}
                                     fontWeight="medium"
-                                /* color="gray.500" */
+                                    /* color="gray.500" */
                                 >
-                                    Host your podcast, manage your episodes, schedule uploads,
-                                    transcribe your audio, generate AI content and more.{" "}
+                                    Host your podcast, manage your episodes,
+                                    schedule uploads, transcribe your audio,
+                                    generate AI content and more.{" "}
                                 </chakra.p>
                                 <Box
                                     mt={{
-                                        base: 5,
+                                        base: 8,
                                         sm: 8,
                                     }}
                                     display={{
@@ -160,7 +164,7 @@ const HeroPage2 = () => {
                                         lg: "start",
                                     }}
                                     fontWeight="extrabold"
-                                /* fontFamily="fantasy" */
+                                    /* fontFamily="fantasy" */
                                 >
                                     <Box rounded="full" shadow="md">
                                         <chakra.a
@@ -253,6 +257,6 @@ const HeroPage2 = () => {
                 </Box>
             </Box>
         </Box>
-    );
-};
-export default HeroPage2;
+    )
+}
+export default HeroPage2

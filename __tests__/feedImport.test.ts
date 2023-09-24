@@ -46,8 +46,8 @@ describe("test podcast feed parsing", () => {
             expect(episodes.length).toEqual(feed.items.length - 1)
             expect(audioFiles.length).toEqual(feed.items.length - 1)
 
-            console.log(episodes?.at(-1)?.episodeNumber)
-            console.log(episodes?.at(-1)?.title)
+            console.info(episodes?.at(-1)?.episodeNumber)
+            console.info(episodes?.at(-1)?.title)
             //Check for correct episode number parsing
             expect(episodes?.at(-1)?.episodeNumber).toBe(feed.items.length)
         }

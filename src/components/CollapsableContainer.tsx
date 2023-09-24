@@ -7,12 +7,9 @@ import {
     Text,
     Tooltip,
 } from "@chakra-ui/react"
-import React from "react"
+import React, { useEffect } from "react"
+import { BiCollapseVertical } from "react-icons/bi"
 import { FiHelpCircle } from "react-icons/fi"
-import {
-    TbLayoutBottombarCollapse,
-    TbLayoutNavbarCollapse,
-} from "react-icons/tb"
 
 const CollapsableContainer = ({
     children,
@@ -22,6 +19,8 @@ const CollapsableContainer = ({
     subTitle,
     tooltipText,
     startCollapsed,
+    collapseAll,
+    setCollapseAll,
 }: {
     children: React.ReactNode
     title: string
@@ -30,36 +29,50 @@ const CollapsableContainer = ({
     subTitle?: string
     tooltipText?: string
     startCollapsed?: boolean
+    collapseAll?: boolean
+    setCollapseAll?: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
     const [show, setShow] = React.useState(startCollapsed ? false : true)
 
-    const handleToggle = () => setShow(!show)
+    const handleToggle = () => {
+        setShow(!show)
+        if (collapseAll && setCollapseAll) setCollapseAll(false)
+    }
+    useEffect(() => {
+        if (!collapseAll || !show || !setCollapseAll) return
+        setShow(false)
+        setCollapseAll(false)
+        return () => {}
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [collapseAll, show])
 
     return (
         <Box style={style} w={"100%"}>
             <Flex
-                my={"10px"}
+                py={"10px"}
                 justifyContent={"space-between"}
                 alignItems={"center"}
                 gap={5}
+                w={"100%"}
             >
                 <Flex gap={"10px"} alignItems={"center"}>
                     <IconButton
+                        variant={show ? "solid" : "outline"}
                         size={"sm"}
                         aria-label="Minimize container"
-                        icon={
-                            show ? (
-                                <TbLayoutNavbarCollapse />
-                            ) : (
-                                <TbLayoutBottombarCollapse />
-                            )
-                        }
+                        icon={<BiCollapseVertical />}
                         onClick={handleToggle}
                     />
-                    <Heading fontSize={"xl"}>{title}</Heading>
+                    <Heading whiteSpace="nowrap" fontSize={"xl"}>
+                        {title}
+                    </Heading>
                     {tooltipText && (
                         <Tooltip label={tooltipText}>
-                            <IconButton size={"sm"} aria-label="help popover">
+                            <IconButton
+                                variant={"ghost"}
+                                size={"sm"}
+                                aria-label="help popover"
+                            >
                                 <FiHelpCircle />
                             </IconButton>
                         </Tooltip>
@@ -68,7 +81,7 @@ const CollapsableContainer = ({
                 {titleComponents}
             </Flex>
             {subTitle && (
-                <Text mb="10px" mt="-10px" color={"gray.500"}>
+                <Text pb="10px" mt="-10px" color={"gray.500"}>
                     {subTitle}
                 </Text>
             )}
