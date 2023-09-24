@@ -7,7 +7,7 @@ import {
     myToast,
 } from "@/components/Toasts & Alerts/MyToast"
 import { trpcClient } from "@/utils/api"
-import { Button, Flex } from "@chakra-ui/react"
+import { Button, Flex, IconButton } from "@chakra-ui/react"
 import { Episode } from "@prisma/client"
 import React, { useState } from "react"
 import { Control, useWatch } from "react-hook-form"
@@ -71,9 +71,32 @@ const ShowNotesEdit = ({
                             </Button>
                         </Flex>
                         <AreYouSureButton
-                            rightIcon={<SiOpenai fontSize={"sm"} />}
+                            customButton={
+                                <>
+                                    <IconButton
+                                        aria-label="Generate"
+                                        icon={<SiOpenai fontSize={"sm"} />}
+                                        isDisabled={
+                                            isLoading || !transcription.length
+                                        }
+                                        hideFrom={"md"}
+                                    />
+
+                                    <Button
+                                        isDisabled={
+                                            isLoading || !transcription.length
+                                        }
+                                        hideBelow={"md"}
+                                        rightIcon={<SiOpenai fontSize={"sm"} />}
+                                        size={"sm"}
+                                        w="max-content"
+                                    >
+                                        Generate
+                                    </Button>
+                                </>
+                            }
                             isDisabled={isLoading || !transcription.length}
-                            buttonText="Generate"
+                            /* buttonText="Generate" */
                             confirmAction={() => {
                                 if (!episode || !episode.transcription.length) {
                                     return myToast.error(

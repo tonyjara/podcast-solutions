@@ -53,6 +53,7 @@ const AreYouSureButton = ({
                     isDisabled={isDisabled}
                     onClick={onOpen}
                     size={"sm"}
+                    w="max-content"
                 >
                     {buttonText}
                 </Button>
@@ -80,12 +81,19 @@ const AreYouSureButton = ({
                         display={"flex"}
                         justifyContent={"space-between"}
                     >
-                        <Button onClick={onClose}>Cancel</Button>
+                        <Button
+                            size={"sm"}
+                            variant={"outline"}
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </Button>
                         <Button
                             isDisabled={isDisabled}
                             onClick={handleConfirmAction}
-                            colorScheme="blue"
                             mr={3}
+                            size={"sm"}
+                            w="max-content"
                         >
                             {confirmButtonText ?? "Confirm"}
                         </Button>

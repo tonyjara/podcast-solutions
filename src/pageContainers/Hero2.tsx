@@ -14,8 +14,8 @@ const HeroPage2 = () => {
     const desktopPic = "/assets/hero/hero-desktop2.jpeg"
     return (
         <Box
-            /* minH={"81vh"} */
-            /* height="100%" */
+        /* minH={"81vh"} */
+        /* height="100%" */
         >
             <Box
                 pos="relative"
@@ -93,7 +93,7 @@ const HeroPage2 = () => {
                             >
                                 <chakra.h1
                                     fontSize={{
-                                        base: "4xl",
+                                        base: "5xl",
                                         sm: "5xl",
                                         md: "6xl",
                                         xl: "7xl",
@@ -124,12 +124,12 @@ const HeroPage2 = () => {
                                             color: "brand.400",
                                         }}
                                     >
-                                        made easy
+                                        simplified{" "}
                                     </chakra.span>
                                 </chakra.h1>
                                 <chakra.p
                                     mt={{
-                                        base: 3,
+                                        base: 8,
                                         sm: 5,
                                         md: 5,
                                     }}
@@ -153,7 +153,7 @@ const HeroPage2 = () => {
                                 </chakra.p>
                                 <Box
                                     mt={{
-                                        base: 5,
+                                        base: 8,
                                         sm: 8,
                                     }}
                                     display={{

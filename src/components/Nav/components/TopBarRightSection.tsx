@@ -20,6 +20,7 @@ import React from "react"
 import { signOut } from "next-auth/react"
 import { BiLogOutCircle } from "react-icons/bi"
 import { MdOutlineFeedback } from "react-icons/md"
+import { HiOutlineIdentification } from "react-icons/hi"
 import SupportTicketModal from "@/components/SupportTicketModal"
 
 const TopBarRightSection = () => {
@@ -73,6 +74,14 @@ const TopBarRightSection = () => {
                         </MenuButton>
                         <Portal>
                             <MenuList zIndex={"11"}>
+                                {user.role === "admin" && (
+                                    <MenuItem
+                                        pointerEvents={"none"}
+                                        icon={<HiOutlineIdentification />}
+                                    >
+                                        {user.id}
+                                    </MenuItem>
+                                )}
                                 <MenuItem
                                     pointerEvents={"none"}
                                     icon={<RxAvatar />}

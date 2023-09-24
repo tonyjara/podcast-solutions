@@ -4,7 +4,6 @@ import { getServerAuthSession } from "@/server/auth"
 import { type GetServerSideProps } from "next"
 import React from "react"
 import Stripe from "stripe"
-import { Box, Flex } from "@chakra-ui/react"
 
 export interface PricingPageProps {
     products: Stripe.ApiList<Stripe.Product>
@@ -13,10 +12,10 @@ export interface PricingPageProps {
 
 const Index = () => {
     return (
-        <Flex flexDir="column" height="100%" justifyContent="space-between">
+        <>
             <HeroPage2 />
             <Footer />
-        </Flex>
+        </>
     )
 }
 

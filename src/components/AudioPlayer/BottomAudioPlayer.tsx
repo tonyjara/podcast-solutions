@@ -84,7 +84,6 @@ export default function BottomAudioPlayer({
         if (nextEpisodeId) {
             return router.push(`/podcasts/${podcastSlug}/${nextEpisodeId}`)
         }
-        /* audioRef.current.currentTime = 0 */
     }
 
     useEffect(() => {

@@ -74,7 +74,7 @@ const RssImportForm = (props: props) => {
                         <Button
                             onClick={() => setImportedFeed(null)}
                             isLoading={isSubmitting || isImportingFeed}
-                            size="lg"
+                            size="sm"
                             alignSelf={"flex-end"}
                         >
                             Prev
@@ -85,7 +85,7 @@ const RssImportForm = (props: props) => {
                                 importFeed({ rssFeedUrl })
                             }}
                             isLoading={isSubmitting || isImportingFeed}
-                            size="lg"
+                            size="sm"
                             alignSelf={"flex-end"}
                         >
                             Yes, import it
@@ -109,7 +109,7 @@ const RssImportForm = (props: props) => {
                             <Button
                                 onClick={props.goBack}
                                 isLoading={isSubmitting || isLoadingFeed}
-                                size="lg"
+                                size="sm"
                                 alignSelf={"flex-end"}
                             >
                                 Prev
@@ -117,7 +117,7 @@ const RssImportForm = (props: props) => {
                             <Button
                                 type="submit"
                                 isLoading={isSubmitting || isLoadingFeed}
-                                size="lg"
+                                size="sm"
                                 alignSelf={"flex-end"}
                             >
                                 Next

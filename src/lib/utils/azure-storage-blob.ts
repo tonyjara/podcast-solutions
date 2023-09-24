@@ -7,7 +7,7 @@ import { BlobServiceClient } from "@azure/storage-blob"
 // ExposedHeaders: [],
 // MaxAgeInSeconds: 60
 
-const uploadFileToBlob = async ({
+export const uploadFileToBlobStorage = async ({
     file,
     containerName,
     fileName,
@@ -55,9 +55,8 @@ const uploadFileToBlob = async ({
     const client = containerClient.getBlobClient(fileName)
     //build a url
     return client.url
+    //This below did not work, it messed up the usability of th url
     /* const cleanUrl = `https://${client.accountName}.blob.core.windows.net/${client.containerName}/${client.name}` */
     /**/
     /* return cleanUrl */
 }
-
-export default uploadFileToBlob

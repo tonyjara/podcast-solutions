@@ -21,9 +21,9 @@ import {
     IoMdVolumeOff,
 } from "react-icons/io"
 import {
-    MdGraphicEq,
     MdOutlineNavigateNext,
     MdOutlineNavigateBefore,
+    MdGraphicEq,
 } from "react-icons/md"
 import { BsZoomIn, BsZoomOut } from "react-icons/bs"
 import {
@@ -38,8 +38,8 @@ import {
 } from "@/lib/utils/durationUtils"
 import { Episode } from "@prisma/client"
 import { UseFormGetValues, UseFormSetValue } from "react-hook-form"
-import { throttle } from "lodash"
-import TimestampNamePopover from "./TimestampNamePopover"
+import SimpleAudioPlayer from "./SimpleAudioPlayer"
+import AddTimestampModal from "./AddTimestampModal"
 
 // NOTE: Chrome blocked autoplay before user interacts with the page and there's a running issue on wavesurfer
 export default function TimestampHandler({
@@ -59,8 +59,10 @@ export default function TimestampHandler({
     const [volume, setVolume] = useState(100)
     const [muteVolume, setMuteVolume] = useState(false)
     const [isPlaying, setIsPlaying] = useState(false)
+    const [hadCorsError, setHadCorsError] = useState(false)
 
     //refs
+    const audioRef = useRef<HTMLAudioElement>(null)
     const regionsAreLoaded = useRef(false)
     const wsContainerRef = useRef<HTMLDivElement>(null)
     const regionsRef = useRef<WsRegions | null>(null)
@@ -78,7 +80,7 @@ export default function TimestampHandler({
     //Effects
     //WaveSurfer and regions ref
     useEffect(() => {
-        if (!wsContainerRef.current || !selectedAudio?.peaks.length) return
+        if (!wsContainerRef.current || !selectedAudio) return
 
         regionsRef.current = WsRegions.create()
 
@@ -106,7 +108,7 @@ export default function TimestampHandler({
         ws.current = WaveSurfer.create({
             container: wsContainerRef.current,
             dragToSeek: true,
-            url: selectedAudio.url,
+            /* url: selectedAudio.url, */
             barWidth: 3,
             autoplay: false,
             cursorWidth: 5,
@@ -114,11 +116,22 @@ export default function TimestampHandler({
             /* waveColor: "#orange", */
             height: 300,
             hideScrollbar: true,
-            peaks: selectedAudio.peaks.length
-                ? (selectedAudio.peaks as any)
-                : undefined,
             plugins: [regionsRef.current],
         })
+        //Loading manually because of CORS, this allows us to manage errors. If CORS fails, we use the regular player
+        ws.current
+            .load(
+                selectedAudio.url,
+                selectedAudio.peaks.length
+                    ? (selectedAudio.peaks as any)
+                    : undefined,
+                selectedAudio.duration
+            )
+            .then(() => {})
+            .catch((e) => {
+                console.error("timestamp handler load error ", e.message)
+                setHadCorsError(true)
+            })
 
         //Add timestamps whenever the waveform is first loaded
         // After that prevent re render with ref
@@ -137,12 +150,8 @@ export default function TimestampHandler({
 
         //Set progress bar state
         ws.current.on("timeupdate", function (curretTimeInSeconds: number) {
-            const updateOncePerSec = throttle(
-                () => setProgressInSeconds(curretTimeInSeconds),
-                1000
-            )
-            /* setProgressInSeconds(curretTimeInSeconds) */
-            updateOncePerSec()
+            if (hadCorsError) return
+            setProgressInSeconds(curretTimeInSeconds)
         })
 
         //Playback ends
@@ -181,6 +190,11 @@ export default function TimestampHandler({
         const percentagePlayed =
             (timeStampInSeconds * 100) / selectedAudio.duration
         ws.current.seekTo(percentagePlayed / 100)
+
+        const ref = audioRef.current
+        if (!ref) return
+        ref.currentTime = timeStampInSeconds
+
         return () => {}
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [router.query])
@@ -195,10 +209,12 @@ export default function TimestampHandler({
     //controls
     const togglePlayPause = () => {
         if (isPlaying) {
+            audioRef.current?.pause()
             ws.current?.pause()
             return setIsPlaying(false)
         }
         ws.current?.play()
+        audioRef.current?.play()
         return setIsPlaying(true)
     }
 
@@ -280,35 +296,49 @@ export default function TimestampHandler({
                 <div className="ws-timestamp-tool" ref={wsContainerRef}></div>
 
                 {/* INFO: PROGRESS BAR */}
-                <Flex alignItems={"center"} w="full" gap={"10px"}>
-                    <Text>{formatSecondsToDuration(progressInSeconds)}</Text>
-                    <Slider
-                        max={Math.floor(selectedAudio.duration)}
-                        onChange={handleProgressBarChange}
-                        aria-label="Progress bar"
-                        value={progressInSeconds}
-                        /* defaultValue={0} */
-                        role="group"
-                    >
-                        <SliderTrack bg="red.100">
-                            <SliderFilledTrack bg="brand.600" />
-                        </SliderTrack>
-                        <SliderThumb
-                            _focus={{ boxShadow: "none" }}
-                            bg={"white"}
-                            boxSize={7}
+                {!hadCorsError && (
+                    <Flex alignItems={"center"} w="full" gap={"10px"}>
+                        <Text>
+                            {formatSecondsToDuration(progressInSeconds)}
+                        </Text>
+                        <Slider
+                            max={Math.floor(selectedAudio.duration)}
+                            onChange={handleProgressBarChange}
+                            aria-label="Progress bar"
+                            value={progressInSeconds}
+                            role="group"
                         >
-                            <Box
-                                color="brand.600"
-                                as={MdGraphicEq}
+                            <SliderTrack bg="red.100">
+                                <SliderFilledTrack bg="brand.600" />
+                            </SliderTrack>
+                            <SliderThumb
+                                _focus={{ boxShadow: "none" }}
+                                bg={"white"}
                                 boxSize={7}
-                            />
-                        </SliderThumb>
-                    </Slider>
-                    <Text>
-                        {formatSecondsToDuration(selectedAudio.duration)}
-                    </Text>
-                </Flex>
+                            >
+                                <Box
+                                    color="brand.600"
+                                    as={MdGraphicEq}
+                                    boxSize={7}
+                                />
+                            </SliderThumb>
+                        </Slider>
+                        <Text>
+                            {formatSecondsToDuration(selectedAudio.duration)}
+                        </Text>
+                    </Flex>
+                )}
+                {hadCorsError && (
+                    <SimpleAudioPlayer
+                        externalProgress={progressInSeconds}
+                        setExternalProgress={setProgressInSeconds}
+                        volume={volume}
+                        muteVolume={muteVolume}
+                        setIsPlaying={setIsPlaying}
+                        audioRef={audioRef}
+                        audioFile={selectedAudio}
+                    />
+                )}
                 {/* INFO: CONTROLS */}
                 <Flex
                     justifyContent={"space-between"}
@@ -354,7 +384,7 @@ export default function TimestampHandler({
                         onClick={handleZoomIn}
                     />
 
-                    <TimestampNamePopover
+                    <AddTimestampModal
                         setValue={setValue}
                         progressInSeconds={progressInSeconds}
                         showNotes={showNotes}

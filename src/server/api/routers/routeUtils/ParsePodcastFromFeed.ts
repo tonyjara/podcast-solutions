@@ -88,7 +88,7 @@ export const parseEpisodesAndAudioFilesFromFeed = ({
             transcription: "",
             imageUrl: item.itunes?.image ?? "",
             explicit: item.itunes?.explicit === "true" ? true : false,
-            status: "published",
+            status: "draft", //Imported episodes are always drafts because they need to be imported to our servers to be published
             seasonNumber: item.itunes?.season
                 ? parseInt(item.itunes.season)
                 : 1,

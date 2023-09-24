@@ -141,7 +141,8 @@ const NewAudioFileModal = ({
                             <Flex justifyContent={"space-between"}>
                                 <Button
                                     isLoading={isSubmitting || isLoading}
-                                    size="lg"
+                                    size="sm"
+                                    variant={"outline"}
                                     isDisabled={formProgress === 0}
                                     alignSelf={"flex-end"}
                                     onClick={() => setFormProgress(0)}
@@ -152,8 +153,7 @@ const NewAudioFileModal = ({
                                 {formProgress === 0 && (
                                     <Button
                                         isLoading={isSubmitting}
-                                        colorScheme="green"
-                                        size="lg"
+                                        size="sm"
                                         alignSelf={"flex-end"}
                                         onClick={handleCheckIfNameIsUnique}
                                         isDisabled={!isDirty || isLoading}
@@ -164,8 +164,8 @@ const NewAudioFileModal = ({
                                 {formProgress === 1 && (
                                     <Button
                                         isLoading={isSubmitting || isLoading}
-                                        colorScheme="green"
-                                        size="lg"
+                                        size="sm"
+                                        pointerEvents={"none"}
                                         alignSelf={"flex-end"}
                                         onClick={() =>
                                             handleSubmit(submitFunc)()

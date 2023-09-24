@@ -16,12 +16,12 @@ import React, { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import type { Path, UseFormGetValues, UseFormSetValue } from "react-hook-form"
 import { AiOutlineCloudUpload } from "react-icons/ai"
-import uploadFileToBlob from "@/lib/utils/azure-storage-blob"
 import axios from "axios"
 import { myToast } from "@/components/Toasts & Alerts/MyToast"
 import slugify from "slugify"
 import { AudioFile } from "@prisma/client"
 import extractPeaks from "webaudio-peaks"
+import { uploadFileToBlobStorage } from "@/lib/utils/azure-storage-blob"
 
 interface InputProps {
     errors: any
@@ -100,7 +100,7 @@ const FormControlledAudioUpload = (props: InputProps) => {
             const handleProgress = (progress: number) => {
                 setProgress((progress / file.size) * 100)
             }
-            const url = await uploadFileToBlob({
+            const url = await uploadFileToBlobStorage({
                 file,
                 containerName: userId,
                 fileName: file.name,

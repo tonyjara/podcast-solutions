@@ -70,11 +70,22 @@ export const episodesRouter = createTRPCRouter({
         .mutation(async ({ input }) => {
             const episode = await prisma.episode.findUniqueOrThrow({
                 where: { id: input.id },
+                include: { audioFiles: { select: { isHostedByPS: true } } },
             })
             if (!episode.selectedAudioFileId && input.status) {
                 throw new TRPCError({
-                    code: "INTERNAL_SERVER_ERROR",
+                    code: "PRECONDITION_FAILED",
                     message: "Please select an audio file before publishing",
+                })
+            }
+            const someAudioFileIsNotHostedByPS = episode.audioFiles.some(
+                (audioFile) => !audioFile.isHostedByPS
+            )
+
+            if (someAudioFileIsNotHostedByPS) {
+                throw new TRPCError({
+                    code: "PRECONDITION_FAILED",
+                    message: "Please resolve all conflicts before publishing",
                 })
             }
             return await prisma.episode.update({

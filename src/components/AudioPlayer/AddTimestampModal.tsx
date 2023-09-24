@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { useMemo, useRef } from "react"
 import {
     Button,
     IconButton,
@@ -24,7 +24,7 @@ interface props {
     showNotes: string
 }
 
-const TimestampNamePopover = ({
+const AddTimestampModal = ({
     progressInSeconds,
     setValue,
     showNotes,
@@ -38,10 +38,12 @@ const TimestampNamePopover = ({
         setText("")
         onClose()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const memoIzedProgress = useMemo(() => progressInSeconds, [isOpen])
 
     const handleAddMarker = () => {
         if (!text.length) return
-        const prettyDuration = formatSecondsToDuration(progressInSeconds)
+        const prettyDuration = formatSecondsToDuration(memoIzedProgress)
 
         setValue(
             "showNotes",
@@ -52,8 +54,6 @@ const TimestampNamePopover = ({
 
         handleClose()
     }
-
-    //Callback when pressing keys
 
     return (
         <>
@@ -98,4 +98,4 @@ const TimestampNamePopover = ({
         </>
     )
 }
-export default TimestampNamePopover
+export default AddTimestampModal

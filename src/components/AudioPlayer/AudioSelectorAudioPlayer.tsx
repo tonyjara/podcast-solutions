@@ -12,6 +12,7 @@ import {
     Spinner,
     Text,
 } from "@chakra-ui/react"
+import Marquee from "react-fast-marquee"
 import WaveSurfer from "wavesurfer.js"
 import { trpcClient } from "@/utils/api"
 import { TbPlayerPause, TbPlayerPlay } from "react-icons/tb"
@@ -26,6 +27,7 @@ import {
     IoMdVolumeMute,
     IoMdVolumeOff,
 } from "react-icons/io"
+import SimpleAudioPlayer from "./SimpleAudioPlayer"
 
 // NOTE: Chrome blocked autoplay before user interacts with the page and there's a running issue on wavesurfer
 export default function AudioSelectorAudioPlayer({
@@ -36,10 +38,12 @@ export default function AudioSelectorAudioPlayer({
     //states
     const context = trpcClient.useContext()
     const [volume, setVolume] = useState(100)
+    const [hadCorsError, setHadCorsError] = useState(false)
     const [muteVolume, setMuteVolume] = useState(false)
     const [isPlaying, setIsPlaying] = useState(false)
 
     //refs
+    const audioRef = useRef<HTMLAudioElement>(null)
     const wsContainerRef = useRef<HTMLDivElement>(null)
     const ws = useRef<WaveSurfer | null>(null)
 
@@ -73,21 +77,32 @@ export default function AudioSelectorAudioPlayer({
         )
 
     useEffect(() => {
-        if (!wsContainerRef.current) return
+        if (!wsContainerRef.current || !audioFile.isSelected) return
+
+        // Make a fetch to the url and check if it fails because of cors
         ws.current = WaveSurfer.create({
             container: wsContainerRef.current,
             dragToSeek: true,
-            url: audioFile.url,
             barWidth: 3,
             autoplay: false,
             cursorWidth: 2,
-            /* mediaControls: isAdmin, */
             height: 50,
             hideScrollbar: true,
-            peaks: audioFile.peaks.length
-                ? (audioFile.peaks as any)
-                : undefined,
         })
+        //Loading manually because of CORS, this allows us to manage errors. If CORS fails, we use the regular player
+        //NOTE: Not having peaks makes CORS fail
+        ws.current
+            .load(
+                audioFile.url,
+                audioFile.peaks.length ? (audioFile.peaks as any) : undefined,
+                audioFile.duration
+            )
+            .then(() => {})
+            .catch((e) => {
+                console.error("audio selector player load error ", e.message)
+                setHadCorsError(true)
+            })
+
         ws.current.on("redraw", function () {
             try {
                 if (!ws.current || audioFile.peaks.length > 0) return
@@ -99,6 +114,7 @@ export default function AudioSelectorAudioPlayer({
 
                 if (!peaks[0]) return
                 updatePeaks({ peaks: peaks[0], audioFileId: audioFile.id })
+                setHadCorsError(false)
             } catch (e) {
                 console.error(e)
             }
@@ -114,15 +130,17 @@ export default function AudioSelectorAudioPlayer({
             ws.current?.destroy()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [audioFile.isSelected])
+    }, [audioFile.id])
 
     //controls
     const togglePlayPause = () => {
         if (isPlaying) {
             ws.current?.pause()
+            audioRef.current?.pause()
             setIsPlaying(false)
         } else {
             ws.current?.play()
+            audioRef.current?.play()
             setIsPlaying(true)
         }
     }
@@ -140,6 +158,7 @@ export default function AudioSelectorAudioPlayer({
         if (volume > 0) return IoMdVolumeLow
         return IoMdVolumeMute
     }
+
     const handleDeleteAudioFile = async () => {
         const req = await axios("/api/get-connection-string")
         const { connectionString } = req.data
@@ -152,9 +171,9 @@ export default function AudioSelectorAudioPlayer({
             episodeId: audioFile.episodeId,
         })
     }
+
     const handleSelectAudioFile = () => {
         if (audioFile.isSelected) return
-
         selectEpisode({
             episodeId: audioFile.episodeId,
             audioFileId: audioFile.id,
@@ -162,7 +181,7 @@ export default function AudioSelectorAudioPlayer({
     }
 
     return (
-        <Flex width="100%" flexDir={"column"} key={audioFile.id}>
+        <Flex width="100%" flexDir={"column"}>
             <Box
                 maxW={"220px"}
                 width={"max-content"}
@@ -180,14 +199,29 @@ export default function AudioSelectorAudioPlayer({
                         : audioFile.name}
                 </Text>
             </Box>
-            {/* INFO: WAVE SURFER */}
-            {!audioFile.peaks.length && (
+            {/* INFO: Display loading when generating waveform if it didn't error */}
+            {!audioFile.peaks.length && !hadCorsError && (
                 <Flex mt={"20px"} alignItems={"center"} gap={"20px"}>
                     <Spinner />
-                    <Text>Generating waveform...</Text>
+
+                    <Marquee>
+                        Generating audio waveform... This might take a minute
+                        depending on your audio... Please refresh the browser if
+                        it hangs for too long...
+                    </Marquee>
                 </Flex>
             )}
+            {/* INFO: WAVE SURFER CONTAINER */}
             <div ref={wsContainerRef}></div>
+            {hadCorsError && (
+                <SimpleAudioPlayer
+                    volume={volume}
+                    muteVolume={muteVolume}
+                    setIsPlaying={setIsPlaying}
+                    audioRef={audioRef}
+                    audioFile={audioFile}
+                />
+            )}
 
             <Flex
                 justifyContent={"space-between"}

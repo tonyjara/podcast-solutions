@@ -3,16 +3,16 @@ import { isScheduled } from "@/lib/utils/dateUtils"
 import { trpcClient } from "@/utils/api"
 import { ChevronDownIcon, WarningIcon } from "@chakra-ui/icons"
 import { Menu, MenuButton, MenuList, MenuItem, Button } from "@chakra-ui/react"
-import { Episode } from "@prisma/client"
 import React from "react"
 import { BsArchive } from "react-icons/bs"
 import { MdOutlinePublish, MdOutlineUnpublished } from "react-icons/md"
+import { EpisodeForEditType } from "./EpisodeEdit.types"
 
 const EpisodeStatusMenu = ({
     episode,
     isDirty,
 }: {
-    episode: Episode
+    episode: EpisodeForEditType
     isDirty: boolean
 }) => {
     const episodeStatus = episode.status
@@ -42,6 +42,9 @@ const EpisodeStatusMenu = ({
     }
 
     const episodeIsScheduled = isScheduled(episode.releaseDate)
+    const someEpisodeIsNotInPsServers = episode.audioFiles.some(
+        (x) => x.isHostedByPS === false
+    )
 
     return (
         <Menu>
@@ -68,7 +71,13 @@ const EpisodeStatusMenu = ({
                         Please save to change the status
                     </MenuItem>
                 )}
-                {episodeStatus === "draft" && (
+
+                {someEpisodeIsNotInPsServers && (
+                    <MenuItem color="orange" icon={<WarningIcon />}>
+                        Please resolve audio file issues before publishing
+                    </MenuItem>
+                )}
+                {episodeStatus === "draft" && !someEpisodeIsNotInPsServers && (
                     <MenuItem
                         onClick={handlePublishEpisode}
                         isDisabled={isDirty}

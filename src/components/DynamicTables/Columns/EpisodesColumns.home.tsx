@@ -18,6 +18,31 @@ type EpisodeForColum = Prisma.EpisodeGetPayload<typeof EpisodesForHomePageArgs>
 
 const columnHelper = createColumnHelper<EpisodeForColum>()
 
+const prettyStatus = (status: string) => {
+    switch (status) {
+        case "published":
+            return "Published"
+        case "draft":
+            return "Draft"
+        case "scheduled":
+            return "Scheduled"
+        default:
+            return "Unknown"
+    }
+}
+const statusColors = (status: string) => {
+    switch (status) {
+        case "published":
+            return "green.500"
+        case "draft":
+            return "gray.500"
+        case "scheduled":
+            return "orange.500"
+        default:
+            return "gray.500"
+    }
+}
+
 export const homeEpisodesColumns = () => [
     columnHelper.accessor("episodeNumber", {
         cell: (x) => `# ${x.getValue()}` ?? "-",
@@ -37,7 +62,12 @@ export const homeEpisodesColumns = () => [
     }),
 
     columnHelper.accessor("status", {
-        cell: (x) => <TextCell text={x.getValue()} />,
+        cell: (x) => (
+            <TextCell
+                color={statusColors(x.getValue())}
+                text={prettyStatus(x.getValue())}
+            />
+        ),
         header: "Status",
         sortingFn: "text",
     }),
