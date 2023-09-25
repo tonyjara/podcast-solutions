@@ -30,7 +30,7 @@ const TopBar = ({ onOpen, authenticated }: MobileProps) => {
             id="top"
             position={"fixed"}
             width="100%"
-            zIndex={2}
+            zIndex={3}
             px={{ base: 4, md: 4 }}
             height="65px"
             alignItems="center"

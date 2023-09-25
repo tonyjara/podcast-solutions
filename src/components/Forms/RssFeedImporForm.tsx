@@ -12,7 +12,6 @@ import toast from "react-hot-toast"
 import { z } from "zod"
 import PodcastImportCard from "../Cards/PodcastImporCard"
 import { Podcast } from "@prisma/client"
-import axios from "axios"
 
 const validateFeedUrl = z.object({
     rssFeedUrl: z.string().url().min(1),
