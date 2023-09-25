@@ -52,6 +52,13 @@ export const knownErrors = (error: string) => {
     if (error.includes("Not enough transcription minutes")) {
         return "Not enough transcription minutes, please subscribe to a plan."
     }
+    if (
+        error.includes(
+            "Your podcast has some missing information. Please make sure all the information is correct before publishing."
+        )
+    ) {
+        return error
+    }
 
     if (error.includes("Not enough chat credits")) {
         return "Not enough chat credits, please subscribe to a plan."
