@@ -4,7 +4,6 @@ import {
     Flex,
     VStack,
     useDisclosure,
-    SimpleGrid,
     Text,
     useMediaQuery,
     IconButton,
@@ -13,8 +12,6 @@ import React from "react"
 import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast"
 import { trpcClient } from "@/utils/api"
 import { zodResolver } from "@hookform/resolvers/zod"
-import FormControlledEditableText from "@/components/Forms/FormControlled/FormControlledEditable"
-import FormControlledSwitch from "@/components/Forms/FormControlled/FormControlledSwitch"
 import slugify from "slugify"
 import { useSession } from "next-auth/react"
 import { Episode } from "@prisma/client"
@@ -26,10 +23,7 @@ import CollapsableContainer from "@/components/CollapsableContainer"
 import TranscriptionEdit from "./TranscriptionEdit"
 import ChatDrawer from "@/components/ChatDrawer"
 import ShowNotesEdit from "./ShowNotesEdit"
-import FormControlledDatePicker from "@/components/Forms/FormControlled/FormControlledDatePicker"
 import { AddIcon } from "@chakra-ui/icons"
-import FormControlledNumberInput from "@/components/Forms/FormControlled/FormControlledNumberInput"
-import FormControlledSelect from "@/components/Forms/FormControlled/FormControlledSelect"
 import { AiOutlineFundView } from "react-icons/ai"
 import { useRouter } from "next/router"
 import { BiCollapse } from "react-icons/bi"
@@ -38,6 +32,7 @@ import { useLazyEffect } from "@/lib/hooks/useLazyEffect"
 import { EpisodeForEditType } from "./EpisodeEdit.types"
 import StickyEpisodeEditActions from "./StickyEpisodeEditActions"
 import EpisodeEditWarnings from "./EpisodeEditWarnings"
+import EpisodeEditDetails from "./EpisodeEditDetails"
 /* import useUnsavedChangesWarning from "@/lib/hooks/useUnsavedChangesWarning"; */
 interface EpisodeEditPageProps {
     episode: EpisodeForEditType
@@ -128,6 +123,7 @@ const EpisodesEditPage = ({
                     noValidate
                 >
                     {/* INFO: Sticky actions bar  */}
+
                     <StickyEpisodeEditActions
                         fetchedEpisode={fetchedEpisode}
                         isDirty={isDirty}
@@ -141,6 +137,7 @@ const EpisodesEditPage = ({
                     />
 
                     {/* INFO: Secondary actions */}
+
                     <Flex
                         justifyContent={"space-between"}
                         mt={"20px"}
@@ -177,107 +174,49 @@ const EpisodesEditPage = ({
                             </Text>
                         )}
                         {/* INFO: Episode warnings and info */}
-                        <EpisodeEditWarnings
-                            audioFiles={fetchedEpisode.audioFiles}
-                        />
+                        {fetchedEpisode.audioFiles.some(
+                            (x) => !x.isHostedByPS
+                        ) && (
+                            <EpisodeEditWarnings
+                                audioFiles={fetchedEpisode.audioFiles}
+                            />
+                        )}
 
                         {/* INFO: Episode details */}
-                        <CollapsableContainer
+
+                        <EpisodeEditDetails
+                            control={control}
+                            errors={errors}
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}
-                            title="Episode Details"
-                        >
-                            <Flex flexDir={"column"} gap={"20px"}>
-                                <FormControlledEditableText
-                                    control={control}
-                                    errors={errors}
-                                    name="title"
-                                />
-                                <SimpleGrid
-                                    columns={[1, 2, 3, 4]}
-                                    spacing={{ base: 5, md: 10 }}
-                                >
-                                    <FormControlledDatePicker
-                                        control={control}
-                                        errors={errors}
-                                        name="releaseDate"
-                                        maxW={"200px"}
-                                        label="Release date"
-                                        helperText="Future dates schedule release."
-                                    />
-                                    <FormControlledNumberInput
-                                        control={control}
-                                        errors={errors}
-                                        name="seasonNumber"
-                                        label="Season"
-                                    />
+                        />
 
-                                    <FormControlledNumberInput
-                                        control={control}
-                                        errors={errors}
-                                        name="episodeNumber"
-                                        label="Number"
-                                    />
-
-                                    <FormControlledSelect
-                                        options={[
-                                            { label: "Full", value: "full" },
-                                            {
-                                                label: "Trailer",
-                                                value: "trailer",
-                                            },
-                                            { label: "Bonus", value: "bonus" },
-                                        ]}
-                                        control={control}
-                                        errors={errors}
-                                        name="episodeType"
-                                        label="Type"
-                                    />
-                                </SimpleGrid>
-
-                                <FormControlledSwitch
-                                    control={control}
-                                    errors={errors}
-                                    name="explicit"
-                                    label="Does this episode have explicit content?"
-                                />
-                            </Flex>
-                        </CollapsableContainer>
                         {/* INFO: Audio selector */}
-                        <CollapsableContainer
+
+                        <AudioFileSelector
+                            errors={errors}
+                            episodeId={episode.id}
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}
-                            title="Audio Files"
-                            tooltipText="The selected audio file will be used for the episode, it will be the one that appears in the podcast feed and the one used for transcription."
-                            titleComponents={
-                                <Button
-                                    size={"sm"}
-                                    rightIcon={<AddIcon fontSize="sm" />}
-                                    onClick={onOpen}
-                                >
-                                    Add{" "}
-                                </Button>
-                            }
-                        >
-                            <AudioFileSelector
-                                errors={errors}
-                                episodeId={episode.id}
-                                {...audioModalDisclosure}
-                            />
-                        </CollapsableContainer>
+                            {...audioModalDisclosure}
+                        />
+
+                        {/* INFO: Transcription */}
+
                         <TranscriptionEdit
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}
                             episode={fetchedEpisode}
                             control={control}
                             errors={errors}
-                            hasAudioFiles={!!fetchedEpisode.audioFiles.length}
                         />
+
                         {/* INFO: Timestamp tool  */}
+
                         <CollapsableContainer
                             collapseAll={collapseAll}
                             tooltipText={
-                                "Add timestamps using the flag icon at the cursos position. Adjust the time by dragging the timestamp text or arrow. Double clck a timestamp to delete it. Add manually by making a list in the show notes, writing your time in the following format hh:mm and creating a link. Then edit the link with this format #t=YOUR_TIME ex: #t=30:01"
+                                "Double click to delete timestamps. Add timestamps pressing the flag icon on the audio player. You can also add timestams using the HH:MM, (HH:MM) or [HH:MM] format as long as it has a BOLD style. Ex: 00:12. Click on this icon to learn more."
                             }
                             setCollapseAll={setCollapseAll}
                             title="Timestamp tool"
@@ -289,6 +228,9 @@ const EpisodesEditPage = ({
                                 episodeId={episode.id}
                             />
                         </CollapsableContainer>
+
+                        {/* INFO: Show notes */}
+
                         <ShowNotesEdit
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}
@@ -296,7 +238,9 @@ const EpisodesEditPage = ({
                             control={control}
                             errors={errors}
                         />
+
                         {/* INFO:Episode Image */}
+
                         <CollapsableContainer
                             collapseAll={collapseAll}
                             setCollapseAll={setCollapseAll}

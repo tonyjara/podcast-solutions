@@ -156,7 +156,7 @@ const FormControlledImageUpload = <T extends FieldValues>(
                 connectionString,
             })
 
-            setValue(name, url)
+            setValue(name, url, { shouldDirty: true })
             setUploading(false)
             setImageIsLoading && setImageIsLoading(false)
         } catch (err) {

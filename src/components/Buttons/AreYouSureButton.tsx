@@ -23,6 +23,7 @@ interface props {
     isDisabled?: boolean
     rightIcon?: any
     leftIcon?: any
+    glow?: boolean
 }
 
 const AreYouSureButton = ({
@@ -35,6 +36,7 @@ const AreYouSureButton = ({
     confirmButtonText,
     isDisabled,
     leftIcon,
+    glow,
     rightIcon,
 }: props) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -48,6 +50,7 @@ const AreYouSureButton = ({
         <>
             {!customButton ? (
                 <Button
+                    className={glow ? "glow" : ""}
                     rightIcon={rightIcon}
                     leftIcon={leftIcon}
                     isDisabled={isDisabled}

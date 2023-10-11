@@ -49,12 +49,16 @@ const ShowNotesEdit = ({
                 collapseAll={collapseAll}
                 setCollapseAll={setCollapseAll}
                 titleComponents={
-                    <Flex w="100%" justifyContent={"space-between"}>
+                    <Flex
+                        w="100%"
+                        alignItems={"center"}
+                        justifyContent={"space-between"}
+                    >
                         <Flex>
                             <Button
                                 borderRightRadius={"none"}
                                 px={"10px"}
-                                size={"small"}
+                                size={"sm"}
                                 variant={isEdit ? "solid" : "outline"}
                                 onClick={() => setIsEdit(true)}
                             >
@@ -63,7 +67,7 @@ const ShowNotesEdit = ({
                             <Button
                                 borderLeftRadius={"none"}
                                 px={"10px"}
-                                size={"small"}
+                                size={"sm"}
                                 variant={!isEdit ? "solid" : "outline"}
                                 onClick={() => setIsEdit(false)}
                             >

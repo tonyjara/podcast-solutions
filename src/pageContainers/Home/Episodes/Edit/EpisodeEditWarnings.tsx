@@ -16,7 +16,11 @@ import axios from "axios"
 import { useSession } from "next-auth/react"
 import React, { useState } from "react"
 
-const EpisodeEditWarnings = ({ audioFiles }: { audioFiles: AudioFile[] }) => {
+const EpisodeEditWarnings = function EpWarnings({
+    audioFiles,
+}: {
+    audioFiles: AudioFile[]
+}) {
     const [showWarning, setShowWarning] = useState(true)
     const trpcContext = trpcClient.useContext()
     const user = useSession().data?.user
@@ -52,8 +56,9 @@ const EpisodeEditWarnings = ({ audioFiles }: { audioFiles: AudioFile[] }) => {
             }
         }
     }
+
     return (
-        <div>
+        <>
             {someAudioFilesAreNotInOurDatabase && showWarning && (
                 <Card
                     variant={"outline"}
@@ -108,7 +113,7 @@ const EpisodeEditWarnings = ({ audioFiles }: { audioFiles: AudioFile[] }) => {
                     </Flex>
                 </Card>
             )}
-        </div>
+        </>
     )
 }
 

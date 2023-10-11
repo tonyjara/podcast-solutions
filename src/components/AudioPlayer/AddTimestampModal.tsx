@@ -48,7 +48,7 @@ const AddTimestampModal = ({
         setValue(
             "showNotes",
             showNotes +
-                `<ul><li><a href="#t=${prettyDuration}"><strong>${prettyDuration}</strong></a> ${text}</li></ul>` +
+                `<ul><li><strong>(${prettyDuration})</strong> ${text}</li></ul>` +
                 "\n"
         )
 
@@ -78,7 +78,6 @@ const AddTimestampModal = ({
                                 autoFocus
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
-                                defaultValue={""}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
                                         handleAddMarker()

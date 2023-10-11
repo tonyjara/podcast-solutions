@@ -28,28 +28,16 @@ const HtmlParser = ({ maxL, content, showMoreButton, allPTags }: Props) => {
     const sanitizedContent = sanitizeHtml(handleShortening())
 
     const handleClickHtml = (e: any) => {
-        if (e.target.nodeName === "A" && e.target.outerHTML.includes("#t=")) {
+        const innerText = e.target.innerHTML
+
+        const timestampMatches = innerText.match(
+            /(\d{1,2}:\d{2}|\d:\d{2}:\d{2})/g
+        )
+
+        if (timestampMatches) {
             e.preventDefault()
-            const regex = /href="([^"]+)"/
-            const query = e.target.outerHTML
-                .match(regex)?.[1]
-                .replace("#t=", "")
+            const query = timestampMatches[0]
             const cleanPath = router.asPath.split("?")[0]
-
-            router.push(
-                { pathname: cleanPath, query: { t: query } },
-                undefined,
-                {
-                    shallow: true,
-                }
-            )
-        }
-        if (e.target.nodeName !== "A" && e.target.parentNode.nodeName === "A") {
-            e.preventDefault()
-            const query = e.target.parentNode.hash.replace("#t=", "")
-
-            const cleanPath = router.asPath.split("?")[0]
-
             router.push(
                 { pathname: cleanPath, query: { t: query } },
                 undefined,
@@ -72,6 +60,7 @@ const HtmlParser = ({ maxL, content, showMoreButton, allPTags }: Props) => {
                         : "prose max-w-none text-slate-300 prose-headings:text-slate-300 prose-p:text-slate-300 prose-a:text-blue-300 prose-strong:font-extrabold prose-strong:text-blue-700"
                 }
                 dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+                /* dangerouslySetInnerHTML={{ __html: handleShortening() }} */
             />
             {content.length > (maxL ?? 500) && showMoreButton && (
                 <Button

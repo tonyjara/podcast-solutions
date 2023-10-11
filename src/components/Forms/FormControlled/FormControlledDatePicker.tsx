@@ -146,6 +146,7 @@ const FormControlledDatePicker = <T extends FieldValues>(
                                         },
                                         today: {
                                             textDecoration: "underline",
+                                            color: "orange",
                                         },
                                     }}
                                     /* onSelect={(e: Date | undefined) => { */

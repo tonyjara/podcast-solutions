@@ -4,14 +4,23 @@ import {
     FormHelperText,
     FormErrorMessage,
 } from "@chakra-ui/react"
-import dynamic from "next/dynamic"
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import type { Control, FieldValues, Path } from "react-hook-form"
 import { Controller } from "react-hook-form"
-const QuillNoSSRWrapper = dynamic(import("react-quill"), {
-    ssr: false,
-    loading: () => <p>Loading ...</p>,
-})
+import dynamic from "next/dynamic"
+import "react-quill/dist/quill.snow.css"
+import type ReactQuill from "react-quill"
+
+const QuillWrapper = dynamic(
+    async () => {
+        const { default: RQ } = await import("react-quill")
+        // eslint-disable-next-line react/display-name
+        return ({ ...props }) => <RQ {...props} />
+    },
+    {
+        ssr: false,
+    }
+) as typeof ReactQuill
 
 interface InputProps<T extends FieldValues> {
     control: Control<T>
@@ -38,6 +47,18 @@ const FormControlledRichTextBlock = <T extends FieldValues>(
         return acc[parseInt(curr)]
     }, errors)
 
+    /* const { quill, quillRef } = useQuill() */
+    /* React.useEffect(() => { */
+    /*     if (quill) { */
+    /*         quill.on("text-change", (delta, oldDelta, source) => { */
+    /*             console.log("Text change!") */
+    /*             console.log(quill.getText()) // Get text only */
+    /*             console.log(quill.getContents()) // Get delta contents */
+    /*             console.log(quill.root.innerHTML) // Get innerHTML using quill */
+    /*             console.log(quillRef.current.firstChild.innerHTML) // Get innerHTML using quillRef */
+    /*         }) */
+    /*     } */
+    /* }, [quill]) */
     return (
         <FormControl hidden={hidden} isInvalid={!!reduceErrors.message}>
             {label && (
@@ -49,13 +70,18 @@ const FormControlledRichTextBlock = <T extends FieldValues>(
                 control={control}
                 name={name}
                 render={({ field }) => (
-                    <QuillNoSSRWrapper
+                    <QuillWrapper
                         style={{
                             color: "black",
                         }}
                         theme="snow"
                         value={field.value}
                         onChange={field.onChange}
+                        modules={{
+                            clipboard: {
+                                matchVisual: false,
+                            },
+                        }}
                     />
                 )}
             />

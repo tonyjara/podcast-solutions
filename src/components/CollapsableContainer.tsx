@@ -47,9 +47,9 @@ const CollapsableContainer = ({
     }, [collapseAll, show])
 
     return (
-        <Box style={style} w={"100%"}>
+        <Flex direction={"column"} gap={"5px"} style={style} w={"100%"}>
             <Flex
-                py={"10px"}
+                /* py={"10px"} */
                 justifyContent={"space-between"}
                 alignItems={"center"}
                 gap={5}
@@ -60,6 +60,7 @@ const CollapsableContainer = ({
                         variant={show ? "solid" : "outline"}
                         size={"sm"}
                         aria-label="Minimize container"
+                        fontSize={"sm"}
                         icon={<BiCollapseVertical />}
                         onClick={handleToggle}
                     />
@@ -80,17 +81,13 @@ const CollapsableContainer = ({
                 </Flex>
                 {titleComponents}
             </Flex>
-            {subTitle && (
-                <Text pb="10px" mt="-10px" color={"gray.500"}>
-                    {subTitle}
-                </Text>
-            )}
+            {subTitle && show && <Text color={"gray.500"}>{subTitle}</Text>}
 
             {/* <Collapse unmountOnExit in={show}> It's breaking zindex */}
             <Box display={show ? "block" : "none"}>{children}</Box>
             {/* </Collapse> */}
             {!show && <Divider />}
-        </Box>
+        </Flex>
     )
 }
 
