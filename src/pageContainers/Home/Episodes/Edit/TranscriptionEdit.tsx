@@ -17,14 +17,12 @@ const TranscriptionEdit = ({
     episode,
     collapseAll,
     setCollapseAll,
-    hasAudioFiles,
 }: {
     control: Control<any>
     errors: any
     episode: Episode | null | undefined
     collapseAll: boolean
     setCollapseAll: React.Dispatch<React.SetStateAction<boolean>>
-    hasAudioFiles: boolean
 }) => {
     const context = trpcClient.useContext()
     const { mutate: transcribe } =
@@ -36,11 +34,11 @@ const TranscriptionEdit = ({
                 },
             })
         )
-
-    /* const { data: selecteAudioFile } = */
-    /*     trpcClient.audioFile.getSelectedAudioFileForEpisode.useQuery({ */
-    /*         episodeId: episode?.id, */
-    /*     }) */
+    const { data: audioFiles } =
+        trpcClient.audioFile.getEpisodeAudioFiles.useQuery({
+            episodeId: episode?.id,
+        })
+    const hasAudioFiles = !!audioFiles && audioFiles.length > 0
 
     return (
         <CollapsableContainer
@@ -54,6 +52,7 @@ const TranscriptionEdit = ({
             }
             titleComponents={
                 <AreYouSureButton
+                    glow={hasAudioFiles && !episode?.transcription.length}
                     rightIcon={<SiOpenai fontSize={"sm"} />}
                     isDisabled={!episode || !hasAudioFiles}
                     buttonText="Generate"

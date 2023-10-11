@@ -7,40 +7,69 @@ import {
 export const extractTimestampsFromShowNotes = (
     showNotes: string
 ): RegionParams[] => {
-    // Create a DOMParser
     const parser = new DOMParser()
-
-    // Parse the HTML string
     const doc = parser.parseFromString(showNotes, "text/html")
 
-    // Select all <a> tags within the parsed document
-    const aTags = doc.querySelectorAll("a")
-
-    // Initialize an array to store the href values
     const regions: any[] = []
 
-    // Loop through the <a> tags and push their href values into the array
-    aTags.forEach((aTag) => {
-        const href = aTag.getAttribute("href")
+    const tags = doc.body.querySelectorAll("strong")
 
-        if (!href?.includes("#t=")) return
-        // Get the closest <li> tag to the <a> tag and extract the text content
-        const parentLi = aTag.closest("li")
-        const parentLiText = parentLi?.textContent?.trim()
-        const durationString = aTag.textContent?.trim()
+    tags.forEach((tag) => {
+        const innerText = tag.innerHTML
+        /* const innerText = tag.firstChild?.innerText */
+        const timestampsMatch = innerText?.match(
+            /(\d{1,2}:\d{2}|\d:\d{2}:\d{2})/g
+        )
 
-        const newRegion: RegionParams = {
-            //Duraion is the id so that we can find it easier when updating or deleting the region
-            id: durationString,
-            start: parseDurationToSeconds(durationString), // in seconds
-            content: parentLiText,
-            color: "#0fa824",
+        if (!timestampsMatch?.length) return
+        const timeStamp = timestampsMatch?.[0]
+
+        if (
+            timeStamp &&
+            /* timestampsMatch.length === 2 && */
+            regions.every((region) => region.id !== timeStamp)
+        ) {
+            const newRegion: RegionParams = {
+                //Duraion is the id so that we can find it easier when updating or deleting the region
+                id: timeStamp,
+                start: parseDurationToSeconds(timeStamp), // in seconds
+                /* content: tag.textContent?.replace("(", "").replace(")", ""), */
+                content: `${timeStamp} ${tag.nextSibling?.textContent?.substring(
+                    0,
+                    20
+                )}...`,
+                color: "#0fa824",
+            }
+            regions.push(newRegion)
         }
-        regions.push(newRegion)
     })
+
+    /* // Select all <a> tags within the parsed document */
+    /* const aTags = doc.querySelectorAll("a") */
+    /* // Loop through the <a> tags and push their href values into the array */
+    /* aTags.forEach((aTag) => { */
+    /*     const href = aTag.getAttribute("href") */
+    /**/
+    /*     if (!href?.includes("#t=")) return */
+    /*     // Get the closest <li> tag to the <a> tag and extract the text content */
+    /*     const parentLi = aTag.closest("li") */
+    /*     const parentLiText = parentLi?.textContent?.trim() */
+    /*     const durationString = aTag.textContent?.trim() */
+    /**/
+    /*     const newRegion: RegionParams = { */
+    /*         //Duraion is the id so that we can find it easier when updating or deleting the region */
+    /*         id: durationString, */
+    /*         start: parseDurationToSeconds(durationString), // in seconds */
+    /*         content: parentLiText, */
+    /*         color: "#0fa824", */
+    /*     } */
+    /*     regions.push(newRegion) */
+    /* }) */
+
     return regions
 }
 
+/**NOTE: Used to change show notes when moving a timestamp */
 export const updateTextTimestamp = ({
     text,
     newStart,
@@ -55,21 +84,21 @@ export const updateTextTimestamp = ({
 
     // Parse the HTML string
     const doc = parser.parseFromString(text, "text/html")
-    const aTagToReplace = [...doc.querySelectorAll("a")].find(
-        (aTag) => aTag?.textContent?.includes(id)
-    )
+    const tags = doc.body.querySelectorAll("strong")
 
-    if (aTagToReplace) {
-        const newDuration = formatSecondsToDuration(newStart)
+    //As long as it matches the format and has bold tags, it will be updated
+    tags.forEach((tag) => {
+        const timestampsMatch = tag.innerHTML?.match(
+            /(\d{1,2}:\d{2}|\d:\d{2}:\d{2})/g
+        )
 
-        /* aTagToReplace.textContent = newDuration */
-        aTagToReplace.setAttribute("href", `#t=${newDuration}`)
-        //add a strong tag to the a tag
-        const strongTag = doc.createElement("strong")
-        strongTag.textContent = newDuration
-        aTagToReplace.innerHTML = ""
-        aTagToReplace.appendChild(strongTag)
-    }
+        if (!timestampsMatch?.length) return
+
+        if (tag?.textContent?.includes(id)) {
+            const newDuration = formatSecondsToDuration(newStart)
+            tag.textContent = tag.textContent?.replace(id, newDuration)
+        }
+    })
 
     return doc.documentElement.outerHTML
 }

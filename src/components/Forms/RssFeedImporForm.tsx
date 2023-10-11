@@ -4,7 +4,7 @@ import {
     myToast,
 } from "@/components/Toasts & Alerts/MyToast"
 import { trpcClient } from "@/utils/api"
-import { Button, Flex, Heading } from "@chakra-ui/react"
+import { Text, Button, Flex, Heading } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -97,6 +97,15 @@ const RssImportForm = (props: props) => {
                 <form onSubmit={handleSubmit(submitFunc)} noValidate>
                     <Flex flexDir={"column"} gap={5}>
                         <Heading fontSize={"4xl"}>Import from RSS Feed</Heading>
+                        <Text opacity={0.7} fontSize={"xl"}>
+                            Some podcast platform's privacy settings may not
+                            allow this option.
+                        </Text>
+                        <Text opacity={0.7} fontSize={"xl"}>
+                            We will import existing audio links to recreate your
+                            feed. Please consider uploading your audio to our
+                            servers before publishing.
+                        </Text>
                         <FormControlledText
                             control={control}
                             errors={errors}

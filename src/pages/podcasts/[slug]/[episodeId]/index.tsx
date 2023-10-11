@@ -33,7 +33,7 @@ export const getServerSideProps: GetServerSideProps<{
     const q = ctx.query as { episodeId: string }
     const session = await getServerAuthSession(ctx)
     const episode = await prisma.episode.findUnique({
-        where: { id: q.episodeId, status: "published" },
+        where: { id: q.episodeId },
         include: {
             audioFiles: true,
             subscription: {
@@ -84,6 +84,7 @@ export const getServerSideProps: GetServerSideProps<{
 
     if (
         !episode.podcast?.active ||
+        episode.status !== "published" ||
         !episode.subscription?.active ||
         episode.subscription.isFreeTrial ||
         episode.podcast?.podcastStatus !== "published" ||
