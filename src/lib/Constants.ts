@@ -33,6 +33,8 @@ export interface pricing {
     features: string[]
 }
 
+export const siteData = {}
+
 export const podcastCategories = {
     Arts: [
         "Books",
