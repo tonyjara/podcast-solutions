@@ -216,6 +216,7 @@ model Subscription {
     updatedAt   DateTime @updatedAt
     active      Boolean
     isFreeTrial Boolean  @default(false)
+    type        PlanType @default(FREE)
 
     stripeCustomerId     String?
     stripeSubscriptionId String?

@@ -32,7 +32,7 @@ const handleStripeWebhooks = async (
         return res.status(405).json({ message: "Method not allowed" })
 
     const stripe = new Stripe(stripeKey, {
-        apiVersion: "2023-08-16",
+        apiVersion: "2023-10-16",
     })
     const buf = await buffer(req)
     const sig = req.headers["stripe-signature"]!

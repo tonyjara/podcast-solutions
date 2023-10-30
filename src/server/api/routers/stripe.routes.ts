@@ -27,7 +27,7 @@ if (!stripeKey || !webUrl)
         message: "Stripe key or web url not found",
     })
 const stripe = new Stripe(stripeKey, {
-    apiVersion: "2023-08-16",
+    apiVersion: "2023-10-16",
 })
 
 export const stripeRouter = createTRPCRouter({

@@ -13,7 +13,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
             message: "Stripe key not found",
         })
     const stripe = new Stripe(stripeKey, {
-        apiVersion: "2023-08-16",
+        apiVersion: "2023-10-16",
     })
     const products = await stripe.products.list({ limit: 100, active: true })
     const prices = await stripe.prices.list({ limit: 100, active: true })

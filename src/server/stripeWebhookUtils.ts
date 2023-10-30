@@ -24,7 +24,7 @@ export const handleCheckoutSessionCompleted = async ({
             await createServerLog(
                 "Checkout session completed, but no subscription or customer found",
                 "ERROR",
-                event.id
+                event.data.object.id
             )
             return
         }
@@ -42,7 +42,7 @@ export const handleCheckoutSessionCompleted = async ({
             await createServerLog(
                 "Checkout session completed, but no product found",
                 "ERROR",
-                event.id
+                event.data.object.id
             )
             return
         }
@@ -53,7 +53,7 @@ export const handleCheckoutSessionCompleted = async ({
             data: {
                 confirmedByWebhookAt: new Date(),
                 validatedByWebhook: true,
-                confirmationEventId: event.id,
+                confirmationEventId: event.data.object.id,
             },
         })
 
@@ -61,7 +61,7 @@ export const handleCheckoutSessionCompleted = async ({
             await createServerLog(
                 "Checkout session completed, but no user found on payment intent",
                 "ERROR",
-                event.id
+                event.data.object.id
             )
             return
         }
@@ -103,7 +103,7 @@ export const handleCheckoutSessionCompleted = async ({
         await createServerLog(
             "Checkout session completed, subscription updated",
             "INFO",
-            event.id
+            event.data.object.id
         )
     }
 }
@@ -114,7 +114,11 @@ export const handleSubscriptionUpdated = async ({
     event: Stripe.DiscriminatedEvent
 }) => {
     if (event.type === "customer.subscription.updated") {
-        await createServerLog("customer.subscription.updated", "INFO", event.id)
+        await createServerLog(
+            "customer.subscription.updated",
+            "INFO",
+            event.data.object.id
+        )
         const subscriptionEvent = event.data.object
 
         const subscription = await prisma.subscription.findFirst({
@@ -125,7 +129,7 @@ export const handleSubscriptionUpdated = async ({
             await createServerLog(
                 "Subscription updated triggered, but no subscription found",
                 "ERROR",
-                event.id
+                event.data.object.id
             )
             return
         }
@@ -149,7 +153,7 @@ export const handleSubscriptionUpdated = async ({
         await createServerLog(
             `Subscription active state: ${handleActiveState()}`,
             "INFO",
-            event.id
+            event.data.object.id
         )
 
         await prisma.subscription.update({
@@ -164,14 +168,14 @@ export const handleSubscriptionUpdated = async ({
                     ? fromUnixTime(subscriptionEvent.canceled_at ?? 0)
                     : null,
                 eventCancellationId: subscriptionEvent.cancel_at
-                    ? event.id
+                    ? event.data.object.id
                     : null,
             },
         })
         await createServerLog(
             "Subscription updated successfully",
             "INFO",
-            event.id
+            event.data.object.id
         )
     }
 }
@@ -182,7 +186,7 @@ export const handleInvoicePaid = async ({
     e: Stripe.DiscriminatedEvent
 }) => {
     if (e.type === "invoice.paid") {
-        await createServerLog("invoice.paid", "INFO", e.id)
+        await createServerLog("invoice.paid", "INFO", e.data.object.id)
         const event = e.data.object
         //If subscription is active add credits
 
