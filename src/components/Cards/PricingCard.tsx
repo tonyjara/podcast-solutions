@@ -1,206 +1,186 @@
-import { decimalDivBy100 } from "@/lib/utils/DecimalUtils";
+import { decimalDivBy100 } from "@/lib/utils/DecimalUtils"
 import {
-  Text,
-  Box,
-  Button,
-  HStack,
-  List,
-  ListIcon,
-  ListItem,
-  VStack,
-  useColorModeValue,
-  Divider,
-} from "@chakra-ui/react";
-import React from "react";
-import { FaCheckCircle, FaDollarSign } from "react-icons/fa";
-import Stripe from "stripe";
+    Text,
+    Box,
+    Button,
+    List,
+    ListIcon,
+    ListItem,
+    useColorModeValue,
+    Divider,
+    Flex,
+} from "@chakra-ui/react"
+import React from "react"
+import { FaCheckCircle, FaDollarSign } from "react-icons/fa"
+import Stripe from "stripe"
 
 export interface PricingCardProps {
-  title: string;
-  defaultPriceId: string;
-  prices: Stripe.Price[];
-  features: string[];
-  payAsYouGo?: string[];
-  description: string;
-  popular?: boolean;
-  handleCheckout: () => void;
-  autenticated: boolean;
-  subscriptionId?: string;
-  currentPlan?: boolean;
+    title: string
+    defaultPriceId: string
+    prices: Stripe.Price[]
+    features: string[]
+    payAsYouGo?: string[]
+    description: string
+    popular?: boolean
+    handleCheckout: () => void
+    autenticated: boolean
+    subscriptionId?: string
+    currentPlan?: boolean
 }
 
 const PricingCard = ({
-  description,
-  payAsYouGo,
-  popular,
-  title,
-  defaultPriceId,
-  handleCheckout,
-  prices,
-  features,
-  autenticated,
-  currentPlan,
+    description,
+    payAsYouGo,
+    popular,
+    title,
+    defaultPriceId,
+    handleCheckout,
+    prices,
+    features,
+    autenticated,
+    currentPlan,
 }: PricingCardProps) => {
-  const defaultPrice = prices.find((x) => x.id === defaultPriceId);
-  const otherPrices = prices.filter((x) => x.id !== defaultPriceId);
+    const defaultPrice = prices.find((x) => x.id === defaultPriceId)
+    const otherPrices = prices.filter((x) => x.id !== defaultPriceId)
 
-  return (
-    <Box
-      mb={4}
-      shadow="base"
-      borderWidth="1px"
-      alignSelf={{ base: "center", lg: "flex-start" }}
-      borderColor={useColorModeValue("gray.200", "gray.500")}
-      borderRadius={"xl"}
-    >
-      <Box position={"relative"}>
-        {popular && (
-          <Box
-            position="absolute"
-            top="-16px"
-            left="50%"
-            style={{ transform: "translate(-50%)" }}
-          >
-            <Text
-              textTransform="uppercase"
-              /* bg={useColorModeValue("red.300", "red.700")} */
-              bg="brand.300"
-              px={3}
-              py={1}
-              /* color={useColorModeValue("gray.900", "gray.300")} */
-              fontSize="sm"
-              fontWeight="600"
-              rounded="xl"
-            >
-              Most Popular
-            </Text>
-          </Box>
-        )}
-
-        {popular && (
-          <Box
-            position="absolute"
-            top="-16px"
-            left="50%"
-            style={{ transform: "translate(-50%)" }}
-          >
-            <Text
-              textTransform="uppercase"
-              /* bg={useColorModeValue("red.300", "red.700")} */
-              bg="brand.300"
-              color={"brand.800"}
-              px={3}
-              py={1}
-              /* color={useColorModeValue("gray.900", "gray.300")} */
-              fontSize="sm"
-              fontWeight="600"
-              rounded="xl"
-            >
-              Most Popular
-            </Text>
-          </Box>
-        )}
-
-        <Box py={4} px={12}>
-          <Text fontWeight="500" fontSize="2xl">
-            {title}
-          </Text>
-          <HStack justifyContent="center">
-            <Text fontSize="3xl" fontWeight="600">
-              $
-            </Text>
-            <Text fontSize="5xl" fontWeight="900">
-              {decimalDivBy100(defaultPrice?.unit_amount_decimal)}
-            </Text>
-            <Text fontSize="3xl" color="gray.500">
-              /month
-            </Text>
-          </HStack>
-        </Box>
-        <Box display={"flex"} justifyContent={"center"} w="100%">
-          <Text mx={2} maxW={"300px"} mb={4}>
-            {description}
-          </Text>
-        </Box>
-        <VStack
-          bg={useColorModeValue("gray.50", "gray.700")}
-          py={4}
-          borderBottomRadius={"xl"}
+    return (
+        <Box
+            shadow="base"
+            borderWidth="1px"
+            borderColor={useColorModeValue("gray.200", "gray.500")}
+            borderRadius={"xl"}
+            w="100%"
+            maxW={"400px"}
+            height={"100%"}
+            alignSelf={{ base: "center", md: "flex-start" }}
+            pt={2}
         >
-          <List spacing={3} textAlign="start" px={12}>
-            {features.map((x) => (
-              <ListItem key={x}>
-                <ListIcon as={FaCheckCircle} color="brand.500" />
-                {x}
-              </ListItem>
-            ))}
-          </List>
-          {payAsYouGo && (
-            <>
-              <Divider my="5px" />
-              <Text fontWeight="500" fontSize="2xl" px={12}>
-                Pay as you go
-              </Text>
-              <Text
-                color={"#63748d"}
-                _dark={{
-                  color: "#95a0b1",
-                }}
-                fontWeight="500"
-                fontSize="md"
-                mb={"10px"}
-              >
-                After monthly quota is exceeded
-              </Text>
+            <Box position={"relative"}>
+                {popular && (
+                    <Box
+                        position="absolute"
+                        top="-26px"
+                        left="50%"
+                        style={{ transform: "translate(-50%)" }}
+                    >
+                        <Text
+                            textTransform="uppercase"
+                            bg="brand.500"
+                            px={3}
+                            py={1}
+                            fontSize="sm"
+                            fontWeight="600"
+                            rounded="xl"
+                            whiteSpace="nowrap"
+                            color={"white"}
+                        >
+                            Most Popular
+                        </Text>
+                    </Box>
+                )}
 
-              <List spacing={3} textAlign="start" px={12}>
-                {payAsYouGo?.map((x) => (
-                  <ListItem key={x}>
-                    <ListIcon as={FaDollarSign} color="brand.500" />
-                    {x}
-                  </ListItem>
-                ))}
+                <Flex px={4} flexDir={"column"} gap={"10px"}>
+                    <Text fontWeight="bold" fontSize="3xl">
+                        {title}
+                    </Text>
+                    <Text
+                        color={"gray.500"}
+                        fontWeight={"medium"}
+                        fontSize={"sm"}
+                    >
+                        {description}
+                    </Text>
+                    <Flex mb={"-10px"} pt={4}>
+                        <Text fontSize="5xl" fontWeight="900">
+                            $
+                            {decimalDivBy100(defaultPrice?.unit_amount_decimal)}
+                        </Text>
+                        <Text mt={"30px"} fontSize="xl" color="gray.500">
+                            /month
+                        </Text>
+                    </Flex>
+                    <Divider pb="10px" />
+                </Flex>
 
-                {otherPrices
-                  ?.sort(
-                    (a, b) =>
-                      parseInt(a.metadata?.sortOrder ?? "0") -
-                      parseInt(b.metadata?.sortOrder ?? "0"),
-                  )
-                  .map((price) => {
-                    return (
-                      <ListItem key={price.id}>
-                        <ListIcon as={FaDollarSign} color="brand.500" />
-                        {decimalDivBy100(price.unit_amount_decimal)}{" "}
-                        {price.nickname}
-                      </ListItem>
-                    );
-                  })}
-              </List>
-            </>
-          )}
-          <Box w="80%" pt={7}>
-            {!currentPlan && (
-              <Button
-                onClick={handleCheckout}
-                w="full"
-                /* colorScheme="orange" */
-                variant="solid"
-              >
-                {autenticated ? "Subscribe" : "Sign up"}
-              </Button>
-            )}
+                <Flex flexDir={"column"} p={4}>
+                    {/* Features */}
+                    <List spacing={3}>
+                        {features.map((x) => (
+                            <ListItem key={x}>
+                                <ListIcon
+                                    as={FaCheckCircle}
+                                    color="brand.500"
+                                />
+                                {x}
+                            </ListItem>
+                        ))}
+                    </List>
+                    {payAsYouGo && (
+                        <>
+                            <Divider py="10px" />
+                            <Text py={"10px"} fontWeight="bold" fontSize="2xl">
+                                Pay as you go
+                            </Text>
 
-            {currentPlan && (
-              <Button w="full" colorScheme="gray" variant="solid">
-                Current Plan
-              </Button>
-            )}
-          </Box>
-        </VStack>
-      </Box>
-    </Box>
-  );
-};
+                            <List spacing={3} textAlign="start">
+                                {payAsYouGo?.map((x) => (
+                                    <ListItem key={x}>
+                                        <ListIcon
+                                            as={FaDollarSign}
+                                            color="brand.500"
+                                        />
+                                        {x}
+                                    </ListItem>
+                                ))}
 
-export default PricingCard;
+                                {otherPrices
+                                    ?.sort(
+                                        (a, b) =>
+                                            parseInt(
+                                                a.metadata?.sortOrder ?? "0"
+                                            ) -
+                                            parseInt(
+                                                b.metadata?.sortOrder ?? "0"
+                                            )
+                                    )
+                                    .map((price) => {
+                                        return (
+                                            <ListItem key={price.id}>
+                                                <ListIcon
+                                                    as={FaDollarSign}
+                                                    color="brand.500"
+                                                />
+                                                {decimalDivBy100(
+                                                    price.unit_amount_decimal
+                                                )}{" "}
+                                                {price.nickname}
+                                            </ListItem>
+                                        )
+                                    })}
+                            </List>
+                        </>
+                    )}
+                    <Box w="100%" pt={8} pb={2}>
+                        {!currentPlan && (
+                            <Button
+                                onClick={handleCheckout}
+                                w="full"
+                                variant="solid"
+                            >
+                                {autenticated ? "Subscribe" : "Sign up"}
+                            </Button>
+                        )}
+
+                        {currentPlan && (
+                            <Button w="full" colorScheme="gray" variant="solid">
+                                Current Plan
+                            </Button>
+                        )}
+                    </Box>
+                </Flex>
+            </Box>
+        </Box>
+    )
+}
+
+export default PricingCard

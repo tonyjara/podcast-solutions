@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "build": "next build",
-        "dev": "concurrently -n \"[lint,next]\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"tsc --noEmit --incremental --watch\" \"NODE_ENV=development && next dev \"",
+        "dev": "concurrently -n \"[lint,next]\" -c \"bgBlue.bold,bgBlack.bold\" \"tsc --noEmit --incremental --watch\" \"NODE_ENV=development && next dev \"",
         "test": "jest --watch",
         "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe-webhook",
         "staging:stripe:listen": "stripe listen --forward-to https://staging.podcastsolutions.org/api/stripe-webhook",
@@ -13,9 +13,10 @@
         "start": "next start",
         "prod": "env-cmd -f .env.prod  next dev",
         "prod:studio": "env-cmd -f .env.prod npx prisma studio",
+        "staging": "env-cmd -f .env.staging  next dev",
         "staging:studio": "env-cmd -f .env.staging npx prisma studio",
         "staging:reset": "env-cmd -f .env.staging npx prisma migrate reset",
-        "staging": "env-cmd -f .env.staging concurrently -n \"[lint,next]\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"tsc --noEmit --incremental --watch\" \"NODE_ENV=development && next dev \"",
+        "dev:staging": "env-cmd -f .env.staging concurrently -n \"[lint,next]\" -c \"bgBlue.bold,bgBlack.bold\" \"tsc --noEmit --incremental --watch\" \"NODE_ENV=development && next dev \"",
         "analyze": "ANALYZE=true next build "
     },
     "dependencies": {
@@ -43,7 +44,7 @@
         "bcryptjs": "2.4.3",
         "blob-util": "2.0.2",
         "browser-image-compression": "2.0.2",
-        "chakra-react-select": "4.7.2",
+        "chakra-react-select": "4.7.6",
         "clsx": "2.0.0",
         "date-fns": "2.30.0",
         "decimal-format": "3.0.1",
