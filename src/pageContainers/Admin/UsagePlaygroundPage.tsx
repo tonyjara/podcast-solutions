@@ -1,7 +1,7 @@
-import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast";
-import { decimalFormat } from "@/lib/utils/DecimalUtils";
-import { prettyPriceTags } from "@/lib/utils/enumUtils";
-import { trpcClient } from "@/utils/api";
+import { handleUseMutationAlerts } from "@/components/Toasts & Alerts/MyToast"
+import { decimalFormat } from "@/lib/utils/DecimalUtils"
+import { prettyPriceTags } from "@/lib/utils/enumUtils"
+import { trpcClient } from "@/utils/api"
 import {
     Box,
     Button,
@@ -16,77 +16,83 @@ import {
     StatNumber,
     VStack,
     useColorModeValue,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
+} from "@chakra-ui/react"
+import React, { useState } from "react"
 
 const UsagePlaygroundPage = () => {
-    const trpcContext = trpcClient.useContext();
+    const trpcContext = trpcClient.useContext()
     const [chatIO, setChatIO] = useState<{
-        inputTokens: number;
-        outputTokens: number;
-    }>({ inputTokens: 0, outputTokens: 0 });
+        inputTokens: number
+        outputTokens: number
+    }>({ inputTokens: 0, outputTokens: 0 })
 
     const [chatCredits, setChatCredits] = useState<{
-        inputTokens: number;
-        outputTokens: number;
-    }>({ inputTokens: 0, outputTokens: 0 });
+        inputTokens: number
+        outputTokens: number
+    }>({ inputTokens: 0, outputTokens: 0 })
 
-    const [transcriptionMinutes, setTranscriptionMinutes] = useState(0);
+    const [transcriptionMinutes, setTranscriptionMinutes] = useState(0)
 
     const { mutate: getSubscription } =
         trpcClient.stripeUsage.getMySubscription.useMutation(
             handleUseMutationAlerts({
                 successText: "subscription fetched",
                 callback: (data) => {
-                    console.info(data);
+                    console.info(data)
                 },
-            }),
-        );
+            })
+        )
     const { data: myUsage, isLoading } =
-        trpcClient.stripeUsage.getMyUsage.useQuery();
+        trpcClient.stripeUsage.getMyUsageForCurrentBillingCycle.useQuery()
 
-    const { mutate: postChatUsage } = trpcClient.admin.postChatUsage.useMutation(
-        handleUseMutationAlerts({
-            successText: "Usage posted",
-            callback: () => {
-                trpcContext.invalidate();
-            },
-        }),
-    );
+    const { mutate: postChatUsage } =
+        trpcClient.admin.postChatUsage.useMutation(
+            handleUseMutationAlerts({
+                successText: "Usage posted",
+                callback: () => {
+                    trpcContext.invalidate()
+                },
+            })
+        )
 
     const { mutate: postTranscriptionMinutes } =
         trpcClient.admin.postTranscriptionMinutesUsage.useMutation(
             handleUseMutationAlerts({
                 successText: "Usage posted",
                 callback: () => {
-                    trpcContext.invalidate();
+                    trpcContext.invalidate()
                 },
-            }),
-        );
+            })
+        )
 
     const { mutate: addChatCredits } =
         trpcClient.stripeUsage.addChatCredits.useMutation(
             handleUseMutationAlerts({
                 successText: "Credits added",
                 callback: () => {
-                    trpcContext.invalidate();
+                    trpcContext.invalidate()
                 },
-            }),
-        );
-    const statBg = useColorModeValue("white", "gray.700");
+            })
+        )
+    const statBg = useColorModeValue("white", "gray.700")
     return (
         <Flex
             flexDir={{ base: "column", lg: "row" }}
             justifyContent={"space-evenly"}
         >
             <VStack spacing={10}>
-                <Button onClick={() => getSubscription()}>Get subscription</Button>
+                <Button onClick={() => getSubscription()}>
+                    Get subscription
+                </Button>
                 <Flex alignItems={"center"}>
                     <Flex flexDir={"column"}>
                         <FormLabel>Chat input</FormLabel>
                         <Input
                             onChange={(e) => {
-                                setChatIO({ ...chatIO, inputTokens: parseInt(e.target.value) });
+                                setChatIO({
+                                    ...chatIO,
+                                    inputTokens: parseInt(e.target.value),
+                                })
                             }}
                             value={chatIO.inputTokens}
                             type="number"
@@ -100,7 +106,7 @@ const UsagePlaygroundPage = () => {
                                 setChatIO({
                                     ...chatIO,
                                     outputTokens: parseInt(e.target.value),
-                                });
+                                })
                             }}
                             type="number"
                         />
@@ -124,7 +130,7 @@ const UsagePlaygroundPage = () => {
                                 setChatCredits({
                                     ...chatCredits,
                                     inputTokens: parseInt(e.target.value),
-                                });
+                                })
                             }}
                             value={chatCredits.inputTokens}
                             type="number"
@@ -138,7 +144,7 @@ const UsagePlaygroundPage = () => {
                                 setChatCredits({
                                     ...chatCredits,
                                     outputTokens: parseInt(e.target.value),
-                                });
+                                })
                             }}
                             type="number"
                         />
@@ -160,7 +166,9 @@ const UsagePlaygroundPage = () => {
                         <FormLabel>Transcription Minutes</FormLabel>
                         <Input
                             onChange={(e) => {
-                                setTranscriptionMinutes(parseInt(e.target.value));
+                                setTranscriptionMinutes(
+                                    parseInt(e.target.value)
+                                )
                             }}
                             value={transcriptionMinutes}
                             type="number"
@@ -184,8 +192,8 @@ const UsagePlaygroundPage = () => {
                 <SimpleGrid columns={2} spacing={10}>
                     {myUsage?.map((item: any) => {
                         const value = item.data.reduce((acc: any, x: any) => {
-                            return (acc += x.total_usage);
-                        }, 0);
+                            return (acc += x.total_usage)
+                        }, 0)
 
                         return (
                             item.tag !== "PLAN_FEE" &&
@@ -198,21 +206,27 @@ const UsagePlaygroundPage = () => {
                                         bg={statBg}
                                         rounded={"lg"}
                                     >
-                                        <StatLabel>{prettyPriceTags(item.tag)}</StatLabel>
+                                        <StatLabel>
+                                            {prettyPriceTags(item.tag)}
+                                        </StatLabel>
                                         <StatNumber>
                                             {" "}
-                                            Credits left: {decimalFormat(item.credits)}
+                                            Credits left:{" "}
+                                            {decimalFormat(item.credits)}
                                         </StatNumber>
-                                        <StatNumber> Reported: {value}</StatNumber>
+                                        <StatNumber>
+                                            {" "}
+                                            Reported: {value}
+                                        </StatNumber>
                                     </Stat>
                                 </Skeleton>
                             )
-                        );
+                        )
                     })}
                 </SimpleGrid>
             </Box>
         </Flex>
-    );
-};
+    )
+}
 
-export default UsagePlaygroundPage;
+export default UsagePlaygroundPage

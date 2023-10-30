@@ -13,7 +13,7 @@ if (!stripeKey) {
     })
 }
 const stripe = new Stripe(stripeKey, {
-    apiVersion: "2023-08-16",
+    apiVersion: "2023-10-16",
 })
 
 /** Simply posts usage to stripe, does not work if subscription is trial */

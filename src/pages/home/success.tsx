@@ -25,7 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         if (!session_id || !stripeKey) return returnHome()
 
         const stripe = new Stripe(stripeKey, {
-            apiVersion: "2023-08-16",
+            apiVersion: "2023-10-16",
         })
 
         const checkoutSession =

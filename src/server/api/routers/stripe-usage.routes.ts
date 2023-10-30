@@ -12,7 +12,7 @@ import Decimal from "decimal.js"
 export interface UsageStats {
     tag: string
     credits: Decimal
-    data: Stripe.UsageRecordSummary[]
+    subscriptionItemId?: string
 }
 
 const stripeKey = process.env.STRIPE_SECRET_KEY
@@ -24,7 +24,7 @@ if (!stripeKey) {
     })
 }
 const stripe = new Stripe(stripeKey, {
-    apiVersion: "2023-08-16",
+    apiVersion: "2023-10-16",
 })
 
 export const stripeUsageRouter = createTRPCRouter({
@@ -34,96 +34,99 @@ export const stripeUsageRouter = createTRPCRouter({
         const subscription = await prisma.subscription.findUniqueOrThrow({
             where: { userId: user.id },
         })
+        if (!subscription?.stripeSubscriptionId)
+            throw "No stripe subscription id found"
         const stripeSubscription = await stripe.subscriptions.retrieve(
-            subscription.id
+            subscription.stripeSubscriptionId
         )
         return { subscription, stripeSubscription }
     }),
-    getMyUsage: protectedProcedure.query(async ({ ctx }) => {
+    getUpcomingInvoice: adminProcedure.query(async ({ ctx }) => {
         const user = ctx.session.user
 
-        const PSSubscription = await prisma.subscription.findUniqueOrThrow({
+        const subscription = await prisma.subscription.findUniqueOrThrow({
             where: { userId: user.id },
-            include: { subscriptionItems: true },
         })
+        if (!subscription?.stripeCustomerId) throw "No stripe customer id found"
+        return await stripe.invoices.retrieveUpcoming({
+            customer: subscription.stripeCustomerId,
+        })
+    }),
+    getMyUsageForCurrentBillingCycle: protectedProcedure.query(
+        async ({ ctx }) => {
+            const user = ctx.session.user
 
-        const lastChatInputAction =
-            await prisma.subscriptionCreditsActions.findFirst({
-                where: { subscriptionId: PSSubscription.id, tag: "CHAT_INPUT" },
-                orderBy: { id: "desc" },
+            const subscription = await prisma.subscription.findUniqueOrThrow({
+                where: { userId: user.id },
+                include: {
+                    subscriptionItems: true,
+                    product: { select: { prices: true } },
+                },
             })
 
-        const lastChatOutputAction =
-            await prisma.subscriptionCreditsActions.findFirst({
-                where: {
-                    subscriptionId: PSSubscription.id,
+            //Last Actions
+            const lastChatInputAction =
+                await prisma.subscriptionCreditsActions.findFirst({
+                    where: {
+                        subscriptionId: subscription.id,
+                        tag: "CHAT_INPUT",
+                    },
+                    orderBy: { id: "desc" },
+                })
+
+            const lastChatOutputAction =
+                await prisma.subscriptionCreditsActions.findFirst({
+                    where: {
+                        subscriptionId: subscription.id,
+                        tag: "CHAT_OUTPUT",
+                    },
+                    orderBy: { id: "desc" },
+                })
+
+            const lastTranscriptionAction =
+                await prisma.subscriptionCreditsActions.findFirst({
+                    where: {
+                        subscriptionId: subscription.id,
+                        tag: "TRANSCRIPTION_MINUTE",
+                    },
+                    orderBy: { id: "desc" },
+                })
+
+            //Summarize usage and get subscription item ids to be able to extract data from invoice
+            let summaries: UsageStats[] = [
+                {
+                    tag: "CHAT_INPUT",
+                    credits: lastChatInputAction?.currentAmount
+                        ? lastChatInputAction.currentAmount
+                        : new Decimal(0),
+                    subscriptionItemId: subscription.subscriptionItems.find(
+                        (subItem) => subItem.priceTag === "CHAT_INPUT"
+                    )?.id,
+                },
+
+                {
                     tag: "CHAT_OUTPUT",
+                    credits: lastChatOutputAction?.currentAmount
+                        ? lastChatOutputAction.currentAmount
+                        : new Decimal(0),
+                    subscriptionItemId: subscription.subscriptionItems.find(
+                        (subItem) => subItem.priceTag === "CHAT_OUTPUT"
+                    )?.id,
                 },
-                orderBy: { id: "desc" },
-            })
 
-        const lastTranscriptionAction =
-            await prisma.subscriptionCreditsActions.findFirst({
-                where: {
-                    subscriptionId: PSSubscription.id,
+                {
                     tag: "TRANSCRIPTION_MINUTE",
+                    credits: lastTranscriptionAction?.currentAmount
+                        ? lastTranscriptionAction.currentAmount
+                        : new Decimal(0),
+                    subscriptionItemId: subscription.subscriptionItems.find(
+                        (subItem) => subItem.priceTag === "TRANSCRIPTION_MINUTE"
+                    )?.id,
                 },
-                orderBy: { id: "desc" },
-            })
-
-        let summaries: UsageStats[] = [
-            {
-                tag: "CHAT_INPUT",
-                credits: lastChatInputAction?.currentAmount
-                    ? lastChatInputAction.currentAmount
-                    : new Decimal(0),
-                data: [],
-            },
-
-            {
-                tag: "CHAT_OUTPUT",
-                credits: lastChatOutputAction?.currentAmount
-                    ? lastChatOutputAction.currentAmount
-                    : new Decimal(0),
-                data: [],
-            },
-
-            {
-                tag: "TRANSCRIPTION_MINUTE",
-                credits: lastTranscriptionAction?.currentAmount
-                    ? lastTranscriptionAction.currentAmount
-                    : new Decimal(0),
-                data: [],
-            },
-        ]
-        //For free trial
-        if (!PSSubscription.subscriptionItems.length) {
+            ]
             return summaries
         }
-
-        let summariesWithUsage: UsageStats[] = []
-        for await (const summary of summaries) {
-            const item = PSSubscription.subscriptionItems.find(
-                (subItem) => subItem.priceTag === summary.tag
-            )
-            if (!item) {
-                summariesWithUsage.push(summary)
-                return
-            }
-
-            const usage =
-                await stripe.subscriptionItems.listUsageRecordSummaries(
-                    item.id,
-                    { limit: 100 }
-                )
-            if (usage.data) {
-                summary.data = usage.data
-            }
-            summariesWithUsage.push(summary)
-        }
-
-        return summariesWithUsage
-    }),
+    ),
 
     addChatCredits: protectedProcedure
         .input(z.object({ inputTokens: z.number(), outputTokens: z.number() }))

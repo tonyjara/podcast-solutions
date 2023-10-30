@@ -25,7 +25,7 @@ export const usersRouter = createTRPCRouter({
         })
     }),
 
-    getMySubsCription: protectedProcedure.query(({ ctx }) => {
+    getMySubscription: protectedProcedure.query(({ ctx }) => {
         const userId = ctx.session.user.id
         return ctx.prisma.subscription.findUnique({
             where: {

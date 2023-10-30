@@ -11,6 +11,8 @@ import {
 import { addMonths } from "date-fns"
 import { postToTelegramGroup } from "@/utils/TelegramUtils"
 
+const isDev = process.env.NODE_ENV === "development"
+
 export const authRouter = createTRPCRouter({
     signup: publicProcedure
         .input(validateVerify)
@@ -22,6 +24,7 @@ export const authRouter = createTRPCRouter({
                     email: input.email,
                     password: hashedPass,
                     isVerified: true,
+                    role: isDev ? "admin" : "user",
                 },
             })
             const user = await prisma.user.create({

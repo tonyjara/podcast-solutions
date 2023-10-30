@@ -26,7 +26,7 @@ export default function Pricing({ prices, products }: PricingPageProps) {
         )
 
     const { data: mySubscription } =
-        trpcClient.users.getMySubsCription.useQuery(undefined, {
+        trpcClient.users.getMySubscription.useQuery(undefined, {
             enabled: !!user,
         })
     const handleCheckout = async (productId?: any, defaultPriceId?: any) => {

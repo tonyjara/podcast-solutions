@@ -10,7 +10,7 @@ const BottomSubscriptionEndBanner = () => {
     const user = useSession().data?.user
     const [showBanner, setShowBanner] = React.useState(true)
     const { data: mySubscription } =
-        trpcClient.users.getMySubsCription.useQuery(undefined, {
+        trpcClient.users.getMySubscription.useQuery(undefined, {
             enabled: !!user,
         })
 
