@@ -1,3 +1,4 @@
+import MetaTagsComponent from "@/components/Meta/MetaTagsComponent"
 import Pricing from "@/pageContainers/Pricing"
 import { getServerAuthSession } from "@/server/auth"
 import { TRPCError } from "@trpc/server"
@@ -14,6 +15,7 @@ const Index = (props: PricingPageProps) => {
     //TODO add meta tags
     return (
         <>
+            <MetaTagsComponent title="Pricing" description="Pricing page" />
             <Pricing {...props} />
         </>
     )
