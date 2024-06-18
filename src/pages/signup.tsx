@@ -10,32 +10,32 @@ import {
     Text,
     useColorModeValue,
     FormErrorMessage,
-} from "@chakra-ui/react";
-import { useRef, useState } from "react";
-import Link from "next/link";
+} from "@chakra-ui/react"
+import { useRef, useState } from "react"
+import Link from "next/link"
 import {
     type SignupFormValues,
     defaultSignupValues,
     validateSignup,
-} from "@/components/Validations/signup.validate";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import FormControlledText from "@/components/Forms/FormControlled/FormControlledText";
-import ReCAPTCHA from "react-google-recaptcha";
-import FormControlledCheckbox from "@/components/Forms/FormControlled/FormControlledCheckbox";
-import { trpcClient } from "@/utils/api";
+} from "@/components/Validations/signup.validate"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller, useForm } from "react-hook-form"
+import FormControlledText from "@/components/Forms/FormControlled/FormControlledText"
+import ReCAPTCHA from "react-google-recaptcha"
+import FormControlledCheckbox from "@/components/Forms/FormControlled/FormControlledCheckbox"
+import { trpcClient } from "@/utils/api"
 import {
     handleUseMutationAlerts,
     myToast,
-} from "@/components/Toasts & Alerts/MyToast";
-import { getServerAuthSession } from "@/server/auth";
-import { GetServerSideProps } from "next";
+} from "@/components/Toasts & Alerts/MyToast"
+import { getServerAuthSession } from "@/server/auth"
+import { GetServerSideProps } from "next"
 
 export default function SignupCard() {
-    const [sent, setSent] = useState(false);
-    const [sentAt, setSentAt] = useState<Date | null>(null);
-    const recaptchaRef = useRef<any>(null);
-    const siteKey = process.env.NEXT_PUBLIC_RE_CAPTCHA_SITE_KEY;
+    const [sent, setSent] = useState(false)
+    const [sentAt, setSentAt] = useState<Date | null>(null)
+    const recaptchaRef = useRef<any>(null)
+    const siteKey = process.env.NEXT_PUBLIC_RE_CAPTCHA_SITE_KEY
     const {
         handleSubmit,
         control,
@@ -43,39 +43,39 @@ export default function SignupCard() {
     } = useForm<SignupFormValues>({
         defaultValues: defaultSignupValues,
         resolver: zodResolver(validateSignup),
-    });
+    })
     const { mutate, isLoading } =
         trpcClient.magicLinks.generateVerificationLink.useMutation(
             handleUseMutationAlerts({
                 successText: "Verification link sent",
                 callback: async (data) => {
-                    setSent(true);
-                    setSentAt(data.sentAt);
+                    setSent(true)
+                    setSentAt(data.sentAt)
                 },
-            }),
-        );
+            })
+        )
 
     const submitFunc = async (data: SignupFormValues) => {
-        mutate(data);
-    };
+        mutate(data)
+    }
 
     const handleSendAgain = () => {
-        if (!sent || !sentAt) return;
-        const now = new Date();
-        const diff = now.getTime() - sentAt.getTime();
+        if (!sent || !sentAt) return
+        const now = new Date()
+        const diff = now.getTime() - sentAt.getTime()
         if (diff < 5000) {
-            myToast.error("Please wait a few seconds before sending again");
-            return;
+            myToast.error("Please wait a few seconds before sending again")
+            return
         }
 
         if (recaptchaRef.current) {
-            recaptchaRef.current.reset();
+            recaptchaRef.current.reset()
         }
-        handleSubmit(submitFunc)();
-        myToast.success("Verification link sent, please check your email");
-    };
+        handleSubmit(submitFunc)()
+        myToast.success("Verification link sent, please check your email")
+    }
 
-    const headingColor = useColorModeValue("brand.500", "brand.400");
+    const headingColor = useColorModeValue("brand.500", "brand.400")
     return (
         <Flex
             px="20px"
@@ -105,10 +105,15 @@ export default function SignupCard() {
                         {sent && (
                             <Stack spacing={6}>
                                 <Heading size={"md"}>
-                                    We sent you a signup link, please check your email.
+                                    We sent you a signup link, please check your
+                                    email.
                                 </Heading>
-                                <Text alignSelf={"center"}>Did not receive the link?</Text>
-                                <Button onClick={handleSendAgain}>Send again</Button>
+                                <Text alignSelf={"center"}>
+                                    Did not receive the link?
+                                </Text>
+                                <Button onClick={handleSendAgain}>
+                                    Send again
+                                </Button>
                             </Stack>
                         )}
 
@@ -147,14 +152,26 @@ export default function SignupCard() {
                                         labelComponent={
                                             <FormLabel ml={"10px"}>
                                                 I agree to Podcastsolution's{" "}
-                                                <Link href="/terms-of-service" target={"_blank"}>
-                                                    <Text as={"span"} color={"hyperlink"}>
+                                                <Link
+                                                    href="/terms-of-service"
+                                                    target={"_blank"}
+                                                >
+                                                    <Text
+                                                        as={"span"}
+                                                        color={"hyperlink"}
+                                                    >
                                                         Terms of Service
                                                     </Text>
                                                 </Link>{" "}
                                                 and{" "}
-                                                <Link href="/privacy-policy" target={"_blank"}>
-                                                    <Text as={"span"} color={"hyperlink"}>
+                                                <Link
+                                                    href="/privacy-policy"
+                                                    target={"_blank"}
+                                                >
+                                                    <Text
+                                                        as={"span"}
+                                                        color={"hyperlink"}
+                                                    >
                                                         Privacy Policy
                                                     </Text>
                                                 </Link>
@@ -163,7 +180,9 @@ export default function SignupCard() {
                                     />
                                 </Flex>
 
-                                <FormControl isInvalid={!!errors.reCaptchaToken}>
+                                <FormControl
+                                    isInvalid={!!errors.reCaptchaToken}
+                                >
                                     {siteKey && (
                                         <Controller
                                             control={control}
@@ -172,7 +191,7 @@ export default function SignupCard() {
                                                 <ReCAPTCHA
                                                     ref={recaptchaRef}
                                                     size="normal"
-                                                    hl="es"
+                                                    hl="en"
                                                     sitekey={siteKey}
                                                     onChange={field.onChange}
                                                 />
@@ -213,11 +232,11 @@ export default function SignupCard() {
                 </Stack>
             </form>
         </Flex>
-    );
+    )
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const session = await getServerAuthSession(context);
+    const session = await getServerAuthSession(context)
     if (session) {
         return {
             redirect: {
@@ -225,10 +244,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 permanent: false,
             },
             props: {},
-        };
+        }
     }
 
     return {
         props: {},
-    };
-};
+    }
+}
